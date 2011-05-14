@@ -27,6 +27,7 @@ class DocumentAPI : public QObject
     Q_PROPERTY(QObject* dimensions READ dimensions);
     Q_PROPERTY(QList<QVariant> items READ items);
     Q_PROPERTY(QList<QVariant> selection READ selection);
+    Q_PROPERTY(QObject* colors READ colors);
 public:
     DocumentAPI();
     virtual ~DocumentAPI();
@@ -46,6 +47,7 @@ private:
     QList<QVariant> selection();
     QObject *activeItem();
     QObject *dimensions();
+    QObject *colors();
 };
 
 
