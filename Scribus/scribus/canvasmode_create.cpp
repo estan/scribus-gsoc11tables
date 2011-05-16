@@ -867,13 +867,13 @@ PageItem* CreateMode::doCreateNewObject(void)
 			{
 				m_view->requestMode(submodePaintingDone);
 				delete dia;
-				dia = NULL;
+				dia = 0;
 				break;
 			}
 			int tableRows = dia->Cols->value();
 			int tableColumns = dia->Rows->value();
 			delete dia;
-			dia=NULL;
+			dia = 0;
 
 			// Add the table item.
 			// TODO: This should be done in an undo transaction.
