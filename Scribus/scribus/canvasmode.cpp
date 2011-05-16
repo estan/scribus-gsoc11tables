@@ -139,6 +139,7 @@ CanvasMode* CanvasMode::createForAppMode(ScribusView* view, int appMode)
 		case modeDrawLatex:
 		case modeDrawText:
 		case modeDrawTable:
+		case modeDrawTable2:
 		case modeDrawRegularPolygon:
 		case modeDrawArc:
 		case modeDrawSpiral:
@@ -606,6 +607,9 @@ void CanvasMode::setModeCursor()
 			qApp->changeOverrideCursor(QCursor(loadIcon("DrawTextFrame.xpm")));
 			break;
 		case modeDrawTable:
+			qApp->changeOverrideCursor(QCursor(loadIcon("DrawTable.xpm")));
+			break;
+		case modeDrawTable2:
 			qApp->changeOverrideCursor(QCursor(loadIcon("DrawTable.xpm")));
 			break;
 		case modeDrawRegularPolygon:

@@ -815,6 +815,7 @@ void ScribusMainWindow::initMenuBar()
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertImageFrame"], "Insert", false);
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertRenderFrame"], "Insert", false);
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertTableFrame"], "Insert", false);
+	scrMenuMgr->addMenuItem(scrActions["toolsInsertTable"], "Insert", false);
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertShape"], "Insert", false);
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertPolygon"], "Insert", false);
 	scrMenuMgr->addMenuItem(scrActions["toolsInsertArc"], "Insert", false);
@@ -2470,6 +2471,7 @@ void ScribusMainWindow::HaveNewDoc()
 	scrActions["toolsInsertTextFrame"]->setEnabled(true);
 	scrActions["toolsInsertImageFrame"]->setEnabled(true);
 	scrActions["toolsInsertTableFrame"]->setEnabled(true);
+	scrActions["toolsInsertTable"]->setEnabled(true);
 	scrActions["toolsInsertShape"]->setEnabled(true);
 	scrActions["toolsInsertLine"]->setEnabled(true);
 	scrActions["toolsInsertBezier"]->setEnabled(true);
@@ -4599,6 +4601,7 @@ bool ScribusMainWindow::DoFileClose()
 		scrActions["toolsInsertTextFrame"]->setEnabled(false);
 		scrActions["toolsInsertImageFrame"]->setEnabled(false);
 		scrActions["toolsInsertTableFrame"]->setEnabled(false);
+		scrActions["toolsInsertTable"]->setEnabled(false);
 		scrActions["toolsInsertShape"]->setEnabled(false);
 		scrActions["toolsInsertLine"]->setEnabled(false);
 		scrActions["toolsInsertBezier"]->setEnabled(false);
@@ -6087,6 +6090,7 @@ void ScribusMainWindow::ToggleFrameEdit()
 		scrActions["toolsInsertTextFrame"]->setEnabled(false);
 		scrActions["toolsInsertImageFrame"]->setEnabled(false);
 		scrActions["toolsInsertTableFrame"]->setEnabled(false);
+		scrActions["toolsInsertTable"]->setEnabled(false);
 		scrActions["toolsInsertShape"]->setEnabled(false);
 		scrActions["toolsInsertLine"]->setEnabled(false);
 		scrActions["toolsInsertBezier"]->setEnabled(false);
@@ -6170,6 +6174,7 @@ void ScribusMainWindow::NoFrameEdit()
 	scrActions["toolsInsertTextFrame"]->setEnabled(true);
 	scrActions["toolsInsertImageFrame"]->setEnabled(true);
 	scrActions["toolsInsertTableFrame"]->setEnabled(true);
+	scrActions["toolsInsertTable"]->setEnabled(true);
 	scrActions["toolsInsertShape"]->setEnabled(true);
 	scrActions["toolsInsertLine"]->setEnabled(true);
 	scrActions["toolsInsertBezier"]->setEnabled(true);
@@ -6265,6 +6270,7 @@ void ScribusMainWindow::setAppMode(int mode)
 	scrActions["toolsInsertTextFrame"]->setChecked(mode==modeDrawText);
 	scrActions["toolsInsertImageFrame"]->setChecked(mode==modeDrawImage);
 	scrActions["toolsInsertTableFrame"]->setChecked(mode==modeDrawTable);
+	scrActions["toolsInsertTable"]->setChecked(mode==modeDrawTable2);
 	scrActions["toolsInsertShape"]->setChecked(mode==modeDrawShapes);
 	scrActions["toolsInsertPolygon"]->setChecked(mode==modeDrawRegularPolygon);
 	scrActions["toolsInsertArc"]->setChecked(mode==modeDrawArc);
@@ -6454,6 +6460,11 @@ void ScribusMainWindow::setAppMode(int mode)
 				qApp->changeOverrideCursor(QCursor(loadIcon("DrawTextFrame.xpm")));
 				break;
 			case modeDrawTable:
+				if (docSelectionCount!=0)
+					view->Deselect(true);
+				qApp->changeOverrideCursor(QCursor(loadIcon("DrawTable.xpm")));
+				break;
+			case modeDrawTable2:
 				if (docSelectionCount!=0)
 					view->Deselect(true);
 				qApp->changeOverrideCursor(QCursor(loadIcon("DrawTable.xpm")));
@@ -9133,6 +9144,7 @@ void ScribusMainWindow::changeLayer(int )
 	scrActions["toolsInsertTextFrame"]->setEnabled(setter);
 	scrActions["toolsInsertImageFrame"]->setEnabled(setter);
 	scrActions["toolsInsertTableFrame"]->setEnabled(setter);
+	scrActions["toolsInsertTable"]->setEnabled(setter);
 	scrActions["toolsInsertShape"]->setEnabled(setter);
 	scrActions["toolsInsertLine"]->setEnabled(setter);
 	scrActions["toolsInsertBezier"]->setEnabled(setter);

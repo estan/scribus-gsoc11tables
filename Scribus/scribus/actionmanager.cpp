@@ -705,6 +705,8 @@ void ActionManager::initToolsMenuActions()
 	scrActions->insert(name, new ScrAction(ScrAction::DataInt, loadIcon("16/insert-renderframe.png"), loadIcon("22/insert-renderframe.png"), "", defaultKey(name), mainWindow, modeDrawLatex));
 	name="toolsInsertTableFrame";
 	scrActions->insert(name, new ScrAction(ScrAction::DataInt, loadIcon("16/insert-table.png"), loadIcon("22/insert-table.png"), "", defaultKey(name), mainWindow, modeDrawTable));
+	name="toolsInsertTable";
+	scrActions->insert(name, new ScrAction(ScrAction::DataInt, loadIcon("16/insert-table.png"), loadIcon("22/insert-table.png"), "", defaultKey(name), mainWindow, modeDrawTable2));
 	name="toolsInsertShape";
 	scrActions->insert(name, new ScrAction(ScrAction::DataInt, QPixmap(), QPixmap(), "", defaultKey(name), mainWindow, modeDrawShapes));
 	name="toolsInsertPolygon";
@@ -787,7 +789,7 @@ void ActionManager::initToolsMenuActions()
 	(*scrActions)["toolsToolbarTools"]->setToggleAction(true);
 	(*scrActions)["toolsToolbarPDF"]->setToggleAction(true);
 
-	*modeActionNames << "toolsSelect" << "toolsInsertTextFrame" << "toolsInsertImageFrame" << "toolsInsertTableFrame";
+	*modeActionNames << "toolsSelect" << "toolsInsertTextFrame" << "toolsInsertImageFrame" << "toolsInsertTableFrame" << "toolsInsertTable";
 	*modeActionNames << "toolsInsertShape" << "toolsInsertPolygon" << "toolsInsertArc" << "toolsInsertSpiral" << "toolsInsertLine" << "toolsInsertBezier";
 	*modeActionNames << "toolsInsertFreehandLine" << "toolsInsertCalligraphicLine" << "toolsInsertRenderFrame" << "toolsRotate" << "toolsZoom" << "toolsEditContents";
 	*modeActionNames << "toolsEditWithStoryEditor" << "toolsLinkTextFrame" << "toolsUnlinkTextFrame";
@@ -1478,6 +1480,7 @@ void ActionManager::languageChange()
 	(*scrActions)["toolsInsertImageFrame"]->setText( tr("Insert &Image Frame"));
 	(*scrActions)["toolsInsertRenderFrame"]->setText( tr("Insert &Render Frame"));
 	(*scrActions)["toolsInsertTableFrame"]->setText( tr("Insert T&able"));
+	(*scrActions)["toolsInsertTable"]->setText( tr("Insert Table 2"));
 	(*scrActions)["toolsInsertShape"]->setText( tr("Insert &Shape"));
 	(*scrActions)["toolsInsertPolygon"]->setText( tr("Insert &Polygon"));
 	(*scrActions)["toolsInsertArc"]->setText( tr("Insert Arc"));
@@ -1872,6 +1875,7 @@ void ActionManager::createDefaultMenus()
 		<< "toolsInsertTextFrame"
 		<< "toolsInsertImageFrame"
 		<< "toolsInsertTableFrame"
+		<< "toolsInsertTable"
 		<< "toolsInsertShape"
 		<< "toolsInsertPolygon"
 		<< "toolsInsertArc"
