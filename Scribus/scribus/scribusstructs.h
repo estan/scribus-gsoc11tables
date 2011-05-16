@@ -301,6 +301,7 @@ enum AppMode
 	modeInsertPDFLinkAnnotation,
 	modeDrawFreehandLine,
 	modeDrawTable,
+	modeDrawTable2, // Temporary name for new tables.
 	modePanning,
 	modeMeasurementTool,
 	modeEditGradientVectors,

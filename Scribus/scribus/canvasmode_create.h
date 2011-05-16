@@ -20,6 +20,7 @@
 
 #include "canvasmode.h"
 #include "fpointarray.h"
+#include "text/frect.h"
 
 class PageItem;
 class ScribusMainWindow;
@@ -59,6 +60,16 @@ private:
 	// We do not use PageItem::ItemType and PageItem::FrameType here
 	// for the pure sake of not including pageitem.h
 	void getFrameItemTypes(int& itemType, int& frameType);
+
+	/**
+	 * Convenience function which given two points calculates and returns the
+	 * normalized rectangle between the two points, adjusted to grid and guides.
+	 *
+	 * @param firstPoint the first point
+	 * @param secondPoint the second point
+	 * @return a normalized rectangle adjusted to grid and guides
+	 */
+	FRect adjustedRect(FPoint &firstPoint, FPoint &secondPoint);
 
 	bool   inItemCreation;
 	bool   m_MouseButtonPressed;

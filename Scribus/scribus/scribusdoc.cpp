@@ -49,6 +49,7 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem_imageframe.h"
 #include "pageitem_latexframe.h"
 #include "pageitem_line.h"
+#include "pageitem_table.h"
 #include "pageitem_pathtext.h"
 #include "pageitem_polygon.h"
 #include "pageitem_polyline.h"
@@ -4198,6 +4199,10 @@ int ScribusDoc::itemAdd(const PageItem::ItemType itemType, const PageItem::ItemF
 				newItem = new PageItem_Line(this, x, y, b, h, lineWidth, CommonStrings::None, outline);
 				Q_ASSERT(frameType==PageItem::Unspecified);
 			}
+			break;
+		case PageItem::Table:
+			newItem = new PageItem_Table(this, x, y, b, h, w, fill, outline);
+			Q_ASSERT(frameType==PageItem::Rectangle || frameType==PageItem::Unspecified);
 			break;
 		case PageItem::Polygon:
 			newItem = new PageItem_Polygon(this, x, y, b, h, w, fill, outline);

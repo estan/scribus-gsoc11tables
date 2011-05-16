@@ -197,6 +197,7 @@ SET(SCRIBUS_MOC_CLASSES
   pageitem_imageframe.h
   pageitem_latexframe.h
   pageitem_line.h
+  pageitem_table.h
   pageitem_pathtext.h
   pageitem_polygon.h
   pageitem_polyline.h
@@ -520,6 +521,7 @@ SET(SCRIBUS_SOURCES
   pageitem_imageframe.cpp
   pageitem_latexframe.cpp
   pageitem_line.cpp
+  pageitem_table.cpp
   pageitem_pathtext.cpp
   pageitem_polygon.cpp
   pageitem_polyline.cpp
