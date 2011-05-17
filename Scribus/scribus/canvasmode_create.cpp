@@ -848,7 +848,6 @@ PageItem* CreateMode::doCreateNewObject(void)
 	case modeDrawTable2:
 		if ((m_doc->m_Selection->count() == 0) && (m_view->HaveSelRect) && (!m_view->MidButt))
 		{
-			UndoTransaction * activeTransaction = NULL;
 			m_view->HaveSelRect = false;
 
 			// Calculate table rectangle.
