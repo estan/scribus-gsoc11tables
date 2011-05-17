@@ -16,6 +16,36 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 {
 }
 
+void PageItem_Table::insertRows(int index, int rows)
+{
+	// Not implemented.
+}
+
+void PageItem_Table::removeRows(int index, int rows)
+{
+	// Not implemented.
+}
+
+void PageItem_Table::insertColumns(int index, int columns)
+{
+	// Not implemented.
+}
+
+void PageItem_Table::removeColumns(int index, int columns)
+{
+	// Not implemented.
+}
+
+void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
+{
+	// Not implemented.
+}
+
+void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
+{
+	// Not implemented.
+}
+
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 {
 	if (!m_Doc->RePos)
