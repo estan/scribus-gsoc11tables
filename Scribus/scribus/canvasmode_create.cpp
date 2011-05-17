@@ -882,7 +882,7 @@ PageItem* CreateMode::doCreateNewObject(void)
 						   tableRect.y(),
 						   tableRect.width(),
 						   tableRect.height(),
-						   m_doc->itemToolPrefs().shapeLineWidth,
+						   0, // TODO: Pass something sensical here later.
 						   CommonStrings::None,
 						   m_doc->itemToolPrefs().textColor,
 						   true);
