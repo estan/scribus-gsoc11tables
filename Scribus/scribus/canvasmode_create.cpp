@@ -846,6 +846,7 @@ PageItem* CreateMode::doCreateNewObject(void)
 		}
 		break;
 	case modeDrawTable2:
+		// TODO: Figure out what these conditions actually do.
 		if ((m_doc->m_Selection->count() == 0) && (m_view->HaveSelRect) && (!m_view->MidButt))
 		{
 			m_view->HaveSelRect = false;
