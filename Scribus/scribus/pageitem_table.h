@@ -104,6 +104,9 @@ public:
 	 * The new cell will span @a numRows rows and @a numCols columns. If @a numRows or
 	 * @a numCols is less than the current number of rows or columns the cell spans then
 	 * this method does nothing.
+	 *
+	 * If any of the merged cells are already merged with other cells, the two areas of
+	 * merged cells will be united.
 	 */
 	void mergeCells(int row, int column, int numRows, int numCols);
 
