@@ -8,6 +8,7 @@ for which a new license (GPL+exception) is in place.
 #define PAGEITEM_TABLE_H
 
 #include <QString>
+#include <QList>
 #include <QRectF>
 
 #include "scribusapi.h"
@@ -26,46 +27,75 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_OBJECT
 
 public:
+	/// Construct a new table item with one row and one column.
 	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline);
 	~PageItem_Table() {};
 
 	/// Returns the number of rows in the table.
-	int	rows () const { return m_rows; }
+	int rows () const { return m_rows; }
 
 	/// Returns the number of columns in the table.
-	int	columns () const { return m_columns; }
+	int columns () const { return m_columns; }
 
 	/**
-	 * Inserts @a rows rows before the row with @a index.
+	 * Inserts @a numRows rows before the row at @a index.
 	 *
-	 * If the row with the given index doesn't exist or the number of rows are
-	 * less than 1 then this method does nothing.
+	 * If @a index is rows(), a row is appended to the table.
+	 *
+	 * If @a index is less than 0 or greater than rows(), or if @a numRows is less than 1,
+	 * this method does nothing.
 	 */
-	void insertRows(int index, int rows);
+	void insertRows(int index, int numRows);
 
 	/**
-	 * Removes @a rows rows from the table, starting with the row at @a index.
+	 * Removes @a numRows rows from the table, starting with the row at @a index.
 	 *
 	 * If the specified range falls outside the table or the number of rows is
 	 * less than 1 then this method does nothing.
 	 */
-	void removeRows(int index, int rows);
+	void removeRows(int index, int numRows);
 
 	/**
-	 * Inserts @a columns columns before the column with @a index.
-	 *
-	 * If the column with the given index doesn't exist or the number of columns are
-	 * less than 1 then this method does nothing.
+	 * Returns the height of @a row, or 0 if @a row does not exist.
 	 */
-	void insertColumns(int index, int columns);
+	qreal rowHeight(int row) const;
 
 	/**
-	 * Removes @a columns columns from the table, starting with the column at @a index.
+	 * Sets the height of @a row to @a height.
+	 *
+	 * If @a row does not exists or @a height is less than or equal to 0, this method does nothing.
+	 */
+	void setRowHeight(int row, qreal height);
+
+	/**
+	 * Inserts @a numColumns columns before the column at @a index.
+	 *
+	 * If @a index is columns(), a column is appended to the table.
+	 *
+	 * If @a index is less than 0 or greater than columns(), or if @a numColumns is less than 1,
+	 * this method does nothing.
+	 */
+	void insertColumns(int index, int numColumns);
+
+	/**
+	 * Removes @a numColumns columns from the table, starting with the column at @a index.
 	 *
 	 * If the specified range falls outside the table or the number of columns is
 	 * less than 1 then this method does nothing.
 	 */
-	void removeColumns(int index, int columns);
+	void removeColumns(int index, int numColumns);
+
+	/**
+	 * Returns the width of @a column, or 0 if @a column does not exist.
+	 */
+	qreal columnWidth(int column) const;
+
+	/**
+	 * Sets the width of @a column to @a width.
+	 *
+	 * If @a column does not exists or @a width is less than or equal to 0, this method does nothing.
+	 */
+	void setColumnWidth(int column, qreal width);
 
 	/**
 	 * Merges the cell at the specified @a row and @a column with the adjacent cells into
@@ -83,10 +113,10 @@ public:
 	 */
 	void splitCell(int row, int column, int numRows, int numCols);
 
+	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
 	virtual bool isTable() const { return true; }
 	PageItem::ItemType realItemType() const { return PageItem::Table; }
-
 	virtual void applicableActions(QStringList &actionList) {};
 	virtual QString infoDescription() { return QString(); }
 
@@ -94,8 +124,37 @@ protected:
 	virtual void DrawObj_Item(ScPainter *painter, QRectF clipRect);
 
 private:
+	/**
+	 * Returns the rectangle of the cell in the given @a row and @a column.
+	 *
+	 * If the queried cell is part of a merged area, the rectangle of the
+	 * entire area is returned.
+	 */
+	QRectF cellRect(int row, int column) const;
+
+	// Convenience methods.
+	bool validRow(int row) const { return row >= 0 && row < m_rows; }
+	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
+	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+
+private:
+	/// Number of rows.
 	int m_rows;
+	/// Number of columns.
 	int m_columns;
+
+	/// Vertical positions of rows.
+	QList<qreal> m_rowPositions;
+	/// Height of rows.
+	QList<qreal> m_rowHeights;
+
+	/// Horizontal positions of columns.
+	QList<qreal> m_columnPositions;
+	/// Width of columns.
+	QList<qreal> m_columnWidths;
+
+	/// List of cell spans created by calls to mergeCells() and splitCell().
+	QList<QRect> m_cellSpans;
 };
 
 #endif // PAGEITEM_TABLE_H
