@@ -46,7 +46,7 @@ void PageItem_Table::insertRows(int index, int numRows)
 		if (index <= span.top())
 		{
 			// Rows were inserted before this span, so move it down.
-			spanIt.setValue(span.adjusted(0, numRows, 0, numRows));
+			spanIt.setValue(span.translated(0, numRows));
 		}
 		if (index > span.top() && index < span.bottom())
 		{
@@ -132,7 +132,7 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		if (index <= span.left())
 		{
 			// Columns were inserted before this span, so move it to the right.
-			spanIt.setValue(span.adjusted(numColumns, 0, numColumns, 0));
+			spanIt.setValue(span.translated(numColumns, 0));
 		}
 		if (index > span.left() && index < span.right())
 		{
