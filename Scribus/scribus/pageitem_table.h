@@ -113,6 +113,11 @@ public:
 	 */
 	void splitCell(int row, int column, int numRows, int numCols);
 
+	/**
+	 * Returns <code>true</code> if the cell at @a row, @a column is covered by a span.
+	 */
+	bool isCovered(int row, int column) const;
+
 	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
 	virtual bool isTable() const { return true; }

@@ -200,6 +200,21 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 	// Not implemented.
 }
 
+bool PageItem_Table::isCovered(int row, int column) const
+{
+	if (!validCell(row, column))
+		return false;
+
+	QList<QRect>::const_iterator spanIt;
+	for (spanIt = m_cellSpans.begin(); spanIt != m_cellSpans.end(); ++spanIt)
+	{
+		QRect span = (*spanIt);
+		if (span.contains(row, column) && !(span.x() == column && span.y() == row))
+			return true;
+	}
+	return false;
+}
+
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 {
 	if (!m_Doc->RePos)
