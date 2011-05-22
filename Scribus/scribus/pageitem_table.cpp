@@ -192,7 +192,22 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 
 void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 {
-	// Not implemented.
+	if (!validCell(row, column) || !validCell(row + numRows, column + numCols))
+		return;
+
+	QRect newSpan(row, column, numRows, numCols);
+	QMutableListIterator<QRect> spanIt(m_cellSpans);
+	while (spanIt.hasNext())
+	{
+		QRect span = spanIt.next();
+		if (newSpan.intersects(span))
+		{
+			// The two spans intersect, so unite them.
+			newSpan = newSpan.united(span);
+			spanIt.remove();
+		}
+	}
+	m_cellSpans.append(newSpan);
 }
 
 void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
