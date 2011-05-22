@@ -32,10 +32,10 @@ public:
 	~PageItem_Table() {};
 
 	/// Returns the number of rows in the table.
-	int rows () const { return m_rows; }
+	int rows() const { return m_rows; }
 
 	/// Returns the number of columns in the table.
-	int columns () const { return m_columns; }
+	int columns() const { return m_columns; }
 
 	/**
 	 * Inserts @a numRows rows before the row at @a index.
