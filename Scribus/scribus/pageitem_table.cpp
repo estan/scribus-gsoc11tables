@@ -76,14 +76,22 @@ void PageItem_Table::removeRows(int index, int numRows)
 	while (spanIt.hasNext())
 	{
 		QRect span = spanIt.next();
-		QRect removedInSpan = removedRect & span;
-		if (removedInSpan.height() == span.height())
+		if (index + numRows <= span.top())
 		{
-			// All rows in span removed, so remove span completely.
-			spanIt.remove();
-		} else {
-			// Decrease span by removed rows.
-			spanIt.setValue(span.adjusted(0, 0, 0, -removedInSpan.height()));
+			// All removed rows are before the span, so move it up.
+			spanIt.setValue(span.translated(0, -numRows));
+		}
+		else
+		{
+			QRect removedInSpan = removedRect & span;
+			if (removedInSpan.height() == span.height())
+			{
+				// All rows in span removed, so remove span completely.
+				spanIt.remove();
+			} else {
+				// Decrease span by removed rows.
+				spanIt.setValue(span.adjusted(0, 0, 0, -removedInSpan.height()));
+			}
 		}
 	}
 
@@ -162,14 +170,22 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	while (spanIt.hasNext())
 	{
 		QRect span = spanIt.next();
-		QRect removedInSpan = removedRect & span;
-		if (removedInSpan.width() == span.width())
+		if (index + numColumns <= span.left())
 		{
-			// All columns in span removed, so remove span completely.
-			spanIt.remove();
-		} else {
-			// Decrease span by removed columns.
-			spanIt.setValue(span.adjusted(0, 0, -removedInSpan.width(), 0));
+			// All removed columns are before the span, so move it left.
+			spanIt.setValue(span.translated(-numColumns, 0));
+		}
+		else
+		{
+			QRect removedInSpan = removedRect & span;
+			if (removedInSpan.width() == span.width())
+			{
+				// All columns in span removed, so remove span completely.
+				spanIt.remove();
+			} else {
+				// Decrease span by removed columns.
+				spanIt.setValue(span.adjusted(0, 0, -removedInSpan.width(), 0));
+			}
 		}
 	}
 
