@@ -6,6 +6,7 @@ for which a new license (GPL+exception) is in place.
 */
 #include "api_document.h"
 #include "selection.h"
+#include "api_color.h"
 
 DocumentAPI::DocumentAPI() : QObject(COLLECTOR)
 {
@@ -150,6 +151,15 @@ QObject *DocumentAPI::dimensions()
     return new Dimensions(this);
 }
 
+/**
+ * Scripter.activeDocument.colors
+ * Property
+ * Colors of activeDocument
+ */
+QObject *DocumentAPI::colors()
+{
+    return new ColorAPI(this);
+}
 
 /**
  * Scripter.activeDocument.items
