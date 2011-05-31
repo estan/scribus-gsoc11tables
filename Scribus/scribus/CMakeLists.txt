@@ -8,6 +8,7 @@ ADD_SUBDIRECTORY(colormgmt)
 ADD_SUBDIRECTORY(desaxe)
 ADD_SUBDIRECTORY(fonts)
 ADD_SUBDIRECTORY(styles)
+ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(text)
 IF(WITH_TESTS)
   ADD_SUBDIRECTORY(tests)
@@ -466,6 +467,7 @@ SET(SCRIBUS_SOURCES
   canvasmode_objimport.cpp
   canvasmode_panning.cpp
   canvasmode_rotate.cpp
+  cellarea.cpp
   chartablemodel.cpp
   chartableview.cpp
   cmserrorhandling.cpp
