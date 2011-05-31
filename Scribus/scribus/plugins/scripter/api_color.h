@@ -16,12 +16,18 @@ for which a new license (GPL+exception) is in place.
 class ColorAPI : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QList<QVariant> getColorNames READ getColorNames);
 public:
     ColorAPI(QObject *parent);
     virtual ~ColorAPI();
 
 public slots:
     // XXX: put your methods here
+
+private:
+    QList<QVariant> getColorNames();
+    
+
 };
 
 #endif /*API_COLOR_H_*/
