@@ -22,11 +22,10 @@ public:
     virtual ~ColorAPI();
 
 public slots:
-    // XXX: put your methods here
+    QList<QVariant> getColor(QString name);
 
 private:
     QList<QVariant> getColorNames();
-    
 
 };
 
