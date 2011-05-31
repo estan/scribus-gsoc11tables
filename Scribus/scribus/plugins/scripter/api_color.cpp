@@ -39,11 +39,12 @@ QList<QVariant> ColorAPI::getColorNames()
 /**
  * Scripter.activeDocument.colors.getColor(name)
  * Function
- * Returns a tuple (C, M, Y, K) containing the four color components of the
+ * Returns a list [C, M, Y, K] containing the four color components of the
  * color \"name\" from the current document. If no document is open, returns
  * the value of the named color from the default document colors.
  * May raise NotFoundError if the named color wasn't found.\n\
  * May raise ValueError if an invalid color name is specified.\n\
+ * @todo This now returns a list; make it a tuple.
  */
 QList<QVariant> ColorAPI::getColor(QString name)
 {
@@ -68,6 +69,32 @@ QList<QVariant> ColorAPI::getColor(QString name)
     cmyk.append(qVariantFromValue(y));
     cmyk.append(qVariantFromValue(k));
     return cmyk;
+}
+
+/**
+ * Scripter.activeDocument.colors.getColorAsRGB(name)
+ * Returns a list [R,G,B] containing the three color components of the
+ * color \"name\" from the current document, converted to the RGB color
+ * space. If no document is open, returns the value of the named color
+ * from the default document colors.
+ * May raise NotFoundError if the named color wasn't found.
+ * May raise ValueError if an invalid color name is specified.
+ */
+QList<QVariant> ColorAPI::getColorAsRGB(QString name)
+{
+    ColorList colors;
+    if(name.isEmpty())
+        RAISE("Cannot get a color with an empty name");
+    colors = ScCore->primaryMainWindow()->HaveDoc ? ScCore->primaryMainWindow()->doc->PageColors : PrefsManager::instance()->colorSet();
+    ScribusDoc* currentDoc = ScCore->primaryMainWindow()->HaveDoc ? ScCore->primaryMainWindow()->doc : NULL;
+    if(!colors.contains(name))
+        RAISE("Color not found");
+    QColor rgb = ScColorEngine::getRGBColor(colors[name], currentDoc);
+    QList<QVariant> rgbList;
+    rgbList.append(rgb.red());
+    rgbList.append(rgb.green());
+    rgbList.append(rgb.blue());
+    return rgbList;
 }
 
 ColorAPI::~ColorAPI()

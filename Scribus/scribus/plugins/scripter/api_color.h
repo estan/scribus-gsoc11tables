@@ -23,6 +23,7 @@ public:
 
 public slots:
     QList<QVariant> getColor(QString name);
+    QList<QVariant> getColorAsRGB(QString name);
 
 private:
     QList<QVariant> getColorNames();
