@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2011 Elvis Stansvik <elvstone@gmail.com>
+ *
+ * For general Scribus (>=1.3.2) copyright and licensing information please refer
+ * to the COPYING file provided with the program. Following this notice may exist
+ * a copyright and/or license notice that predates the release of Scribus 1.3.2
+ * for which a new license (GPL+exception) is in place.
+ */
+#ifndef CELLAREA_H
+#define CELLAREA_H
+
+/**
+ * The CellArea class is a simple representation of a rectangular area of table cells.
+ *
+ * CellArea is similar to QRect, but its contains() and intersects() semantics are a bit
+ * different. It is used during table layout when keeping track of areas of merged table cells.
+ */
+class CellArea
+{
+public:
+	/// Constructs a new invalid area.
+	CellArea();
+
+	/// Constructs an area starting at @a row, @a column with the given @a width and @a height.
+	CellArea(int row, int column, int width, int height);
+
+	/// Returns <code>true</code> if the area is valid.
+	bool isValid() const { return m_width >= 1 && m_height >= 1; }
+
+	/// Returns the start row of the area.
+	int row() const { return m_row; }
+	/// Sets the start row of the area to @a row.
+	void setRow(int row) { m_row = row; }
+
+	/// Returns the start column of the area.
+	int column() const { return m_column; }
+	/// Sets the start column of the area to @a column.
+	void setColumn(int column) { m_column = column; }
+
+	/// Returns the width of the area.
+	int width() const { return m_width; }
+	/// Sets the width of the area to @a width.
+	void setWidth(int width) { m_width = width; }
+
+	/// Returns the height of the area.
+	int height() const { return m_height; }
+	/// Sets the height of the area to @a height.
+	void setHeight(int height) { m_height = height; }
+
+	/// Returns the bottom row of the area.
+	int bottom() const { return m_row + m_height - 1; }
+	/// Returns the right column of the area.
+	int right() const { return m_column + m_width - 1; }
+
+	/// Returns <code>true</code> if this area contains the cell at @a row, @a column.
+	bool contains(int row, int column) const;
+	/// Returns <code>true</code> if this area contains @a area.
+	bool contains(const CellArea& area) const;
+
+	/// Returns <code>true</code> if this area and @a area intersects.
+	bool intersects(const CellArea& area);
+
+	/// Returns a copy of this area that has been translated @a rows rows and @a columns columns.
+	CellArea translated(int rows, int columns) const;
+	/// Translates this area @a rows rows and @a columns columns.
+	void translate(int rows, int columns);
+
+private:
+	int m_row;
+	int m_column;
+	int m_width;
+	int m_height;
+};
+
+bool operator==(const CellArea& lhs, const CellArea& rhs);
+bool operator!=(const CellArea& lhs, const CellArea& rhs);
+
+#endif // CELLAREA_H
