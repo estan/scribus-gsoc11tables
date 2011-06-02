@@ -59,6 +59,12 @@ void CellArea::translate(int rows, int columns)
 	m_column += columns;
 }
 
+CellArea CellArea::adjusted(int rows, int columns, int width, int height) const
+{
+	CellArea area(row() + rows, column() + columns, this->width() + width, this->height() + height);
+	return area;
+}
+
 bool operator==(const CellArea& lhs, const CellArea& rhs)
 {
 	return lhs.row() == rhs.row() && lhs.column() == rhs.column() &&

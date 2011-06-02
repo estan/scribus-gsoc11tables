@@ -65,6 +65,9 @@ public:
 	/// Translates this area @a rows rows and @a columns columns.
 	void translate(int rows, int columns);
 
+	/// Returns a copy of this area with @a rows, @a columns, @a width, @a height.added.
+	CellArea adjusted(int rows, int columns, int width, int height) const;
+
 private:
 	int m_row;
 	int m_column;

@@ -239,4 +239,37 @@ void CellAreaTests::testTranslate_data()
 	QTest::newRow("translate up 1") << CellArea(1, 1, 2, 2) << 0 << -1 << CellArea(0, 1, 2, 2);
 }
 
+void CellAreaTests::testAdjusted()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, rows);
+	QFETCH(int, columns);
+	QFETCH(int, width);
+	QFETCH(int, height);
+	QFETCH(CellArea, result);
+
+	QCOMPARE(area.adjusted(rows, columns, width, height), result);
+}
+
+void CellAreaTests::testAdjusted_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("rows");
+	QTest::addColumn<int>("columns");
+	QTest::addColumn<int>("width");
+	QTest::addColumn<int>("height");
+	QTest::addColumn<CellArea>("result");
+
+	// Tests for area.adjusted(rows, columns, width, height).
+	QTest::newRow("no adjustment") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << 0 << CellArea(1, 1, 2, 2);
+	QTest::newRow("translate down 1") << CellArea(1, 1, 2, 2) << 1 << 0 << 0 << 0 << CellArea(2, 1, 2, 2);
+	QTest::newRow("translate up 1") << CellArea(1, 1, 2, 2) << -1 << 0 << 0 << 0 << CellArea(0, 1, 2, 2);
+	QTest::newRow("translate right 1") << CellArea(1, 1, 2, 2) << 0 << 1 << 0 << 0 << CellArea(1, 2, 2, 2);
+	QTest::newRow("translate left 1") << CellArea(1, 1, 2, 2) << 0 << -1 << 0 << 0 << CellArea(1, 0, 2, 2);
+	QTest::newRow("increase width") << CellArea(1, 1, 2, 2) << 0 << 0 << 1 << 0 << CellArea(1, 1, 3, 2);
+	QTest::newRow("decrease width") << CellArea(1, 1, 2, 2) << 0 << 0 << -1 << 0 << CellArea(1, 1, 1, 2);
+	QTest::newRow("increase height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << 1 << CellArea(1, 1, 2, 3);
+	QTest::newRow("decrease height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << -1 << CellArea(1, 1, 2, 1);
+}
+
 QTEST_APPLESS_MAIN(CellAreaTests)
