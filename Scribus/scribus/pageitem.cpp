@@ -567,6 +567,10 @@ PageItem::PageItem(ScribusDoc *pa, ItemType newType, double x, double y, double 
 		AnName = tr("Spiral");
 		setUPixmap(Um::IPolygon);
 		break;
+	case Table:
+		AnName = tr("Table");
+		//setUPixmap(Um::IPolygon); // TODO: Fix this.
+		break;
 	default:
 		AnName = "Item";
 		break;
