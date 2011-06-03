@@ -300,6 +300,8 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	QColor cellBorderColor(Qt::red);
 	QColor tableBorderColor(Qt::black);
 
+	// TODO: How do I set up a clip rect here?
+
 	// Draw table border.
 	p->setPen(tableBorderColor);
 	p->drawRect(0, 0, m_columnPositions.last() + m_columnWidths.last(),
