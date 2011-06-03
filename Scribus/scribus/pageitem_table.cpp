@@ -19,19 +19,15 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 	insertRows(0, numRows);
 	insertColumns(0, numColumns);
 
-	// Just distribute all available space evenly for now.
-	qreal initialRowHeight = h / rows();
+	// Distribute width evenly across columns initially.
 	qreal initialColumnWidth = w / columns();
-	for (int row = 0; row < rows(); ++row)
-		setRowHeight(row, initialRowHeight);
 	for (int col = 0; col < columns(); ++col)
 		setColumnWidth(col, initialColumnWidth);
-
 }
 
 void PageItem_Table::insertRows(int index, int numRows)
 {
-	qreal rowHeight = 10.0; // Hardcoded for now.
+	qreal rowHeight = 20.0; // TODO: Use font metrics here?
 
 	if (index < 0 || index > rows() || numRows < 1)
 		return;
