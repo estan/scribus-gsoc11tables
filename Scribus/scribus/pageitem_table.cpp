@@ -13,11 +13,20 @@ for which a new license (GPL+exception) is in place.
 #include "scribusdoc.h"
 #include "scpainter.h"
 
-PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline)
+PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
 	: PageItem(pa, PageItem::Line, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
-	insertRows(0, 1);
-	insertColumns(0, 1);
+	insertRows(0, numRows);
+	insertColumns(0, numColumns);
+
+	// Just distribute all available space evenly for now.
+	qreal initialRowHeight = h / rows();
+	qreal initialColumnWidth = w / columns();
+	for (int row = 0; row < rows(); ++row)
+		setRowHeight(row, initialRowHeight);
+	for (int col = 0; col < columns(); ++col)
+		setColumnWidth(col, initialColumnWidth);
+
 }
 
 void PageItem_Table::insertRows(int index, int numRows)

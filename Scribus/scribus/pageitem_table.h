@@ -29,8 +29,8 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_OBJECT
 
 public:
-	/// Construct a new table item with one row and one column.
-	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline);
+	/// Construct a new table item with @a numRows rows and @a numColumns columns.
+	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
 	~PageItem_Table() {};
 
 	/// Returns the number of rows in the table.
