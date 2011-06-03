@@ -14,7 +14,7 @@ for which a new license (GPL+exception) is in place.
 #include "scpainter.h"
 
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
-	: PageItem(pa, PageItem::Line, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
+	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
 	insertRows(0, qMax(1, numRows));
 	insertColumns(0, qMax(1, numColumns));
