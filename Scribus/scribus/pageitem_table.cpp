@@ -16,24 +16,25 @@ for which a new license (GPL+exception) is in place.
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
 	: PageItem(pa, PageItem::Line, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
-	insertRows(0, numRows);
-	insertColumns(0, numColumns);
-
-	// Distribute width evenly across columns initially.
-	qreal initialColumnWidth = w / columns();
-	for (int col = 0; col < columns(); ++col)
-		setColumnWidth(col, initialColumnWidth);
+	insertRows(0, qMax(1, numRows));
+	insertColumns(0, qMax(1, numColumns));
+	adjustToFrame();
 }
 
 void PageItem_Table::insertRows(int index, int numRows)
 {
-	qreal rowHeight = 20.0; // TODO: Use font metrics here?
-
 	if (index < 0 || index > rows() || numRows < 1)
 		return;
 
 	// Insert row heights and positions.
-	qreal rowPosition = index == 0 ? 0.0 : m_rowPositions.at(index - 1) + m_rowHeights.at(index - 1);
+	qreal rowHeight = 20.0; // TODO: Use font metrics here?
+	qreal rowPosition = 0.0;
+	if (index != 0)
+	{
+		rowHeight = m_rowHeights.at(index - 1);
+		rowPosition = m_rowPositions.at(index - 1) + rowHeight;
+	}
+
 	for (int i = 0; i < numRows; ++i)
 	{
 		m_rowHeights.insert(index + i, rowHeight);
@@ -120,13 +121,19 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 
 void PageItem_Table::insertColumns(int index, int numColumns)
 {
-	qreal columnWidth = 20.0; // Hardcoded for now.
 
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
 	// Insert columns widths and positions.
-	qreal columnPosition = index == 0 ? 0.0 : m_columnPositions.at(index - 1) + m_columnWidths.at(index - 1);
+	qreal columnWidth = 20.0; // Hardcoded for now.
+	qreal columnPosition = 0.0;
+	if (index != 0)
+	{
+		columnWidth = m_columnWidths.at(index - 1);
+		columnPosition = m_columnPositions.at(index - 1) + columnWidth;
+	}
+
 	for (int i = 0; i < numColumns; ++i)
 	{
 		m_columnWidths.insert(index + i, columnWidth);
@@ -291,6 +298,29 @@ void PageItem_Table::debug() const
 	qDebug() << "-------------------------------------------------";
 }
 
+void PageItem_Table::adjustToFrame()
+{
+	// Distribute width equally across columns.
+	qreal columnWidth = width() / columns();
+	qreal columnPosition = 0.0;
+	for (int col = 0; col < columns(); ++col)
+	{
+		m_columnWidths[col] = columnWidth;
+		m_columnPositions[col] = columnPosition;
+		columnPosition += columnWidth;
+	}
+
+	// Distribute height equally across rows.
+	qreal rowHeight = height() / rows();
+	qreal rowPosition = 0.0;
+	for (int row = 0; row < rows(); ++row)
+	{
+		m_rowHeights[row] = rowHeight;
+		m_rowPositions[row] = rowPosition;
+		rowPosition += rowHeight;
+	}
+}
+
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)
@@ -302,7 +332,7 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	 */
 
 	// A couple of hardcoded values for now.
-	QColor cellBorderColor(Qt::red);
+	QColor cellBorderColor(Qt::black);
 	QColor tableBorderColor(Qt::black);
 
 	// TODO: How do I set up a clip rect here?
@@ -314,9 +344,6 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 
 	// Draw table cells.
 	p->setPen(cellBorderColor);
-	QVector<double> dashValues;
-	dashValues.append(1);
-	p->setDash(dashValues, 1);
 	for (int row = 0; row < rows(); ++row)
 	{
 		for (int col = 0; col < columns(); ++col)

@@ -123,6 +123,14 @@ public:
 	 */
 	bool isCovered(int row, int column) const;
 
+	/**
+	 * Adjusts the rows and columns of the table to fit the frame. Currently this method gives
+	 * all rows equal height and all columns equal width.
+	 *
+	 * TODO: We need much more sophistication/flexibility here, but that will come.
+	 */
+	void adjustToFrame();
+
 	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
 	virtual bool isTable() const { return true; }
