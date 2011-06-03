@@ -41,10 +41,6 @@ void PageItem_Table::insertRows(int index, int numRows)
 		rowPosition += rowHeight;
 	}
 
-	// Adjust positions of following rows.
-	for (int row = index + numRows; row < rows(); ++row)
-		m_rowPositions[row] += rowHeight;
-
 	// Adjust cell spans.
 	QMutableListIterator<CellArea> spanIt(m_cellSpans);
 	while (spanIt.hasNext())
@@ -63,6 +59,10 @@ void PageItem_Table::insertRows(int index, int numRows)
 	}
 
 	m_rows += numRows;
+
+	// Adjust positions of following rows.
+	for (int row = index + numRows; row < rows(); ++row)
+		m_rowPositions[row] += rowHeight * numRows;
 }
 
 void PageItem_Table::removeRows(int index, int numRows)
@@ -134,10 +134,6 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		columnPosition += columnWidth;
 	}
 
-	// Adjust positions of following columns.
-	for (int column = index + numColumns; column < columns(); ++column)
-		m_columnPositions[column] += columnWidth;
-
 	// Adjust cell spans.
 	QMutableListIterator<CellArea> spanIt(m_cellSpans);
 	while (spanIt.hasNext())
@@ -156,6 +152,10 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	}
 
 	m_columns += numColumns;
+
+	// Adjust positions of following columns.
+	for (int column = index + numColumns; column < columns(); ++column)
+		m_columnPositions[column] += columnWidth * numColumns;
 }
 
 void PageItem_Table::removeColumns(int index, int numColumns)
