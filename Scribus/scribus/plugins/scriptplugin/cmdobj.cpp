@@ -126,8 +126,10 @@ PyObject *scribus_newtable(PyObject* /* self */, PyObject* args)
 	char *Name = const_cast<char*>("");
 	if (!PyArg_ParseTuple(args, "ddddii|es", &x, &y, &w, &h, &numRows, &numColumns, "utf-8", &Name))
 		return NULL;
-	if(!checkHaveDocument())
+	if (!checkHaveDocument())
 		return NULL;
+	if (numRows < 1 || numColumns < 1)
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Both numRows and numColumns must be greater than 0.","python error").toLocal8Bit().constData());
 	int i = ScCore->primaryMainWindow()->doc->itemAdd(PageItem::Table, PageItem::Unspecified,
 								pageUnitXToDocX(x),
 								pageUnitYToDocY(y),
