@@ -13,9 +13,11 @@ for which a new license (GPL+exception) is in place.
 
 #include "scribusapi.h"
 #include "pageitem.h"
+#include "cellarea.h"
 
 class ScPainter;
 class ScribusDoc;
+class FRect;
 
 /**
  * The PageItem_Table class represents a table item.
@@ -129,21 +131,25 @@ public:
 	virtual QString infoDescription() { return QString(); }
 
 protected:
+	// Reimplemented from PageItem.
 	virtual void DrawObj_Item(ScPainter *painter, QRectF clipRect);
 
 private:
 	/**
 	 * Returns the rectangle of the cell in the given @a row and @a column.
 	 *
-	 * If the queried cell is part of a merged area, the rectangle of the
-	 * entire area is returned.
+	 * If the cell is part of a merged area, the rectangle of the entire area is returned.
+	 * If the cell does not exist, a null rectangle is returned.
 	 */
-	QRectF cellRect(int row, int column) const;
+	FRect cellRect(int row, int column) const;
 
 	// Convenience methods.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }
 	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+
+	// Temporary debug method.
+	void debug() const;
 
 private:
 	/// Number of rows.
@@ -162,7 +168,7 @@ private:
 	QList<qreal> m_columnWidths;
 
 	/// List of cell spans created by calls to mergeCells() and splitCell().
-	QList<QRect> m_cellSpans;
+	QList<CellArea> m_cellSpans;
 };
 
 #endif // PAGEITEM_TABLE_H
