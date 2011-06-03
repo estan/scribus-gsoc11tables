@@ -87,6 +87,7 @@ the object because you need this name for further referencing of that object. If
 \"name\" is not given Scribus will create one for you.\n\
 \n\
 May raise NameExistsError if you explicitly pass a name that's already used.\n\
+May raise ValueError if an insufficient number of rows or columns is passed.\n\
 "));
 /** Creates a table - x, y, width, height, numRows, numColumns and opt. name. */
 PyObject *scribus_newtable(PyObject * /*self*/, PyObject* args);
