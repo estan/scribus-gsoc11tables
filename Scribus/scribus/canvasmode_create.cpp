@@ -39,6 +39,7 @@
 #include "ui/insertTable.h"
 #include "ui/oneclick.h"
 #include "pageitem_textframe.h"
+#include "pageitem_table.h"
 #include "ui/pageselector.h"
 #include "prefscontext.h"
 #include "prefsfile.h"
@@ -870,8 +871,8 @@ PageItem* CreateMode::doCreateNewObject(void)
 				dia = 0;
 				break;
 			}
-			int tableRows = dia->Cols->value();
-			int tableColumns = dia->Rows->value();
+			int numRows = dia->Rows->value();
+			int numColumns = dia->Cols->value();
 			delete dia;
 			dia = 0;
 
@@ -886,6 +887,10 @@ PageItem* CreateMode::doCreateNewObject(void)
 						   CommonStrings::None,
 						   m_doc->itemToolPrefs().textColor,
 						   true);
+			PageItem_Table *table = m_doc->Items->at(z)->asTable();
+			table->insertRows(0, numRows - 1);
+			table->insertColumns(0, numColumns - 1);
+			table->adjustToFrame();
 		}
 		break;
 	case modeInsertPDF3DAnnotation:
