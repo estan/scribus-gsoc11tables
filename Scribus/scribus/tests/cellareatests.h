@@ -35,6 +35,8 @@ private slots:
 	void testTranslate_data();
 	void testAdjusted();
 	void testAdjusted_data();
+	void testUnited();
+	void testUnited_data();
  };
 
 #endif // CELLAREATESTS_H

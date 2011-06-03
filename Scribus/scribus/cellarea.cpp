@@ -7,6 +7,8 @@
  * for which a new license (GPL+exception) is in place.
  */
 
+#include <QtGlobal>
+
 #include "cellarea.h"
 
 CellArea::CellArea() :
@@ -63,6 +65,16 @@ CellArea CellArea::adjusted(int rows, int columns, int width, int height) const
 {
 	CellArea area(row() + rows, column() + columns, this->width() + width, this->height() + height);
 	return area;
+}
+
+CellArea CellArea::united(CellArea& area) const
+{
+	int newRow = qMin(row(), area.row());
+	int newColumn = qMin(column(), area.column());
+	int newWidth = qMax(right() - newColumn + 1, area.right() - newColumn + 1);
+	int newHeight = qMax(bottom() - newRow + 1, area.bottom() - newRow + 1);
+	CellArea unitedArea(newRow, newColumn, newWidth, newHeight);
+	return unitedArea;
 }
 
 bool operator==(const CellArea& lhs, const CellArea& rhs)
