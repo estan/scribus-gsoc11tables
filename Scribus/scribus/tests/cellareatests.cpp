@@ -272,4 +272,27 @@ void CellAreaTests::testAdjusted_data()
 	QTest::newRow("decrease height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << -1 << CellArea(1, 1, 2, 1);
 }
 
+void CellAreaTests::testUnited()
+{
+	QFETCH(CellArea, area1);
+	QFETCH(CellArea, area2);
+	QFETCH(CellArea, result);
+
+	QCOMPARE(area1.united(area2), result);
+	QCOMPARE(area2.united(area1), result);
+}
+
+void CellAreaTests::testUnited_data()
+{
+	QTest::addColumn<CellArea>("area1");
+	QTest::addColumn<CellArea>("area2");
+	QTest::addColumn<CellArea>("result");
+
+	// Tests for area1.united(area2) and area2.united(area1).
+	QTest::newRow("areas same") << CellArea(1, 1, 2, 2) << CellArea(1, 1, 2, 2) << CellArea(1, 1, 2, 2);
+	QTest::newRow("overlapping southeast/northwest") << CellArea(1, 1, 2, 2) << CellArea(2, 2, 2, 2) << CellArea(1, 1, 3, 3);
+	QTest::newRow("overlapping southwest/northeast") << CellArea(1, 1, 2, 2) << CellArea(2, 0, 2, 2) << CellArea(1, 0, 3, 3);
+	QTest::newRow("non-overlapping") << CellArea(1, 1, 2, 2) << CellArea(3, 3, 2, 2) << CellArea(1, 1, 4, 4);
+}
+
 QTEST_APPLESS_MAIN(CellAreaTests)

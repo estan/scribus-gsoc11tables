@@ -68,6 +68,9 @@ public:
 	/// Returns a copy of this area with @a rows, @a columns, @a width, @a height added.
 	CellArea adjusted(int rows, int columns, int width, int height) const;
 
+	/// Returns the bounding area of this area and @a area.
+	CellArea united(CellArea& area) const;
+
 private:
 	int m_row;
 	int m_column;
