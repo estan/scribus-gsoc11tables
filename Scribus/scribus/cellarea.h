@@ -80,5 +80,6 @@ private:
 
 bool operator==(const CellArea& lhs, const CellArea& rhs);
 bool operator!=(const CellArea& lhs, const CellArea& rhs);
+QDebug operator<<(QDebug debug, const CellArea& area);
 
 #endif // CELLAREA_H

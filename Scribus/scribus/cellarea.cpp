@@ -7,7 +7,7 @@
  * for which a new license (GPL+exception) is in place.
  */
 
-#include <QtGlobal>
+#include <QDebug>
 
 #include "cellarea.h"
 
@@ -87,4 +87,10 @@ bool operator!=(const CellArea& lhs, const CellArea& rhs)
 {
 	return lhs.row() != rhs.row() || lhs.column() != rhs.column() ||
 			lhs.width() != rhs.width() || lhs.height() != rhs.height();
+}
+
+QDebug operator<<(QDebug debug, const CellArea& area)
+{
+	debug.nospace() << "(" << area.row() << ", " << area.column() << " " << area.width() << "x" << area.height() << ")";
+	return debug.space();
 }
