@@ -209,9 +209,9 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 	qreal deltaWidth = width - m_columnWidths.at(column);
 	m_columnWidths.replace(column, width);
 
-	// Adjust positions of following rows.
-	for (int c = column + 1; c < columns(); ++c)
-		m_columnPositions[c] += deltaWidth;
+	// Adjust positions of following columns.
+	for (int col = column + 1; col < columns(); ++col)
+		m_columnPositions[col] += deltaWidth;
 }
 
 void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
