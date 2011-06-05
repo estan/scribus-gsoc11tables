@@ -567,9 +567,7 @@ void ScribusMainWindow::initPalettes()
 
 	// initializing style manager here too even it's not strictly a palette
 	styleManager = new StyleManager(this, "styleManager");
-#ifdef NEW_TABLES
 	styleManager->addStyle(new SMTableStyle());
-#endif
 	styleManager->addStyle(new SMLineStyle());
 	SMCharacterStyle *tmpCS = new SMCharacterStyle();
 	styleManager->addStyle(new SMParagraphStyle(tmpCS->tmpStyles()));
