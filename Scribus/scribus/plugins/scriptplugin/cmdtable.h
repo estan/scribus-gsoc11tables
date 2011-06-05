@@ -119,7 +119,7 @@ PyObject *scribus_gettablecolumnwidth(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
 PyDoc_STRVAR(scribus_settablecolumnwidth__doc__,
-QT_TR_NOOP("setTableColumnWidth(row, height, [\"name\"])\n\
+QT_TR_NOOP("setTableColumnWidth(column, width, [\"name\"])\n\
 \n\
 Sets the width of \"column\" to \"width\" in the table \"name\".\n\
 If \"name\" is not given the currently selected item is used.\n\
