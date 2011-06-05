@@ -121,7 +121,6 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 
 void PageItem_Table::insertColumns(int index, int numColumns)
 {
-
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
