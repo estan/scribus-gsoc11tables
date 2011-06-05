@@ -71,6 +71,18 @@ selected item is used.\n\
 PyObject *scribus_gettablerowheight(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
+PyDoc_STRVAR(scribus_settablerowheight__doc__,
+QT_TR_NOOP("setTableRowHeight(row, height, [\"name\"])\n\
+\n\
+Sets the height of \"row\" to \"height\" in the table \"name\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError if the height is less than 0 or the row does not exist.\n\
+"));
+/*! Set table row height */
+PyObject *scribus_settablerowheight(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
 PyDoc_STRVAR(scribus_inserttablecolumns__doc__,
 QT_TR_NOOP("insertTableColumns(index, numColumns, [\"name\"])\n\
 \n\
@@ -104,5 +116,28 @@ selected item is used.\n\
 "));
 /*! Get table column width */
 PyObject *scribus_gettablecolumnwidth(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_settablecolumnwidth__doc__,
+QT_TR_NOOP("setTableColumnWidth(row, height, [\"name\"])\n\
+\n\
+Sets the width of \"column\" to \"width\" in the table \"name\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError if the width is less than 0 or the column does not exist.\n\
+"));
+/*! Set table column width */
+PyObject *scribus_settablecolumnwidth(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_mergetablecells__doc__,
+QT_TR_NOOP("mergeTableCells(row, column, numRows, numColumns, [\"name\"])\n\
+\n\
+Merges the cell at the specified \"row\" and \"column\" with the adjacent cells into one cell.\n\
+\n\
+May throw ValueError if number if numRows or numColumns is less than 1 or the specified area is out of bounds.\n\
+"));
+/*! Merge table cells */
+PyObject *scribus_mergetablecells(PyObject * /*self*/, PyObject* args);
 
 #endif // CMDTABLE_H

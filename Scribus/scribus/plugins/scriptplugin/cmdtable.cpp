@@ -97,7 +97,7 @@ PyObject *scribus_removetablerows(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot remove rows from a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	if (index < 0 || index > table->rows())
+	if (index < 0 || index >= table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
 	}
@@ -131,6 +131,36 @@ PyObject *scribus_gettablerowheight(PyObject* /* self */, PyObject* args)
 		return NULL;
 	}
 	return PyFloat_FromDouble(static_cast<double>(table->rowHeight(row)));
+}
+
+PyObject *scribus_settablerowheight(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row;
+	double height;
+	if (!PyArg_ParseTuple(args, "id|es", &row, &height, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set row height on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
+	}
+	if (height <= 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row height must be > 0.0", "python error").toLocal8Bit().constData());
+	}
+	table->setRowHeight(row, height);
+	Py_RETURN_NONE;
 }
 
 PyObject *scribus_inserttablecolumns(PyObject* /* self */, PyObject* args)
@@ -179,7 +209,7 @@ PyObject *scribus_removetablecolumns(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot remove columns from a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	if (index < 0 || index > table->columns())
+	if (index < 0 || index >= table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
 	}
@@ -215,6 +245,67 @@ PyObject *scribus_gettablecolumnwidth(PyObject* /* self */, PyObject* args)
 	return PyFloat_FromDouble(static_cast<double>(table->columnWidth(column)));
 }
 
+PyObject *scribus_settablecolumnwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int column;
+	double width;
+	if (!PyArg_ParseTuple(args, "id|es", &column, &width, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set column width on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
+	}
+	if (width <= 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column width must be > 0.0", "python error").toLocal8Bit().constData());
+	}
+	table->setColumnWidth(column, width);
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column, numRows, numColumns;
+	if (!PyArg_ParseTuple(args, "iiii|es", &row, &column, &numRows, &numColumns, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot merge cells on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (numRows < 1 || numColumns < 1)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Number of rows and columns must both be > 0.", "python error").toLocal8Bit().constData());
+	}
+	if (row < 0 || row >= table->rows() || column < 0 || column >= table->columns() ||
+			row + numRows - 1 < 0 || row + numRows - 1 >= table->rows() ||
+			column + numColumns - 1 < 0 || column + numColumns >= table->columns())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The area %1,%2 %3x%4 is not inside the table.", "python error").arg(row).arg(column).arg(numColumns).arg(numRows).toLocal8Bit().constData());
+	}
+	table->mergeCells(row, column, numRows, numColumns);
+	Py_RETURN_NONE;
+}
+
 /*! HACK: this removes "warning: 'blah' defined but not used" compiler warnings
 with header files structure untouched (docstrings are kept near declarations)
 PV */
@@ -224,5 +315,7 @@ void cmdtabledocwarnings()
 	s << scribus_gettablecolumns__doc__ << scribus_gettablerows__doc__
 	  << scribus_inserttablerows__doc__ << scribus_removetablerows__doc__
 	  << scribus_inserttablecolumns__doc__ << scribus_removetablecolumns__doc__
-	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__;
+	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
+	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
+	  << scribus_mergetablecells__doc__;
 }
