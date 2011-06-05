@@ -67,9 +67,10 @@ void PageItem_Table::removeRows(int index, int numRows)
 		return;
 
 	// Remove row heights and positions.
+	qreal removedHeight = 0.0;
 	for (int i = 0; i < numRows; ++i)
 	{
-		m_rowHeights.removeAt(index);
+		removedHeight += m_rowHeights.takeAt(index);
 		m_rowPositions.removeAt(index);
 	}
 
@@ -92,6 +93,10 @@ void PageItem_Table::removeRows(int index, int numRows)
 	}
 
 	m_rows -= numRows;
+
+	// Adjust positions of following rows.
+	for (int nextRow = index; nextRow < rows(); ++nextRow)
+		m_rowPositions[nextRow] -= removedHeight;
 }
 
 qreal PageItem_Table::rowHeight(int row) const
@@ -161,9 +166,10 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		return;
 
 	// Remove column widths and positions.
+	qreal removedWidth = 0.0;
 	for (int i = 0; i < numColumns; ++i)
 	{
-		m_columnWidths.removeAt(index);
+		removedWidth += m_columnWidths.takeAt(index);
 		m_columnPositions.removeAt(index);
 	}
 
@@ -186,6 +192,10 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	}
 
 	m_columns -= numColumns;
+
+	// Adjust positions of following columns.
+	for (int nextColumn = index; nextColumn < columns(); ++nextColumn)
+		m_columnPositions[nextColumn] -= removedWidth;
 }
 
 qreal PageItem_Table::columnWidth(int column) const
