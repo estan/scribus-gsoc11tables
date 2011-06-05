@@ -27,14 +27,8 @@ void PageItem_Table::insertRows(int index, int numRows)
 		return;
 
 	// Insert row heights and positions.
-	qreal rowHeight = 20.0; // TODO: Use font metrics here?
-	qreal rowPosition = 0.0;
-	if (index != 0)
-	{
-		rowHeight = m_rowHeights.at(index - 1);
-		rowPosition = m_rowPositions.at(index - 1) + rowHeight;
-	}
-
+	qreal rowHeight = rows() == 0 ? height() : m_rowHeights.at(qMax(index - 1, 0));
+	qreal rowPosition = rows() == 0 ? 0.0 : m_rowPositions.at(qMax(index - 1, 0)) + rowHeight;
 	for (int i = 0; i < numRows; ++i)
 	{
 		m_rowHeights.insert(index + i, rowHeight);
@@ -62,8 +56,9 @@ void PageItem_Table::insertRows(int index, int numRows)
 	m_rows += numRows;
 
 	// Adjust positions of following rows.
-	for (int row = index + numRows; row < rows(); ++row)
-		m_rowPositions[row] += rowHeight * numRows;
+	qreal insertedHeight = rowHeight * numRows;
+	for (int nextRow = index + numRows; nextRow < rows(); ++nextRow)
+		m_rowPositions[nextRow] += insertedHeight;
 }
 
 void PageItem_Table::removeRows(int index, int numRows)
@@ -112,11 +107,11 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 		return;
 
 	qreal deltaHeight = height - m_rowHeights.at(row);
-	m_rowHeights.replace(row, height);
+	m_rowHeights[row] = height;
 
 	// Adjust positions of following rows.
-	for (int r = row + 1; r < rows(); ++r)
-		m_rowPositions[r] += deltaHeight;
+	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
+		m_rowPositions[nextRow] += deltaHeight;
 }
 
 void PageItem_Table::insertColumns(int index, int numColumns)
@@ -125,15 +120,9 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
-	// Insert columns widths and positions.
-	qreal columnWidth = 20.0; // Hardcoded for now.
-	qreal columnPosition = 0.0;
-	if (index != 0)
-	{
-		columnWidth = m_columnWidths.at(index - 1);
-		columnPosition = m_columnPositions.at(index - 1) + columnWidth;
-	}
-
+	// Insert column widths and positions.
+	qreal columnWidth = columns() == 0 ? width() : m_columnWidths.at(qMax(index - 1, 0));
+	qreal columnPosition = columns() == 0 ? 0.0 : m_columnPositions.at(qMax(index - 1, 0)) + columnWidth;
 	for (int i = 0; i < numColumns; ++i)
 	{
 		m_columnWidths.insert(index + i, columnWidth);
@@ -161,8 +150,9 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	m_columns += numColumns;
 
 	// Adjust positions of following columns.
-	for (int column = index + numColumns; column < columns(); ++column)
-		m_columnPositions[column] += columnWidth * numColumns;
+	qreal insertedWidth = columnWidth * numColumns;
+	for (int nextColumn = index + numColumns; nextColumn < columns(); ++nextColumn)
+		m_columnPositions[nextColumn] += insertedWidth;
 }
 
 void PageItem_Table::removeColumns(int index, int numColumns)
@@ -210,11 +200,11 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 	if (!validColumn(column) || width <= 0.0)
 		return;
 	qreal deltaWidth = width - m_columnWidths.at(column);
-	m_columnWidths.replace(column, width);
+	m_columnWidths[column] = width;
 
 	// Adjust positions of following columns.
-	for (int col = column + 1; col < columns(); ++col)
-		m_columnPositions[col] += deltaWidth;
+	for (int nextColumn = column + 1; nextColumn < columns(); ++nextColumn)
+		m_columnPositions[nextColumn] += deltaWidth;
 }
 
 void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
@@ -223,6 +213,8 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 		return;
 
 	CellArea newSpan(row, column, numCols, numRows);
+
+	// Unite intersecting spans.
 	QMutableListIterator<CellArea> spanIt(m_cellSpans);
 	while (spanIt.hasNext())
 	{
@@ -234,6 +226,7 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 			spanIt.remove();
 		}
 	}
+
 	m_cellSpans.append(newSpan);
 }
 
