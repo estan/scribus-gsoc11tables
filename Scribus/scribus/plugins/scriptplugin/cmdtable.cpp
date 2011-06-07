@@ -71,10 +71,12 @@ PyObject *scribus_inserttablerows(PyObject* /* self */, PyObject* args)
 	if (index < 0 || index > table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (numRows < 1)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	table->insertRows(index, numRows);
 	Py_RETURN_NONE;
@@ -100,14 +102,17 @@ PyObject *scribus_removetablerows(PyObject* /* self */, PyObject* args)
 	if (index < 0 || index >= table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (numRows < 1)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	if (index + numRows > table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Row deletion range out of bounds, index + numRows must be <= %1", "python error").arg(table->rows()).toLocal8Bit().constData());
+		return NULL;
 	}
 	table->removeRows(index, numRows);
 	Py_RETURN_NONE;
@@ -154,10 +159,12 @@ PyObject *scribus_settablerowheight(PyObject* /* self */, PyObject* args)
 	if (row < 0 || row >= table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (height <= 0.0)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row height must be > 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	table->setRowHeight(row, height);
 	Py_RETURN_NONE;
@@ -183,10 +190,12 @@ PyObject *scribus_inserttablecolumns(PyObject* /* self */, PyObject* args)
 	if (index < 0 || index > table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (numColumns < 1)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	table->insertColumns(index, numColumns);
 	Py_RETURN_NONE;
@@ -212,14 +221,17 @@ PyObject *scribus_removetablecolumns(PyObject* /* self */, PyObject* args)
 	if (index < 0 || index >= table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (numColumns < 1)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	if (index + numColumns > table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Column deletion range out of bounds, index + numColumns must be <= %1", "python error").arg(table->columns()).toLocal8Bit().constData());
+		return NULL;
 	}
 	table->removeColumns(index, numColumns);
 	Py_RETURN_NONE;
@@ -266,10 +278,12 @@ PyObject *scribus_settablecolumnwidth(PyObject* /* self */, PyObject* args)
 	if (column < 0 || column >= table->rows())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
+		return NULL;
 	}
 	if (width <= 0.0)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column width must be > 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	table->setColumnWidth(column, width);
 	Py_RETURN_NONE;
@@ -295,12 +309,14 @@ PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
 	if (numRows < 1 || numColumns < 1)
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Number of rows and columns must both be > 0.", "python error").toLocal8Bit().constData());
+		return NULL;
 	}
 	if (row < 0 || row >= table->rows() || column < 0 || column >= table->columns() ||
 			row + numRows - 1 < 0 || row + numRows - 1 >= table->rows() ||
 			column + numColumns - 1 < 0 || column + numColumns >= table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The area %1,%2 %3x%4 is not inside the table.", "python error").arg(row).arg(column).arg(numColumns).arg(numRows).toLocal8Bit().constData());
+		return NULL;
 	}
 	table->mergeCells(row, column, numRows, numColumns);
 	Py_RETURN_NONE;
