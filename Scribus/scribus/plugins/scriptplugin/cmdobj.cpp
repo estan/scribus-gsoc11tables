@@ -129,7 +129,10 @@ PyObject *scribus_newtable(PyObject* /* self */, PyObject* args)
 	if (!checkHaveDocument())
 		return NULL;
 	if (numRows < 1 || numColumns < 1)
+	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Both numRows and numColumns must be greater than 0.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
 	int i = ScCore->primaryMainWindow()->doc->itemAdd(PageItem::Table, PageItem::Unspecified,
 								pageUnitXToDocX(x),
 								pageUnitYToDocY(y),
