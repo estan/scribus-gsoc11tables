@@ -52,13 +52,191 @@ class TableTests:
                 if objectExists(table):
                     deleteObject(table)
 
+    def test_insert_rows(self):
+        """ Test for insertTableRows(...) """
+        # TODO: - Test individual cell rects
+        #       - Test that rows were inserted in the right place.
+
+        # Test valid API usage.
+        for index in range(3):
+            # Insert one row.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            insertTableRows(index, 1, table)
+            check(getTableRows(table) == 4)
+            deleteObject(table)
+
+            # Insert three rows.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            insertTableRows(index, 3, table)
+            check(getTableRows(table) == 6)
+            deleteObject(table)
+
+        # Test invalid API usage.
+        for invalidIndex in [-1, 4]:
+            try:
+                table = createTable(50, 50, 90, 90, 3, 3)
+                insertTableRows(invalidIndex, 1, table)
+                fail('Expected ValueError, index=%i' % invalidIndex)
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table):
+                    deleteObject(table)
+
+    def test_remove_rows(self):
+        """ Test for removeTableRows(...) """
+        # TODO: - Test individual cell rects
+        #       - Test that rows were removed from the right place.
+
+        # Test valid API usage.
+        for index in range(3):
+            # Remove one row at a valid index.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            removeTableRows(index, 1, table)
+            check(getTableRows(table) == 2)
+            deleteObject(table)
+
+        # Remove two first rows.
+        table = createTable(50, 50, 90, 90, 3, 3)
+        removeTableRows(0, 2, table)
+        check(getTableRows(table) == 1)
+        deleteObject(table)
+
+        # Remove two last rows.
+        table = createTable(50, 50, 90, 90, 3, 3)
+        removeTableRows(1, 2, table)
+        check(getTableRows(table) == 1)
+        deleteObject(table)
+
+        # Test invalid API usage.
+        bad_args = [(-1, 1), (1, -1), (0, 3), (0, 4), (1, 3)]
+        for args in bad_args:
+            try:
+                table = createTable(50, 50, 90, 90, 3, 3)
+                removeTableRows(args[0], args[1], table)
+                fail('Expected ValueError, index=%i, numRows=%i' % (args[0], args[1]))
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table):
+                    deleteObject(table)
+
+    def test_insert_columns(self):
+        """ Test for insertTableColumns(...) """
+        # TODO: - Test individual cell rects
+        #       - Test that columns were inserted in the right place.
+
+        # Test valid API usage.
+        for index in range(3):
+            # Insert one column.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            insertTableColumns(index, 1, table)
+            check(getTableColumns(table) == 4)
+            deleteObject(table)
+
+            # Insert three columns.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            insertTableColumns(index, 3, table)
+            check(getTableColumns(table) == 6)
+            deleteObject(table)
+
+        # Test invalid API usage.
+        for invalidIndex in [-1, 4]:
+            try:
+                table = createTable(50, 50, 90, 90, 3, 3)
+                insertTableColumns(invalidIndex, 1, table)
+                fail('Expected ValueError, index=%i' % invalidIndex)
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table):
+                    deleteObject(table)
+
+    def test_remove_columns(self):
+        """ Test for removeTableColumns(...) """
+        # TODO: - Test individual cell rects
+        #       - Test that columns were removed from the right place.
+
+        # Test valid API usage.
+        for index in range(3):
+            # Remove one column at a valid index.
+            table = createTable(50, 50, 90, 90, 3, 3)
+            removeTableColumns(index, 1, table)
+            check(getTableColumns(table) == 2)
+            deleteObject(table)
+
+        # Remove two first columns.
+        table = createTable(50, 50, 90, 90, 3, 3)
+        removeTableColumns(0, 2, table)
+        check(getTableColumns(table) == 1)
+        deleteObject(table)
+
+        # Remove two last columns.
+        table = createTable(50, 50, 90, 90, 3, 3)
+        removeTableColumns(1, 2, table)
+        check(getTableColumns(table) == 1)
+        deleteObject(table)
+
+        # Test invalid API usage.
+        bad_args = [(-1, 1), (1, -1), (0, 3), (0, 4), (1, 3)]
+        for args in bad_args:
+            try:
+                table = createTable(50, 50, 90, 90, 3, 3)
+                removeTableColumns(args[0], args[1], table)
+                fail('Expected ValueError, index=%i, numColumns=%i' % (args[0], args[1]))
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table):
+                    deleteObject(table)
+
     def test_set_row_height(self):
         """ Test for setTableRowHeight(...) """
-        pass # TODO
+        # TODO: Test individual cell rects.
+
+        # Test valid API usage.
+        table1 = createTable(50, 50, 90, 90, 3, 3)
+        for row in range(2):
+            setTableRowHeight(row, 20, table1)
+            check(getTableRowHeight(row, table1) == 20)
+        deleteObject(table1)
+
+        # Test invalid API usage.
+        bad_args = [(-1, 10), (3, 10), (-1, 0), (0, 0)]
+        for args in bad_args:
+            try:
+                table2 = createTable(50, 50, 90, 90, 3, 3)
+                setTableRowHeight(args[0], args[1], table2)
+                fail('Expected ValueError, row=%i, height=%i' % (args[0], args[1]))
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table2):
+                    deleteObject(table2)
 
     def test_set_column_width(self):
         """ Test for setTableColumnWidth(...) """
-        pass # TODO
+        # TODO: Test individual cell rects.
+
+        # Test valid API usage.
+        table1 = createTable(50, 50, 90, 90, 3, 3)
+        for col in range(2):
+            setTableColumnWidth(col, 20, table1)
+            check(getTableColumnWidth(col, table1) == 20)
+        deleteObject(table1)
+
+        # Test invalid API usage.
+        bad_args = [(-1, 10), (3, 10), (-1, 0), (0, 0)]
+        for args in bad_args:
+            try:
+                table2 = createTable(50, 50, 90, 90, 3, 3)
+                setTableColumnWidth(args[0], args[1], table2)
+                fail('Expected ValueError, col=%i, height=%i' % (args[0], args[1]))
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table2):
+                    deleteObject(table2)
 
     def test_merge_cells(self):
         """ Test for mergeTableCells(...) """
