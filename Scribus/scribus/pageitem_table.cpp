@@ -63,7 +63,7 @@ void PageItem_Table::insertRows(int index, int numRows)
 
 void PageItem_Table::removeRows(int index, int numRows)
 {
-	if (!validRow(index) || numRows < 1 || index + numRows > rows())
+	if (!validRow(index) || numRows < 1 || numRows >= rows() || index + numRows > rows())
 		return;
 
 	// Remove row heights and positions.
@@ -161,7 +161,7 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 
 void PageItem_Table::removeColumns(int index, int numColumns)
 {
-	if (!validColumn(index) || numColumns < 1 || index + numColumns > columns())
+	if (!validColumn(index) || numColumns < 1 || numColumns >= columns() || index + numColumns > columns())
 		return;
 
 	// Remove column widths and positions.
