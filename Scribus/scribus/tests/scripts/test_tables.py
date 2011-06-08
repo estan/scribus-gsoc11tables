@@ -105,6 +105,4 @@ if __name__ == '__main__':
             nfailed += 1
         else:
             print 'Passed'
-    print '%i%% passed, %i tests failed out of %i' % (
-            int(round(((float(ntests) - float(nfailed))/float(ntests))*100)),
-            nfailed, ntests)
+    print '%i%% passed, %i tests failed out of %i' % (int(round((float(ntests - nfailed)/ntests)*100)), nfailed, ntests)
