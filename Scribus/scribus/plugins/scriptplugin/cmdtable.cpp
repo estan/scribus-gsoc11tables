@@ -104,9 +104,9 @@ PyObject *scribus_removetablerows(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row index out of bounds, must be >= 0 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (numRows < 1)
+	if (numRows < 1 || numRows >= table->rows())
 	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row count out of bounds, must be >= 1 and < %1", "python error").arg(table->rows()).toLocal8Bit().constData());
 		return NULL;
 	}
 	if (index + numRows > table->rows())
@@ -223,9 +223,9 @@ PyObject *scribus_removetablecolumns(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column index out of bounds, must be >= 0 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (numColumns < 1)
+	if (numColumns < 1 || numColumns >= table->columns())
 	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column count out of bounds, must be >= 1", "python error").toLocal8Bit().constData());
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column count out of bounds, must be >= 1 and < %1", "python error").arg(table->columns()).toLocal8Bit().constData());
 		return NULL;
 	}
 	if (index + numColumns > table->columns())
