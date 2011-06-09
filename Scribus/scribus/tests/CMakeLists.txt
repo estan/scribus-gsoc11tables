@@ -8,13 +8,13 @@ ${FREETYPE_INCLUDE_DIRS}
 SET(TESTS_LIBRARIES ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES})
 
 SET(SCRIBUS_TEST_MOC_CLASSES
-testIndex.h
+#testIndex.h
 testStoryText.h
 )
 
 SET(SCRIBUS_TEST_SOURCES
 runtests.cpp
-testIndex.cpp
+#testIndex.cpp
 testStoryText.cpp
 )
 
