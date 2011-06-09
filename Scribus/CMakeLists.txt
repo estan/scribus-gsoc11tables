@@ -34,6 +34,8 @@ INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckTypeSize)
 INCLUDE(TestBigEndian)
 
+ENABLE_TESTING()
+
 #Set the custom CMake module directory where our include/lib finders are
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
@@ -349,11 +351,6 @@ ENDIF (WANT_RELEASEWITHDEBUG)
 IF(NOT WANT_DEBUG AND NOT WANT_RELEASEWITHDEBUG)
   SET(CMAKE_BUILD_TYPE RELEASE)
 ENDIF(NOT WANT_DEBUG AND NOT WANT_RELEASEWITHDEBUG)
-
-# The experimental new tables implementation.
-IF(WANT_NEW_TABLES)
-  ADD_DEFINITIONS(-DNEW_TABLES)
-ENDIF(WANT_NEW_TABLES)
 
 #Based on our build type, setup our build options
 IF(APPLE)
