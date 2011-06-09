@@ -5,8 +5,6 @@ ${FREETYPE_INCLUDE_DIRS}
 ..
 )
 
-SET(TESTS_LIBRARIES ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES})
-
 SET(SCRIBUS_TEST_MOC_CLASSES
 #testIndex.h
 testStoryText.h
@@ -32,6 +30,14 @@ SET_TARGET_PROPERTIES(${SCRIBUS_TESTS_LIB}
   PROPERTIES
   COMPILE_FLAGS -DCOMPILE_SCRIBUS_MAIN_APP
   )
+
+#
+# Regular unit tests below.
+#
+# These tests are built as standalone executables and runned using "make test"
+#
+
+SET(TESTS_LIBRARIES ${QT_QTTEST_LIBRARY} ${QT_LIBRARIES})
 
 # Unit tests for CellArea
 SET(CELLAREATESTS_CLASSES cellareatests.h)
