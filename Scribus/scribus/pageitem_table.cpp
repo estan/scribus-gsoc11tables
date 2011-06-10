@@ -1,4 +1,6 @@
 /*
+Copyright (C) 2011 Elvis Stansvik <elvstone@gmail.com>
+
 For general Scribus (>=1.3.2) copyright and licensing information please refer
 to the COPYING file provided with the program. Following this notice may exist
 a copyright and/or license notice that predates the release of Scribus 1.3.2
@@ -302,10 +304,12 @@ void PageItem_Table::debug() const
 
 void PageItem_Table::drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const
 {
+	p->save();
 	// TODO: Color should be configurable.
 	double width = 1.0 / (qMax(p->zoomFactor(), 1.0) * 5.0);
 	p->setPen(Qt::red, width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->drawLine(start, end);
+	p->restore();
 }
 
 void PageItem_Table::adjustToFrame()
@@ -337,6 +341,8 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 		return;
 
 	// Just draw the grid with decorative lines for now.
+	p->save();
+
 	for (int row = 0; row < rows(); ++row)
 	{
 		for (int col = 0; col < columns(); ++col)
@@ -353,4 +359,5 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 			}
 		}
 	}
+	p->restore();
 }
