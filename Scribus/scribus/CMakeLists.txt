@@ -611,6 +611,7 @@ SET(SCRIBUS_SOURCES
   selection.cpp
   serializer.cpp
   styleitem.cpp
+  tablecell.cpp
   textwriter.cpp
   tocgenerator.cpp
   transaction.cpp
