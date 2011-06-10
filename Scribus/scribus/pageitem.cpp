@@ -1603,6 +1603,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 			p->setBlendModeFill(0);
 	#endif
 			p->setMaskMode(0);
+			// TODO: Investigate whether itemType()==Table should really be here. I got artifacts without it so keeping it here for now. /estan
 			if (itemType()==PathText || itemType()==PolyLine || itemType()==Spiral || itemType()==Line || itemType()==Symbol || itemType()==Group || itemType()==Table)
 				doStroke=false;
 			if ((doStroke) && (!m_Doc->RePos))
