@@ -300,6 +300,14 @@ void PageItem_Table::debug() const
 	qDebug() << "-------------------------------------------------";
 }
 
+void PageItem_Table::drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const
+{
+	// TODO: Color should be configurable.
+	double width = 1.0 / (qMax(p->zoomFactor(), 1.0) * 5.0);
+	p->setPen(Qt::red, width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+	p->drawLine(start, end);
+}
+
 void PageItem_Table::adjustToFrame()
 {
 	// Distribute width equally across columns.
@@ -328,24 +336,7 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->RePos)
 		return;
 
-	/*
-	 * Below is just some temporary painting to see what things looks like.
-	 * It is not proper painting of tables.
-	 */
-
-	// A couple of hardcoded values for now.
-	QColor cellBorderColor(Qt::black);
-	QColor tableBorderColor(Qt::black);
-
-	// TODO: How do I set up a clip rect here?
-
-	// Draw table border.
-	p->setPen(tableBorderColor);
-	p->drawRect(0, 0, m_columnPositions.last() + m_columnWidths.last(),
-				m_rowPositions.last() + m_rowHeights.last());
-
-	// Draw table cells.
-	p->setPen(cellBorderColor);
+	// Just draw the grid with decorative lines for now.
 	for (int row = 0; row < rows(); ++row)
 	{
 		for (int col = 0; col < columns(); ++col)
@@ -356,9 +347,9 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 				rect.setRight(rect.right() + 1);
 				rect.setBottom(rect.bottom() + 1);
 				if (col != columns() - 1)
-					p->drawLine(rect.topRight(), rect.bottomRight());
+					drawGridLine(rect.topRight(), rect.bottomRight(), p);
 				if (row != rows() - 1)
-					p->drawLine(rect.bottomRight(), rect.bottomLeft());
+					drawGridLine(rect.bottomRight(), rect.bottomLeft(), p);
 			}
 		}
 	}

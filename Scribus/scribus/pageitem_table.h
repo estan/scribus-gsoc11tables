@@ -140,7 +140,7 @@ public:
 
 protected:
 	// Reimplemented from PageItem.
-	virtual void DrawObj_Item(ScPainter *painter, QRectF clipRect);
+	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
 
 private:
 	/**
@@ -159,6 +159,8 @@ private:
 	// Temporary debug method.
 	void debug() const;
 
+	// Draws a decorative dotted grid line from @a start to @a end.
+	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
 private:
 	/// Number of rows.
 	int m_rows;
