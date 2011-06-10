@@ -139,6 +139,7 @@ SET(SCRIBUS_UI_SRC
   ui/replaceonecolor.ui
   ui/selectobjects.ui
   ui/shortcutwidget.ui
+  ui/smcellstylewidget.ui
   ui/smcstylewidget.ui
   ui/smtablestylewidget.ui
   ui/smlinestylewidget.ui
@@ -391,6 +392,8 @@ SET(SCRIBUS_MOC_CLASSES
   ui/shadebutton.h
   ui/shortcutwidget.h
   ui/smalignselect.h
+  ui/smcellstylewidget.h
+  ui/smcellstyle.h
   ui/smcheckbox.h
   ui/smcolorcombo.h
   ui/smcstylewidget.h
@@ -793,6 +796,8 @@ SET(SCRIBUS_SOURCES
   ui/shadebutton.cpp
   ui/shortcutwidget.cpp
   ui/smalignselect.cpp
+  ui/smcellstylewidget.cpp
+  ui/smcellstyle.cpp
   ui/smcheckbox.cpp
   ui/smcolorcombo.cpp
   ui/smcstylewidget.cpp
