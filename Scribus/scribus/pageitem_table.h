@@ -145,6 +145,13 @@ protected:
 	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
 
 private:
+	/// Returns true if @a row is a row in this table.
+	bool validRow(int row) const { return row >= 0 && row < m_rows; }
+	/// Returns true if @a column is a column in this table.
+	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
+	/// Returns true if there is a cell at @a row, @a column in this table.
+	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+
 	/**
 	 * Returns the rectangle of the cell in the given @a row and @a column.
 	 *
@@ -153,16 +160,12 @@ private:
 	 */
 	FRect cellRect(int row, int column) const;
 
-	// Convenience methods.
-	bool validRow(int row) const { return row >= 0 && row < m_rows; }
-	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
-	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+	/// Draws a decorative dotted grid line from @a start to @a end.
+	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
 
-	// Temporary debug method.
+	/// Prints internal table information.
 	void debug() const;
 
-	// Draws a decorative dotted grid line from @a start to @a end.
-	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
 private:
 	/// Number of rows.
 	int m_rows;
