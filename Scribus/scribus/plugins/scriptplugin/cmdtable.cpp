@@ -313,7 +313,7 @@ PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
 	}
 	if (row < 0 || row >= table->rows() || column < 0 || column >= table->columns() ||
 			row + numRows - 1 < 0 || row + numRows - 1 >= table->rows() ||
-			column + numColumns - 1 < 0 || column + numColumns >= table->columns())
+			column + numColumns - 1 < 0 || column + numColumns - 1 >= table->columns())
 	{
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The area %1,%2 %3x%4 is not inside the table.", "python error").arg(row).arg(column).arg(numColumns).arg(numRows).toLocal8Bit().constData());
 		return NULL;
