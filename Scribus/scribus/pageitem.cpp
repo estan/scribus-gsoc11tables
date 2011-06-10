@@ -1603,7 +1603,7 @@ void PageItem::DrawObj_Post(ScPainter *p)
 			p->setBlendModeFill(0);
 	#endif
 			p->setMaskMode(0);
-			if (itemType()==PathText || itemType()==PolyLine || itemType()==Spiral || itemType()==Line || itemType()==Symbol || itemType()==Group)
+			if (itemType()==PathText || itemType()==PolyLine || itemType()==Spiral || itemType()==Line || itemType()==Symbol || itemType()==Group || itemType()==Table)
 				doStroke=false;
 			if ((doStroke) && (!m_Doc->RePos))
 			{
