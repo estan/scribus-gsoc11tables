@@ -182,8 +182,8 @@ private:
 	/// Width of columns.
 	QList<qreal> m_columnWidths;
 
-	/// List of cell spans created by calls to mergeCells() and splitCell().
-	QList<CellArea> m_cellSpans;
+	/// List of areas of merged cells.
+	QList<CellArea> m_cellAreas;
 };
 
 #endif // PAGEITEM_TABLE_H

@@ -38,20 +38,20 @@ void PageItem_Table::insertRows(int index, int numRows)
 		rowPosition += rowHeight;
 	}
 
-	// Adjust cell spans.
-	QMutableListIterator<CellArea> spanIt(m_cellSpans);
-	while (spanIt.hasNext())
+	// Adjust cell areas.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
 	{
-		CellArea span = spanIt.next();
-		if (index < span.row())
+		CellArea area = areaIt.next();
+		if (index < area.row())
 		{
-			// Rows were inserted before this span, so move it down.
-			spanIt.setValue(span.translated(numRows, 0));
+			// Rows were inserted before this area, so move it down.
+			areaIt.setValue(area.translated(numRows, 0));
 		}
-		if (index >= span.row() && index <= span.bottom())
+		if (index >= area.row() && index <= area.bottom())
 		{
-			// Rows were inserted inside this span, so increase its height.
-			spanIt.setValue(span.adjusted(0, 0, 0, numRows));
+			// Rows were inserted inside this area, so increase its height.
+			areaIt.setValue(area.adjusted(0, 0, 0, numRows));
 		}
 	}
 
@@ -76,21 +76,21 @@ void PageItem_Table::removeRows(int index, int numRows)
 		m_rowPositions.removeAt(index);
 	}
 
-	// Adjust cell spans.
-	QMutableListIterator<CellArea> spanIt(m_cellSpans);
-	while (spanIt.hasNext())
+	// Adjust cell areas.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
 	{
-		CellArea span = spanIt.next();
-		int removedInSpan = qMin(span.bottom(), index + numRows - 1) - qMax(span.row(), index);
-		if (removedInSpan == span.height())
+		CellArea area = areaIt.next();
+		int removedInSpan = qMin(area.bottom(), index + numRows - 1) - qMax(area.row(), index);
+		if (removedInSpan == area.height())
 		{
-			// All rows in span removed, so remove span completely.
-			spanIt.remove();
+			// All rows in area removed, so remove area completely.
+			areaIt.remove();
 		}
 		else if (removedInSpan > 0)
 		{
-			// Some rows in span removed, so decrease its height.
-			spanIt.setValue(span.adjusted(0, 0, 0, -removedInSpan));
+			// Some rows in area removed, so decrease its height.
+			areaIt.setValue(area.adjusted(0, 0, 0, -removedInSpan));
 		}
 	}
 
@@ -136,20 +136,20 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		columnPosition += columnWidth;
 	}
 
-	// Adjust cell spans.
-	QMutableListIterator<CellArea> spanIt(m_cellSpans);
-	while (spanIt.hasNext())
+	// Adjust cell areas.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
 	{
-		CellArea span = spanIt.next();
-		if (index < span.column())
+		CellArea area = areaIt.next();
+		if (index < area.column())
 		{
-			// Columns were inserted before this span, so move it to the right.
-			spanIt.setValue(span.translated(0, numColumns));
+			// Columns were inserted before this area, so move it to the right.
+			areaIt.setValue(area.translated(0, numColumns));
 		}
-		if (index >= span.column() && index <= span.right())
+		if (index >= area.column() && index <= area.right())
 		{
-			// Columns were inserted inside this span, so increase its width.
-			spanIt.setValue(span.adjusted(0, 0, numColumns, 0));
+			// Columns were inserted inside this area, so increase its width.
+			areaIt.setValue(area.adjusted(0, 0, numColumns, 0));
 		}
 	}
 
@@ -174,21 +174,21 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		m_columnPositions.removeAt(index);
 	}
 
-	// Adjust cell spans.
-	QMutableListIterator<CellArea> spanIt(m_cellSpans);
-	while (spanIt.hasNext())
+	// Adjust cell areas.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
 	{
-		CellArea span = spanIt.next();
-		int removedInSpan = qMin(span.right(), index + numColumns - 1) - qMax(span.column(), index);
-		if (removedInSpan == span.width())
+		CellArea area = areaIt.next();
+		int removedInSpan = qMin(area.right(), index + numColumns - 1) - qMax(area.column(), index);
+		if (removedInSpan == area.width())
 		{
-			// All columns in span removed, so remove span completely.
-			spanIt.remove();
+			// All columns in area removed, so remove area completely.
+			areaIt.remove();
 		}
 		else if (removedInSpan > 0)
 		{
-			// Some columns in span removed, so decrease its width.
-			spanIt.setValue(span.adjusted(0, 0, -removedInSpan, 0));
+			// Some columns in area removed, so decrease its width.
+			areaIt.setValue(area.adjusted(0, 0, -removedInSpan, 0));
 		}
 	}
 
@@ -225,20 +225,20 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 
 	CellArea newSpan(row, column, numCols, numRows);
 
-	// Unite intersecting spans.
-	QMutableListIterator<CellArea> spanIt(m_cellSpans);
-	while (spanIt.hasNext())
+	// Unite intersecting areas.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
 	{
-		CellArea span = spanIt.next();
-		if (newSpan.intersects(span))
+		CellArea area = areaIt.next();
+		if (newSpan.intersects(area))
 		{
-			// The two spans intersect, so unite them.
-			newSpan = newSpan.united(span);
-			spanIt.remove();
+			// The two areas intersect, so unite them.
+			newSpan = newSpan.united(area);
+			areaIt.remove();
 		}
 	}
 
-	m_cellSpans.append(newSpan);
+	m_cellAreas.append(newSpan);
 }
 
 void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
@@ -251,11 +251,11 @@ bool PageItem_Table::isCovered(int row, int column) const
 	if (!validCell(row, column))
 		return false;
 
-	QList<CellArea>::const_iterator spanIt;
-	for (spanIt = m_cellSpans.begin(); spanIt != m_cellSpans.end(); ++spanIt)
+	QList<CellArea>::const_iterator areaIt;
+	for (areaIt = m_cellAreas.begin(); areaIt != m_cellAreas.end(); ++areaIt)
 	{
-		CellArea span = (*spanIt);
-		if (span.contains(row, column) && !(span.row() == row && span.column() == column))
+		CellArea area = (*areaIt);
+		if (area.contains(row, column) && !(area.row() == row && area.column() == column))
 			return true;
 	}
 	return false;
@@ -269,17 +269,17 @@ FRect PageItem_Table::cellRect(int row, int column) const
 	FRect rect(m_columnPositions.at(column), m_rowPositions.at(row),
 				m_columnWidths.at(column), m_rowHeights.at(row));
 
-	// Adjust the rectangle if it's part of a span.
-	QList<CellArea>::const_iterator spanIt;
-	for (spanIt = m_cellSpans.begin(); spanIt != m_cellSpans.end(); ++spanIt)
+	// Adjust the rectangle if it's part of a area.
+	QList<CellArea>::const_iterator areaIt;
+	for (areaIt = m_cellAreas.begin(); areaIt != m_cellAreas.end(); ++areaIt)
 	{
-		CellArea span = (*spanIt);
-		if (span.contains(row, column))
+		CellArea area = (*areaIt);
+		if (area.contains(row, column))
 		{
-			// Cell is contained in span, so use rectangle of the span.
-			rect.setCoords(m_columnPositions.at(span.column()), m_rowPositions.at(span.row()),
-						   m_columnPositions.at(span.right()) + m_columnWidths.at(span.right()) - 1,
-						   m_rowPositions.at(span.bottom()) + m_rowHeights.at(span.bottom()) - 1);
+			// Cell is contained in area, so use rectangle of the area.
+			rect.setCoords(m_columnPositions.at(area.column()), m_rowPositions.at(area.row()),
+						   m_columnPositions.at(area.right()) + m_columnWidths.at(area.right()) - 1,
+						   m_rowPositions.at(area.bottom()) + m_rowHeights.at(area.bottom()) - 1);
 			break;
 		}
 	}
@@ -298,7 +298,7 @@ void PageItem_Table::debug() const
 	qDebug() << "m_columnWidths: " <<  m_columnWidths;
 	qDebug() << "m_rowPositions: " <<  m_rowPositions;
 	qDebug() << "m_rowHeights: " <<  m_rowHeights;
-	qDebug() << "m_cellSpans: " <<  m_cellSpans;
+	qDebug() << "m_cellSpans: " <<  m_cellAreas;
 	qDebug() << "-------------------------------------------------";
 }
 
