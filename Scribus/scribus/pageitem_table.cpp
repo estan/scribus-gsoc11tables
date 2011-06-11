@@ -38,8 +38,8 @@ void PageItem_Table::insertRows(int index, int numRows)
 		rowPosition += rowHeight;
 	}
 
-	// Update cell areas.
-	updateCellAreas(index, numRows, RowsInserted);
+	// Update row spans.
+	updateSpans(index, numRows, RowsInserted);
 
 	m_rows += numRows;
 
@@ -62,8 +62,8 @@ void PageItem_Table::removeRows(int index, int numRows)
 		m_rowPositions.removeAt(index);
 	}
 
-	// Update cell areas.
-	updateCellAreas(index, numRows, RowsRemoved);
+	// Update row spans.
+	updateSpans(index, numRows, RowsRemoved);
 
 	m_rows -= numRows;
 
@@ -107,8 +107,8 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		columnPosition += columnWidth;
 	}
 
-	// Update cell areas.
-	updateCellAreas(index, numColumns, ColumnsInserted);
+	// Update column spans.
+	updateSpans(index, numColumns, ColumnsInserted);
 
 	m_columns += numColumns;
 
@@ -131,8 +131,8 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		m_columnPositions.removeAt(index);
 	}
 
-	// Update cell areas.
-	updateCellAreas(index, numColumns, ColumnsRemoved);
+	// Update column spans.
+	updateSpans(index, numColumns, ColumnsRemoved);
 
 	m_columns -= numColumns;
 
@@ -165,22 +165,22 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 	if (!validCell(row, column) || !validCell(row + numRows - 1, column + numCols - 1))
 		return;
 
-	CellArea newSpan(row, column, numCols, numRows);
+	CellArea newArea(row, column, numCols, numRows);
 
 	// Unite intersecting areas.
 	QMutableListIterator<CellArea> areaIt(m_cellAreas);
 	while (areaIt.hasNext())
 	{
 		CellArea area = areaIt.next();
-		if (newSpan.intersects(area))
+		if (newArea.intersects(area))
 		{
 			// The two areas intersect, so unite them.
-			newSpan = newSpan.united(area);
+			newArea = newArea.united(area);
 			areaIt.remove();
 		}
 	}
 
-	m_cellAreas.append(newSpan);
+	m_cellAreas.append(newArea);
 }
 
 void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
@@ -229,38 +229,47 @@ FRect PageItem_Table::cellRect(int row, int column) const
 	return rect;
 }
 
-void PageItem_Table::updateCellAreas(int index, int number, ChangeType changeType)
+void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 {
+	// Loop through areas of merged cells.
 	QMutableListIterator<CellArea> areaIt(m_cellAreas);
 	while (areaIt.hasNext())
 	{
 		CellArea area = areaIt.next();
-		bool areaChanged = false;
 
+		// Get a copy of the area adjusted to the change.
+		CellArea newArea;
 		switch (changeType)
 		{
-		case RowsInserted:
-			areaChanged = area.insertRows(index, number);
-			break;
-		case RowsRemoved:
-			areaChanged = area.removeRows(index, number);
-			break;
-		case ColumnsInserted:
-			areaChanged = area.insertColumns(index, number);
-			break;
-		case ColumnsRemoved:
-			areaChanged = area.removeColumns(index, number);
-			break;
-		default:
-			break;
+			case RowsInserted:
+				newArea = area.adjustedForRowInsertion(index, number);
+				break;
+			case RowsRemoved:
+				newArea = area.adjustedForRowRemoval(index, number);
+				break;
+			case ColumnsInserted:
+				newArea = area.adjustedForColumnInsertion(index, number);
+				break;
+			case ColumnsRemoved:
+				newArea = area.adjustedForColumnRemoval(index, number);
+				break;
+			default:
+				break;
 		}
 
-		if (areaChanged)
+		if (newArea != area)
 		{
-			if (area.isValid())
-				areaIt.setValue(area);
-			else
+			// If the area was affected by the change we either..
+			if (newArea.height() < 2)
+			{
+				// ..remove areas that would become less than 2 in height or..
 				areaIt.remove();
+			}
+			else
+			{
+				// ..replace the area with the adjusted copy.
+				areaIt.setValue(newArea);
+			}
 		}
 	}
 }

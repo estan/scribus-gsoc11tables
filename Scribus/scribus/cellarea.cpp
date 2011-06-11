@@ -21,6 +21,11 @@ CellArea::CellArea(int row, int column, int width, int height) :
 {
 }
 
+CellArea::CellArea(const CellArea& other) : m_row(other.m_row), m_column(other.m_column),
+	m_width(other.m_width), m_height(other.m_height)
+{
+}
+
 bool CellArea::contains(int row, int column) const
 {
 	if (!isValid())
@@ -85,95 +90,80 @@ CellArea CellArea::united(CellArea& area) const
 	return unitedArea;
 }
 
-bool CellArea::insertRows(int index, int numRows)
+CellArea CellArea::adjustedForRowInsertion(int index, int numRows)
 {
-	if (numRows < 1)
-		return false;
+	CellArea adjustedArea(*this);
+
+	if (numRows < 1 || index > bottom())
+		return adjustedArea; // No rows inserted, or inserted after area.
 
 	if (index <= row())
-	{
-		// Rows were inserted before this area, so move it down.
-		m_row += numRows;
-		return true;
-	}
-	if (index > row() && index <= bottom())
-	{
-		// Rows were inserted inside this area, so increase its height.
-		m_height += numRows;
-		return true;
-	}
+		adjustedArea.adjust(numRows, 0, 0, 0); // Inserted before area.
+	else
+		adjustedArea.adjust(0, 0, 0, numRows); // Inserted inside area.
 
-	return false;
+	return adjustedArea;
 }
 
-bool CellArea::removeRows(int index, int numRows)
+CellArea CellArea::adjustedForRowRemoval(int index, int numRows)
 {
-	if (numRows < 1)
-		return false;
+	CellArea adjustedArea(*this);
 
-	if (index > bottom())
-	{
-		// Rows removed after area.
-		return false;
-	}
+	if (numRows < 1 || index > bottom())
+		return adjustedArea; // No rows removed, or removed after area.
 
 	int end = index + numRows - 1;
 	if (end < row())
 	{
-		// Rows removed before area, so move it.
-		m_row -= numRows;
-		return true;
+		// Removed before area.
+		adjustedArea.adjust(-numRows, 0, 0, 0);
+	}
+	else
+	{
+		// Removed inside area.
+		int removedInsideArea = qMin(bottom(), end) - qMax(row(), index) + 1;
+		adjustedArea.adjust(0, 0, 0, -removedInsideArea);
 	}
 
-	// Rows removed inside area, so shrink it.
-	m_height -= qMin(bottom(), end) - qMax(row(), index) + 1;
-
-	return true;
+	return adjustedArea;
 }
 
-bool CellArea::insertColumns(int index, int numColumns)
+CellArea CellArea::adjustedForColumnInsertion(int index, int numColumns)
 {
-	if (numColumns < 1)
-		return false;
+	CellArea adjustedArea(*this);
+
+	if (numColumns < 1 || index > right())
+		return adjustedArea; // No columns inserted, or inserted after area.
 
 	if (index <= column())
-	{
-		// Columns were inserted before this area, so move it to the right.
-		m_column += numColumns;
-		return true;
-	}
-	if (index > column() && index <= right())
-	{
-		// Columns were inserted inside this area, so increase its width.
-		m_width += numColumns;
-		return true;
-	}
-	return false;
+		adjustedArea.adjust(0, numColumns, 0, 0); // Inserted before area.
+	else
+		adjustedArea.adjust(0, 0, numColumns, 0); // Inserted inside area.
+
+	return adjustedArea;
 }
 
-bool CellArea::removeColumns(int index, int numColumns)
+CellArea CellArea::adjustedForColumnRemoval(int index, int numColumns)
 {
-	if (numColumns < 1)
-		return false;
+	CellArea adjustedArea(*this);
 
-	if (index > right())
-	{
-		// Columns removed after area.
-		return false;
-	}
+	if (numColumns < 1 || index > right())
+		return adjustedArea; // No columns removed, or removed after area.
 
 	int end = index + numColumns - 1;
 	if (end < column())
 	{
-		// Columns removed before area, so move it.
-		m_column -= numColumns;
-		return true;
+		// Removed before area.
+		adjustedArea.adjust(0, -numColumns, 0, 0);
+	}
+	else
+	{
+		// Removed inside area.
+		int removedInsideArea = qMin(right(), end) - qMax(column(), index) + 1;
+		adjustedArea.adjust(0, 0, -removedInsideArea, 0);
 	}
 
-	// Columns removed inside area, so shrink it.
-	m_width -= qMin(right(), end) - qMax(column(), index) + 1;
-
-	return true;
+	return adjustedArea;
 }
 
 bool operator==(const CellArea& lhs, const CellArea& rhs)

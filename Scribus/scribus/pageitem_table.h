@@ -15,6 +15,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "scribusapi.h"
 #include "pageitem.h"
+#include "tablecell.h"
 #include "cellarea.h"
 
 class ScPainter;
@@ -145,7 +146,7 @@ protected:
 	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
 
 private:
-	/// Table structure changes.
+	/// Enum describing types of changes on a table. For internal use.
 	enum ChangeType
 	{
 		RowsInserted,    /**< Rows were inserted. */
@@ -170,13 +171,24 @@ private:
 	FRect cellRect(int row, int column) const;
 
 	/**
-	 * Updates areas of merged cells after rows or columns were removed or inserted.
+	 * Updates row and column spans following a change in rows or columns.
 	 *
-	 * The @a index and @a number specifies that starting with @a index, @a number rows
-	 * or columns were either inserted or removed. The type of change that occurred is
-	 * specified by @a changeType.
+	 * If @a changeType is <code>RowsInserted</code> or <code>ColumnsInserted</code>, @a index
+	 * and @a number specifies that @a number rows or columns were inserted before the row or
+	 * or column at @a index. Similarly, if @a changeType is <code>RowsRemoved</code> or
+	 * <code>ColumnsRemoved</code>, @a index and @a number specifies that @a number rows or
+	 * columns were removed, starting with the row or column at @a index.
 	 */
-	void updateCellAreas(int index, int number, ChangeType changeType);
+	void updateSpans(int index, int number, ChangeType changeType);
+
+	/// Inserts @a numRows new row of cells at @a index.
+	void insertCellRows(int index, int numRows);
+	/// Removes @a numRows row of cells starting with the row at @a index.
+	void removeCellRows(int index, int numRows);
+	/// Inserts @a numColumns new columns of cells at @a index.
+	void insertCellColumns(int index, int numColumns);
+	/// Removes @a numColumns columns of cells starting with the column at @a index.
+	void removeCellColumns(int index, int numColumns);
 
 	/// Draws a decorative dotted grid line from @a start to @a end.
 	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
@@ -185,6 +197,9 @@ private:
 	void debug() const;
 
 private:
+	/// List of rows of cells in the table.
+	QList<QList<TableCell> > m_cells;
+
 	/// Number of rows.
 	int m_rows;
 	/// Number of columns.

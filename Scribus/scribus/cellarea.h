@@ -26,6 +26,9 @@ public:
 	/// Constructs an area starting at @a row, @a column with the given @a width and @a height.
 	CellArea(int row, int column, int width, int height);
 
+	/// Constructs an area as a copy of the area @a other.
+	CellArea(const CellArea& other);
+
 	/// Returns <code>true</code> if the area is valid.
 	bool isValid() const { return m_width >= 1 && m_height >= 1; }
 
@@ -76,42 +79,44 @@ public:
 	CellArea united(CellArea& area) const;
 
 	/**
-	 * Inserts @a numRows rows before the row at @a index and updates the area appropriately.
-	 * If rows are inserted above the area, the area is moved down. If rows are inserted
-	 * inside the area, the area increases in height. If rows are inserted below the area,
-	 * the area is unaffected.
+	 * Returns a copy of this area adjusted for an insertion of @a numRows rows before the
+	 * row at @a index.
 	 *
-	 * The function will return <code>true</code> if the area was affected.
+	 * If rows are inserted above the area, the adjusted area is moved down. If rows are
+	 * inserted inside the area, the adjusted area is increased in height. If rows are inserted
+	 * below the area, the returned area is unaffected and a copy of this area.
 	 */
-	bool insertRows(int index, int numRows);
+	CellArea adjustedForRowInsertion(int index, int numRows);
 
 	/**
-	 * Removes @a numRows rows, starting with the row at @a index. If any of the removed
-	 * rows are inside the area, the area will have its height updated accordingly.
+	 * Returns a copy of this area adjusted for a removal of @a numRows rows starting with the
+	 * row at @a index.
 	 *
-	 * The function will return <code>true</code> if the area was affected. If all rows of the
-	 * area are removed, the area will become invalid and isValid() return <code>false</code>.
+	 * If rows are removed above the area, the adjusted area is moved up. If rows are removed
+	 * inside the area, the adjusted area is decreased in height. If rows are removed below the
+	 * area, the returned area is unaffected and a copy of this area.
 	 */
-	bool removeRows(int index, int numRows);
+	CellArea adjustedForRowRemoval(int index, int numRows);
 
 	/**
-	 * Inserts @a numColumns columns before the column at @a index and updates the area
-	 * appropriately. If columns are inserted left of the area, the area is moved right.
-	 * If columns are inserted inside the area, the area increases in width. If columns are
-	 * inserted right of the area, the area is unaffected.
+	 * Returns a copy of this area adjusted for an insertion of @a numColumns columns before the
+	 * column at @a index.
 	 *
-	 * The function will return <code>true</code> if the area was affected.
+	 * If columns are inserted left of the area, the adjusted area is moved right. If columns are
+	 * inserted inside the area, the adjusted area is increased in width. If columns are inserted
+	 * right of the area, the returned area is unaffected and a copy of this area.
 	 */
-	bool insertColumns(int index, int numColumns);
+	CellArea adjustedForColumnInsertion(int index, int numColumns);
 
 	/**
-	 * Removes @a numColumns columns, starting with the column at @a index. If any of the removed
-	 * columns are inside the area, the area will have its height updated accordingly.
+	 * Returns a copy of this area adjusted for a removal of @a numColumns columns starting with the
+	 * column at @a index.
 	 *
-	 * The function will return <code>true</code> if the area was affected. If all columns of the
-	 * area are removed, the area will become invalid and isValid() return <code>false</code>.
+	 * If columns are removed left of the area, the adjusted area is moved left. If columns are removed
+	 * inside the area, the adjusted area is decreased in width. If columns are removed right of the
+	 * area, the returned area is unaffected and a copy of this area.
 	 */
-	bool removeColumns(int index, int numColumns);
+	CellArea adjustedForColumnRemoval(int index, int numColumns);
 
 private:
 	int m_row;
