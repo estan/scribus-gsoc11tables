@@ -40,33 +40,54 @@ public:
 /**
  * The TableCell class represents a cell in a table.
  *
- * The class provides an interface for setting and getting cell properties.
- *
- * If the table structure is changed after a cell has been retrieved from the
- * table, trying to use the cell will result in undefined behavior. This may
- * change in the future.
+ * It provides an interface for setting and getting cell properties. A cell may be
+ * marked as invalid if the row or column it is in is removed or if it is covered by
+ * a spanning cell. The valid state of a cell may be queried for using the
+ * <code>isValid()</code> function.
  */
 class TableCell
 {
 public:
-	/// Returns <code>true</code> if this cell is valid.
+	/**
+	 * Returns <code>true</code> if this cell is valid.
+	 */
 	bool isValid() const { return d->isValid && d->table; }
-	/// Returns the number of the row in the table that contains this cell.
-	int row() const { return d->row; }
-	/// Returns the number of the column in the table that contains this cell.
-	int column() const { return d->column; }
-	/// Returns the number of rows this cell spans.
-	int rowSpan() const { return d->rowSpan; }
-	/// Returns the number of columns this cell spans.
-	int columnSpan() const { return d->columnSpan; }
-	/// Sets the cell style for this cell to @a style.
-	void setStyle(const QString& style) { d->style = style; }
-	/// Returns the cell style for this cell.
-	QString style() const { return d->style; }
+
+	/**
+	 * Returns the number of the row in the table that contains this cell, or <code>-1</code> if
+	 * the cell is invalid.
+	 */
+	int row() const { return isValid() ? d->row : -1; }
+
+	/**
+	 * Returns the number of the column in the table that contains this cell, or <code>-1</code> if
+	 * the cell is invalid.
+	 */
+	int column() const { return isValid() ? d->column : -1; }
+
+	/**
+	 * Returns the number of rows this cell spans, or <code>-1</code> if the cell is invalid.
+	 */
+	int rowSpan() const { return isValid() ? d->rowSpan : -1; }
+
+	/**
+	 * Returns the number of columns this cell spans, or <code>-1</code> if the cell is invalid.
+	 */
+	int columnSpan() const { return isValid() ? d->columnSpan : -1; }
+
+	/**
+	 * Sets the cell style for this cell to @a style, or do nothing if the cell is invalid.
+	 */
+	void setStyle(const QString& style) { if (isValid()) d->style = style; }
+
+	/**
+	 * Returns the cell style for this cell, or QString() if the cell is invalid.
+	 */
+	QString style() const { return isValid() ? d->style : QString(); }
 
 private:
 	/**
-	 * Construct a new valid table cell in the table @a table at @a row, @a column spanning
+	 * Construct a new valid table cell at @a row, @a column in the table @a table, spanning
 	 * @a rowSpan rows and @a columnSpan columns.
 	 */
 	TableCell(int row, int column, PageItem_Table *table);
