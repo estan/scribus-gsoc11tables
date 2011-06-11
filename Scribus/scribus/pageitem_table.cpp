@@ -240,19 +240,15 @@ void PageItem_Table::updateCellAreas(int index, int number, ChangeType changeTyp
 		switch (changeType)
 		{
 		case RowsInserted:
-			qDebug() << "Rows inserted";
 			areaChanged = area.insertRows(index, number);
 			break;
 		case RowsRemoved:
-			qDebug() << "Rows removed";
 			areaChanged = area.removeRows(index, number);
 			break;
 		case ColumnsInserted:
-			qDebug() << "Columns inserted";
 			areaChanged = area.insertColumns(index, number);
 			break;
 		case ColumnsRemoved:
-			qDebug() << "Columns removed";
 			areaChanged = area.removeColumns(index, number);
 			break;
 		default:
@@ -262,15 +258,9 @@ void PageItem_Table::updateCellAreas(int index, int number, ChangeType changeTyp
 		if (areaChanged)
 		{
 			if (area.isValid())
-			{
-				qDebug() << "setting area to " << area;
 				areaIt.setValue(area);
-			}
 			else
-			{
 				areaIt.remove();
-				qDebug() << "removing area " << area;
-			}
 		}
 	}
 }
