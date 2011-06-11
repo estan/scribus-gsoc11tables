@@ -30,7 +30,7 @@ void PageItem_Table::insertRows(int index, int numRows)
 
 	// Insert row heights and positions.
 	qreal rowHeight = rows() == 0 ? height() : m_rowHeights.at(qMax(index - 1, 0));
-	qreal rowPosition = rows() == 0 ? 0.0 : m_rowPositions.at(qMax(index - 1, 0)) + rowHeight;
+	qreal rowPosition = index == 0 ? 0.0 : m_rowPositions.at(qMax(index - 1, 0)) + rowHeight;
 	for (int i = 0; i < numRows; ++i)
 	{
 		m_rowHeights.insert(index + i, rowHeight);
@@ -99,7 +99,7 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 
 	// Insert column widths and positions.
 	qreal columnWidth = columns() == 0 ? width() : m_columnWidths.at(qMax(index - 1, 0));
-	qreal columnPosition = columns() == 0 ? 0.0 : m_columnPositions.at(qMax(index - 1, 0)) + columnWidth;
+	qreal columnPosition = index == 0 ? 0.0 : m_columnPositions.at(qMax(index - 1, 0)) + columnWidth;
 	for (int i = 0; i < numColumns; ++i)
 	{
 		m_columnWidths.insert(index + i, columnWidth);
