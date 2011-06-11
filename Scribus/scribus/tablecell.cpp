@@ -11,6 +11,13 @@ for which a new license (GPL+exception) is in place.
 
 #include "pageitem_table.h"
 
-TableCell::TableCell(PageItem_Table *table) : m_table(table), m_rowSpan(1), m_columnSpan(1)
+TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCellData)
 {
+	setValid(true);
+	setRow(row);
+	setColumn(column);
+	setRowSpan(1);
+	setColumnSpan(1);
+
+	d->table = table;
 }

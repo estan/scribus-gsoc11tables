@@ -11,9 +11,31 @@ for which a new license (GPL+exception) is in place.
 #define TABLECELL_H
 
 #include <QString>
+#include <QSharedData>
 
 class PageItem_Table;
 class CellStyle;
+
+/**
+ * Shared data class for TableCell.
+ */
+class TableCellData : public QSharedData
+{
+public:
+	TableCellData() : isValid(false), row(-1), column(-1), rowSpan(-1), columnSpan(-1), table(0) {}
+	TableCellData(const TableCellData& other) : QSharedData(other), isValid(other.isValid), row(other.row),
+		column(other.column), rowSpan(other.rowSpan), columnSpan(other.columnSpan) {}
+	~TableCellData() {}
+
+public:
+	bool isValid;
+	int row;
+	int column;
+	int rowSpan;
+	int columnSpan;
+	QString style;
+	PageItem_Table *table;
+};
 
 /**
  * The TableCell class represents a cell in a table.
@@ -24,33 +46,49 @@ class CellStyle;
  * table, trying to use the cell will result in undefined behavior. This may
  * change in the future.
  */
-class TableCell {
+class TableCell
+{
 public:
 	/// Returns <code>true</code> if this cell is valid.
-	bool isValid() const { return m_table != 0; }
-	/// Returns the row span of this cell.
-	int rowSpan() const { return m_rowSpan; }
-	/// Returns the column span of this cell.
-	int columnSpan() const { return m_columnSpan; }
+	bool isValid() const { return d->isValid && d->table; }
+	/// Returns the number of the row in the table that contains this cell.
+	int row() const { return d->row; }
+	/// Returns the number of the column in the table that contains this cell.
+	int column() const { return d->column; }
+	/// Returns the number of rows this cell spans.
+	int rowSpan() const { return d->rowSpan; }
+	/// Returns the number of columns this cell spans.
+	int columnSpan() const { return d->columnSpan; }
 	/// Sets the cell style for this cell to @a style.
-	void setStyle(const QString& style) { m_style = style; }
+	void setStyle(const QString& style) { d->style = style; }
 	/// Returns the cell style for this cell.
-	QString style() const { return m_style; }
+	QString style() const { return d->style; }
 
 private:
-	/// Construct a new cell with parent table @a table.
-	TableCell(PageItem_Table *table);
-	/// Set the row span of this cell to @a rowSpan.
-	void setRowSpan(int rowSpan) { m_rowSpan = rowSpan; }
-	/// Set the column span of this cell to @a columnSpan.
-	void setColumnSpan(int columnSpan) { m_columnSpan = columnSpan; }
+	/**
+	 * Construct a new valid table cell in the table @a table at @a row, @a column spanning
+	 * @a rowSpan rows and @a columnSpan columns.
+	 */
+	TableCell(int row, int column, PageItem_Table *table);
+	/// Constructs a new invalid table cell.
+	TableCell() : d(new TableCellData) { setValid(false); }
+	/// Construct a new table cell as a shallow copy of @a other.
+	TableCell(const TableCell& other) : d(other.d) {}
+
+	/// Set the row of the table that contains this cell to @a row.
+	void setRow(int row) { d->row = row; }
+	/// Set the column of the table that contains this cell to @a row.
+	void setColumn(int column) { d->column = column; }
+	/// Set the number of rows this cell is spanning to @a rowSpan.
+	void setRowSpan(int rowSpan) { d->rowSpan = rowSpan; }
+	/// Set the number of columns this cell is spanning to @a columnSpan.
+	void setColumnSpan(int columnSpan) { d->columnSpan = columnSpan; }
+	/// Sets the valid state of the cell to @a isValid.
+	void setValid(bool isValid) { d->isValid = isValid; }
 
 private:
 	friend class PageItem_Table;
-	PageItem_Table *m_table;
-	QString m_style;
-	int m_rowSpan;
-	int m_columnSpan;
+	QSharedDataPointer<TableCellData> d;
 };
 
 #endif // TABLECELL_H
