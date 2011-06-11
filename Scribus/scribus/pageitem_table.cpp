@@ -38,22 +38,8 @@ void PageItem_Table::insertRows(int index, int numRows)
 		rowPosition += rowHeight;
 	}
 
-	// Adjust cell areas.
-	QMutableListIterator<CellArea> areaIt(m_cellAreas);
-	while (areaIt.hasNext())
-	{
-		CellArea area = areaIt.next();
-		if (index < area.row())
-		{
-			// Rows were inserted before this area, so move it down.
-			areaIt.setValue(area.translated(numRows, 0));
-		}
-		if (index >= area.row() && index <= area.bottom())
-		{
-			// Rows were inserted inside this area, so increase its height.
-			areaIt.setValue(area.adjusted(0, 0, 0, numRows));
-		}
-	}
+	// Update cell areas.
+	updateCellAreas(index, numRows, RowsInserted);
 
 	m_rows += numRows;
 
@@ -76,23 +62,8 @@ void PageItem_Table::removeRows(int index, int numRows)
 		m_rowPositions.removeAt(index);
 	}
 
-	// Adjust cell areas.
-	QMutableListIterator<CellArea> areaIt(m_cellAreas);
-	while (areaIt.hasNext())
-	{
-		CellArea area = areaIt.next();
-		int removedInSpan = qMin(area.bottom(), index + numRows - 1) - qMax(area.row(), index);
-		if (removedInSpan == area.height())
-		{
-			// All rows in area removed, so remove area completely.
-			areaIt.remove();
-		}
-		else if (removedInSpan > 0)
-		{
-			// Some rows in area removed, so decrease its height.
-			areaIt.setValue(area.adjusted(0, 0, 0, -removedInSpan));
-		}
-	}
+	// Update cell areas.
+	updateCellAreas(index, numRows, RowsRemoved);
 
 	m_rows -= numRows;
 
@@ -136,22 +107,8 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		columnPosition += columnWidth;
 	}
 
-	// Adjust cell areas.
-	QMutableListIterator<CellArea> areaIt(m_cellAreas);
-	while (areaIt.hasNext())
-	{
-		CellArea area = areaIt.next();
-		if (index < area.column())
-		{
-			// Columns were inserted before this area, so move it to the right.
-			areaIt.setValue(area.translated(0, numColumns));
-		}
-		if (index >= area.column() && index <= area.right())
-		{
-			// Columns were inserted inside this area, so increase its width.
-			areaIt.setValue(area.adjusted(0, 0, numColumns, 0));
-		}
-	}
+	// Update cell areas.
+	updateCellAreas(index, numColumns, ColumnsInserted);
 
 	m_columns += numColumns;
 
@@ -174,23 +131,8 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		m_columnPositions.removeAt(index);
 	}
 
-	// Adjust cell areas.
-	QMutableListIterator<CellArea> areaIt(m_cellAreas);
-	while (areaIt.hasNext())
-	{
-		CellArea area = areaIt.next();
-		int removedInSpan = qMin(area.right(), index + numColumns - 1) - qMax(area.column(), index);
-		if (removedInSpan == area.width())
-		{
-			// All columns in area removed, so remove area completely.
-			areaIt.remove();
-		}
-		else if (removedInSpan > 0)
-		{
-			// Some columns in area removed, so decrease its width.
-			areaIt.setValue(area.adjusted(0, 0, -removedInSpan, 0));
-		}
-	}
+	// Update cell areas.
+	updateCellAreas(index, numColumns, ColumnsRemoved);
 
 	m_columns -= numColumns;
 
@@ -285,6 +227,52 @@ FRect PageItem_Table::cellRect(int row, int column) const
 	}
 
 	return rect;
+}
+
+void PageItem_Table::updateCellAreas(int index, int number, ChangeType changeType)
+{
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
+	{
+		CellArea area = areaIt.next();
+		bool areaChanged = false;
+
+		switch (changeType)
+		{
+		case RowsInserted:
+			qDebug() << "Rows inserted";
+			areaChanged = area.insertRows(index, number);
+			break;
+		case RowsRemoved:
+			qDebug() << "Rows removed";
+			areaChanged = area.removeRows(index, number);
+			break;
+		case ColumnsInserted:
+			qDebug() << "Columns inserted";
+			areaChanged = area.insertColumns(index, number);
+			break;
+		case ColumnsRemoved:
+			qDebug() << "Columns removed";
+			areaChanged = area.removeColumns(index, number);
+			break;
+		default:
+			break;
+		}
+
+		if (areaChanged)
+		{
+			if (area.isValid())
+			{
+				qDebug() << "setting area to " << area;
+				areaIt.setValue(area);
+			}
+			else
+			{
+				areaIt.remove();
+				qDebug() << "removing area " << area;
+			}
+		}
+	}
 }
 
 void PageItem_Table::debug() const

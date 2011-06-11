@@ -272,6 +272,40 @@ void CellAreaTests::testAdjusted_data()
 	QTest::newRow("decrease height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << -1 << CellArea(1, 1, 2, 1);
 }
 
+void CellAreaTests::testAdjust()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, rows);
+	QFETCH(int, columns);
+	QFETCH(int, width);
+	QFETCH(int, height);
+	QFETCH(CellArea, result);
+
+	area.adjust(rows, columns, width, height);
+	QCOMPARE(area, result);
+}
+
+void CellAreaTests::testAdjust_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("rows");
+	QTest::addColumn<int>("columns");
+	QTest::addColumn<int>("width");
+	QTest::addColumn<int>("height");
+	QTest::addColumn<CellArea>("result");
+
+	// Tests for area.adjust(rows, columns, width, height).
+	QTest::newRow("no adjustment") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << 0 << CellArea(1, 1, 2, 2);
+	QTest::newRow("translate down 1") << CellArea(1, 1, 2, 2) << 1 << 0 << 0 << 0 << CellArea(2, 1, 2, 2);
+	QTest::newRow("translate up 1") << CellArea(1, 1, 2, 2) << -1 << 0 << 0 << 0 << CellArea(0, 1, 2, 2);
+	QTest::newRow("translate right 1") << CellArea(1, 1, 2, 2) << 0 << 1 << 0 << 0 << CellArea(1, 2, 2, 2);
+	QTest::newRow("translate left 1") << CellArea(1, 1, 2, 2) << 0 << -1 << 0 << 0 << CellArea(1, 0, 2, 2);
+	QTest::newRow("increase width") << CellArea(1, 1, 2, 2) << 0 << 0 << 1 << 0 << CellArea(1, 1, 3, 2);
+	QTest::newRow("decrease width") << CellArea(1, 1, 2, 2) << 0 << 0 << -1 << 0 << CellArea(1, 1, 1, 2);
+	QTest::newRow("increase height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << 1 << CellArea(1, 1, 2, 3);
+	QTest::newRow("decrease height") << CellArea(1, 1, 2, 2) << 0 << 0 << 0 << -1 << CellArea(1, 1, 2, 1);
+}
+
 void CellAreaTests::testUnited()
 {
 	QFETCH(CellArea, area1);
@@ -293,6 +327,144 @@ void CellAreaTests::testUnited_data()
 	QTest::newRow("overlapping southeast/northwest") << CellArea(1, 1, 2, 2) << CellArea(2, 2, 2, 2) << CellArea(1, 1, 3, 3);
 	QTest::newRow("overlapping southwest/northeast") << CellArea(1, 1, 2, 2) << CellArea(2, 0, 2, 2) << CellArea(1, 0, 3, 3);
 	QTest::newRow("non-overlapping") << CellArea(1, 1, 2, 2) << CellArea(3, 3, 2, 2) << CellArea(1, 1, 4, 4);
+}
+
+void CellAreaTests::testInsertRows()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, index);
+	QFETCH(int, numRows);
+	QFETCH(CellArea, result);
+	QFETCH(bool, retval);
+
+	QCOMPARE(area.insertRows(index, numRows), retval);
+	QCOMPARE(area, result);
+}
+
+void CellAreaTests::testInsertRows_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("index");
+	QTest::addColumn<int>("numRows");
+	QTest::addColumn<CellArea>("result");
+	QTest::addColumn<bool>("retval");
+
+	// Tests for area.insertRows(index, numRows).
+	QTest::newRow("well above") << CellArea(2, 2, 4, 4) << 0 << 3 << CellArea(5, 2, 4, 4) << true;
+	QTest::newRow("just above") << CellArea(2, 2, 4, 4) << 2 << 3 << CellArea(5, 2, 4, 4) << true;
+	QTest::newRow("just inside at top") << CellArea(2, 2, 4, 4) << 3 << 3 << CellArea(2, 2, 4, 7) << true;
+	QTest::newRow("well inside") << CellArea(2, 2, 4, 4) << 4 << 3 << CellArea(2, 2, 4, 7) << true;
+	QTest::newRow("just inside at bottom") << CellArea(2, 2, 4, 4) << 5 << 3 << CellArea(2, 2, 4, 7) << true;
+	QTest::newRow("just below") << CellArea(2, 2, 4, 4) << 6 << 3 << CellArea(2, 2, 4, 4) << false;
+	QTest::newRow("well below") << CellArea(2, 2, 4, 4) << 7 << 3 << CellArea(2, 2, 4, 4) << false;
+
+	QTest::newRow("zero rows") << CellArea(2, 2, 4, 4) << 4 << 0 << CellArea(2, 2, 4, 4) << false;
+	QTest::newRow("negative rows") << CellArea(2, 2, 4, 4) << 4 << -1 << CellArea(2, 2, 4, 4) << false;
+}
+
+void CellAreaTests::testRemoveRows()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, index);
+	QFETCH(int, numRows);
+	QFETCH(CellArea, result);
+	QFETCH(bool, retval);
+
+	QCOMPARE(area.removeRows(index, numRows), retval);
+	QCOMPARE(area, result);
+}
+
+void CellAreaTests::testRemoveRows_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("index");
+	QTest::addColumn<int>("numRows");
+	QTest::addColumn<CellArea>("result");
+	QTest::addColumn<bool>("retval");
+
+	// Tests for area.removeRows(index, numRows).
+	QTest::newRow("well above") << CellArea(3, 3, 4, 4) << 0 << 2 << CellArea(1, 3, 4, 4) << true;
+	QTest::newRow("just above") << CellArea(3, 3, 4, 4) << 1 << 2 << CellArea(1, 3, 4, 4) << true;
+	QTest::newRow("overlapping top") << CellArea(3, 3, 4, 4) << 2 << 3 << CellArea(3, 3, 4, 2) << true;
+	QTest::newRow("just inside at top") << CellArea(3, 3, 4, 4) << 3 << 2 << CellArea(3, 3, 4, 2) << true;
+	QTest::newRow("completely overlapping") << CellArea(3, 3, 4, 4) << 3 << 4 << CellArea(3, 3, 4, 0) << true;
+	QTest::newRow("well inside") << CellArea(3, 3, 4, 4) << 4 << 2 << CellArea(3, 3, 4, 2) << true;
+	QTest::newRow("just inside at bottom") << CellArea(3, 3, 4, 4) << 5 << 2 << CellArea(3, 3, 4, 2) << true;
+	QTest::newRow("overlapping bottom") << CellArea(3, 3, 4, 4) << 5 << 3 << CellArea(3, 3, 4, 2) << true;
+	QTest::newRow("just below") << CellArea(3, 3, 4, 4) << 7 << 2 << CellArea(3, 3, 4, 4) << false;
+	QTest::newRow("well below") << CellArea(3, 3, 4, 4) << 8 << 2 << CellArea(3, 3, 4, 4) << false;
+
+	QTest::newRow("zero rows") << CellArea(3, 3, 4, 4) << 4 << 0 << CellArea(3, 3, 4, 4) << false;
+	QTest::newRow("negative rows") << CellArea(3, 3, 4, 4) << 4 << -1 << CellArea(3, 3, 4, 4) << false;
+}
+
+void CellAreaTests::testInsertColumns()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, index);
+	QFETCH(int, numColumns);
+	QFETCH(CellArea, result);
+	QFETCH(bool, retval);
+
+	QCOMPARE(area.insertColumns(index, numColumns), retval);
+	QCOMPARE(area, result);
+}
+
+void CellAreaTests::testInsertColumns_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("index");
+	QTest::addColumn<int>("numColumns");
+	QTest::addColumn<CellArea>("result");
+	QTest::addColumn<bool>("retval");
+
+	// Tests for area.insertColumns(index, numColumns).
+	QTest::newRow("well left of") << CellArea(2, 2, 4, 4) << 0 << 3 << CellArea(2, 5, 4, 4) << true;
+	QTest::newRow("just left of") << CellArea(2, 2, 4, 4) << 2 << 3 << CellArea(2, 5, 4, 4) << true;
+	QTest::newRow("just inside at left") << CellArea(2, 2, 4, 4) << 3 << 3 << CellArea(2, 2, 7, 4) << true;
+	QTest::newRow("well inside") << CellArea(2, 2, 4, 4) << 4 << 3 << CellArea(2, 2, 7, 4) << true;
+	QTest::newRow("just inside at right") << CellArea(2, 2, 4, 4) << 5 << 3 << CellArea(2, 2, 7, 4) << true;
+	QTest::newRow("just right of") << CellArea(2, 2, 4, 4) << 6 << 3 << CellArea(2, 2, 4, 4) << false;
+	QTest::newRow("well right of") << CellArea(2, 2, 4, 4) << 7 << 3 << CellArea(2, 2, 4, 4) << false;
+
+	QTest::newRow("zero columns") << CellArea(2, 2, 4, 4) << 4 << 0 << CellArea(2, 2, 4, 4) << false;
+	QTest::newRow("negative columns") << CellArea(2, 2, 4, 4) << 4 << -1 << CellArea(2, 2, 4, 4) << false;
+}
+
+void CellAreaTests::testRemoveColumns()
+{
+	QFETCH(CellArea, area);
+	QFETCH(int, index);
+	QFETCH(int, numColumns);
+	QFETCH(CellArea, result);
+	QFETCH(bool, retval);
+
+	QCOMPARE(area.removeColumns(index, numColumns), retval);
+	QCOMPARE(area, result);
+}
+
+void CellAreaTests::testRemoveColumns_data()
+{
+	QTest::addColumn<CellArea>("area");
+	QTest::addColumn<int>("index");
+	QTest::addColumn<int>("numColumns");
+	QTest::addColumn<CellArea>("result");
+	QTest::addColumn<bool>("retval");
+
+	// Tests for area.removeColumns(index, numColumns).
+	QTest::newRow("well left of") << CellArea(3, 3, 4, 4) << 0 << 2 << CellArea(3, 1, 4, 4) << true;
+	QTest::newRow("just left of") << CellArea(3, 3, 4, 4) << 1 << 2 << CellArea(3, 1, 4, 4) << true;
+	QTest::newRow("overlapping left") << CellArea(3, 3, 4, 4) << 2 << 3 << CellArea(3, 3, 2, 4) << true;
+	QTest::newRow("just inside at left") << CellArea(3, 3, 4, 4) << 3 << 2 << CellArea(3, 3, 2, 4) << true;
+	QTest::newRow("completely overlapping") << CellArea(3, 3, 4, 4) << 3 << 4 << CellArea(3, 3, 0, 4) << true;
+	QTest::newRow("well inside") << CellArea(3, 3, 4, 4) << 4 << 2 << CellArea(3, 3, 2, 4) << true;
+	QTest::newRow("just inside at right") << CellArea(3, 3, 4, 4) << 5 << 2 << CellArea(3, 3, 2, 4) << true;
+	QTest::newRow("overlapping right") << CellArea(3, 3, 4, 4) << 5 << 3 << CellArea(3, 3, 2, 4) << true;
+	QTest::newRow("just right of") << CellArea(3, 3, 4, 4) << 7 << 2 << CellArea(3, 3, 4, 4) << false;
+	QTest::newRow("well right of") << CellArea(3, 3, 4, 4) << 8 << 2 << CellArea(3, 3, 4, 4) << false;
+
+	QTest::newRow("zero columns") << CellArea(3, 3, 4, 4) << 4 << 0 << CellArea(3, 3, 4, 4) << false;
+	QTest::newRow("negative columns") << CellArea(3, 3, 4, 4) << 4 << -1 << CellArea(3, 3, 4, 4) << false;
 }
 
 QTEST_APPLESS_MAIN(CellAreaTests)

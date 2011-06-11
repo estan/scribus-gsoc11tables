@@ -67,9 +67,49 @@ public:
 
 	/// Returns a copy of this area with @a rows, @a columns, @a width, @a height added.
 	CellArea adjusted(int rows, int columns, int width, int height) const;
+	/// Adjusts this area by @a rows, @a columns, @a width, @a height.
+	void adjust(int rows, int columns, int width, int height);
 
 	/// Returns the bounding area of this area and @a area.
 	CellArea united(CellArea& area) const;
+
+	/**
+	 * Inserts @a numRows rows before the row at @a index and updates the area appropriately.
+	 * If rows are inserted above the area, the area is moved down. If rows are inserted
+	 * inside the area, the area increases in height. If rows are inserted below the area,
+	 * the area is unaffected.
+	 *
+	 * The function will return <code>true</code> if the area was affected.
+	 */
+	bool insertRows(int index, int numRows);
+
+	/**
+	 * Removes @a numRows rows, starting with the row at @a index. If any of the removed
+	 * rows are inside the area, the area will have its height updated accordingly.
+	 *
+	 * The function will return <code>true</code> if the area was affected. If all rows of the
+	 * area are removed, the area will become invalid and isValid() return <code>false</code>.
+	 */
+	bool removeRows(int index, int numRows);
+
+	/**
+	 * Inserts @a numColumns columns before the column at @a index and updates the area
+	 * appropriately. If columns are inserted left of the area, the area is moved right.
+	 * If columns are inserted inside the area, the area increases in width. If columns are
+	 * inserted right of the area, the area is unaffected.
+	 *
+	 * The function will return <code>true</code> if the area was affected.
+	 */
+	bool insertColumns(int index, int numColumns);
+
+	/**
+	 * Removes @a numColumns columns, starting with the column at @a index. If any of the removed
+	 * columns are inside the area, the area will have its height updated accordingly.
+	 *
+	 * The function will return <code>true</code> if the area was affected. If all columns of the
+	 * area are removed, the area will become invalid and isValid() return <code>false</code>.
+	 */
+	bool removeColumns(int index, int numColumns);
 
 private:
 	int m_row;

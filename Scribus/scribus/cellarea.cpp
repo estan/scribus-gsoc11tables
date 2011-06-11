@@ -67,6 +67,14 @@ CellArea CellArea::adjusted(int rows, int columns, int width, int height) const
 	return area;
 }
 
+void CellArea::adjust(int rows, int columns, int width, int height)
+{
+	m_row += rows;
+	m_column += columns;
+	m_width += width;
+	m_height += height;
+}
+
 CellArea CellArea::united(CellArea& area) const
 {
 	int newRow = qMin(row(), area.row());
@@ -75,6 +83,97 @@ CellArea CellArea::united(CellArea& area) const
 	int newHeight = qMax(bottom() - newRow + 1, area.bottom() - newRow + 1);
 	CellArea unitedArea(newRow, newColumn, newWidth, newHeight);
 	return unitedArea;
+}
+
+bool CellArea::insertRows(int index, int numRows)
+{
+	if (numRows < 1)
+		return false;
+
+	if (index <= row())
+	{
+		// Rows were inserted before this area, so move it down.
+		m_row += numRows;
+		return true;
+	}
+	if (index > row() && index <= bottom())
+	{
+		// Rows were inserted inside this area, so increase its height.
+		m_height += numRows;
+		return true;
+	}
+
+	return false;
+}
+
+bool CellArea::removeRows(int index, int numRows)
+{
+	if (numRows < 1)
+		return false;
+
+	if (index > bottom())
+	{
+		// Rows removed after area.
+		return false;
+	}
+
+	int end = index + numRows - 1;
+	if (end < row())
+	{
+		// Rows removed before area, so move it.
+		m_row -= numRows;
+		return true;
+	}
+
+	// Rows removed inside area, so shrink it.
+	m_height -= qMin(bottom(), end) - qMax(row(), index) + 1;
+
+	return true;
+}
+
+bool CellArea::insertColumns(int index, int numColumns)
+{
+	if (numColumns < 1)
+		return false;
+
+	if (index <= column())
+	{
+		// Columns were inserted before this area, so move it to the right.
+		m_column += numColumns;
+		return true;
+	}
+	if (index > column() && index <= right())
+	{
+		// Columns were inserted inside this area, so increase its width.
+		m_width += numColumns;
+		return true;
+	}
+	return false;
+}
+
+bool CellArea::removeColumns(int index, int numColumns)
+{
+	if (numColumns < 1)
+		return false;
+
+	if (index > right())
+	{
+		// Columns removed after area.
+		return false;
+	}
+
+	int end = index + numColumns - 1;
+	if (end < column())
+	{
+		// Columns removed before area, so move it.
+		m_column -= numColumns;
+		return true;
+	}
+
+	// Columns removed inside area, so shrink it.
+	m_width -= qMin(right(), end) - qMax(column(), index) + 1;
+
+	return true;
 }
 
 bool operator==(const CellArea& lhs, const CellArea& rhs)

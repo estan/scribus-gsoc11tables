@@ -145,6 +145,15 @@ protected:
 	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
 
 private:
+	/// Table structure changes.
+	enum ChangeType
+	{
+		RowsInserted,    /**< Rows were inserted. */
+		RowsRemoved,     /**< Rows were removed. */
+		ColumnsInserted, /**< Columns were inserted. */
+		ColumnsRemoved   /**< Columns were removed. */
+	};
+
 	/// Returns true if @a row is a row in this table.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }
 	/// Returns true if @a column is a column in this table.
@@ -159,6 +168,15 @@ private:
 	 * If the cell does not exist, a null rectangle is returned.
 	 */
 	FRect cellRect(int row, int column) const;
+
+	/**
+	 * Updates areas of merged cells after rows or columns were removed or inserted.
+	 *
+	 * The @a index and @a number specifies that starting with @a index, @a number rows
+	 * or columns were either inserted or removed. The type of change that occurred is
+	 * specified by @a changeType.
+	 */
+	void updateCellAreas(int index, int number, ChangeType changeType);
 
 	/// Draws a decorative dotted grid line from @a start to @a end.
 	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;

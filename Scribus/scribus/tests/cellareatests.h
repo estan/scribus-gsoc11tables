@@ -35,8 +35,18 @@ private slots:
 	void testTranslate_data();
 	void testAdjusted();
 	void testAdjusted_data();
+	void testAdjust();
+	void testAdjust_data();
 	void testUnited();
 	void testUnited_data();
+	void testInsertRows();
+	void testInsertRows_data();
+	void testRemoveRows();
+	void testRemoveRows_data();
+	void testInsertColumns();
+	void testInsertColumns_data();
+	void testRemoveColumns();
+	void testRemoveColumns_data();
  };
 
 #endif // CELLAREATESTS_H
