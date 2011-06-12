@@ -293,7 +293,7 @@ void PageItem_Table::drawGridLine(const FPoint& start, const FPoint& end, ScPain
 {
 	p->save();
 	// TODO: Color should be configurable.
-	double width = 1.0 / (qMax(p->zoomFactor(), 1.0) * 5.0);
+	double width = 0.5 / qMax(p->zoomFactor(), 1.0);
 	p->setPen(Qt::red, width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->drawLine(start, end);
 	p->restore();
