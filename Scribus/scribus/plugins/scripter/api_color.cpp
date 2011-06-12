@@ -1,9 +1,12 @@
 /*
-For general Scribus (>=1.3.2) copyright and licensing information please refer
-to the COPYING file provided with the program. Following this notice may exist
-a copyright and/or license notice that predates the release of Scribus 1.3.2
-for which a new license (GPL+exception) is in place.
-*/
+ * Copyright (C) 2011 Jain Basil Aliyas <jainbasil@gmail.com>
+ *
+ * For general Scribus (>=1.3.2) copyright and licensing information please refer
+ * to the COPYING file provided with the program. Following this notice may exist
+ * a copyright and/or license notice that predates the release of Scribus 1.3.2
+ * for which a new license (GPL+exception) is in place.
+ */
+
 #include "api_color.h"
 #include "sccolorengine.h"
 #include "scribusdoc.h"
@@ -95,6 +98,40 @@ QList<QVariant> ColorAPI::getColorAsRGB(QString name)
     rgbList.append(rgb.green());
     rgbList.append(rgb.blue());
     return rgbList;
+}
+
+/**
+ * Scripter.activeDocument.colors.changeColorCMYK(name, c, m, y, k)
+ * Changes the color "name" to the specified CMYK valur. The color value
+ * is defined via four components, c = Cyan, m = Magenta, y = Yellow and k = Black.
+ * Color components should be in the range from 0 to 255.
+ *
+ * May raise NotFountError is the named color wasn't found.
+ * May raise ValueError if an invalid color name is specified
+ */
+void ColorAPI::changeColorCMYK(QString name, int c, int m, int y, int k)
+{
+    if(name.isEmpty())
+        RAISE("Cannot get a color with an empty name");
+    if(ScCore->primaryMainWindow()->HaveDoc)
+    {
+        if(!ScCore->primaryMainWindow()->doc->PageColors.contains(name))
+        {
+            RAISE("Color not found in document");
+            return;
+        }
+        ScCore->primaryMainWindow()->doc->PageColors[name].setColor(c, m, y, k);
+    }
+    else
+    {
+        ColorList* colorList=PrefsManager::instance()->colorSetPtr();
+        if(!colorList->contains(name))
+        {
+            RAISE("Color not found in default colors.");
+            return;
+        }
+        (*colorList)[name].setColor(c, m, y, k);
+    }
 }
 
 ColorAPI::~ColorAPI()
