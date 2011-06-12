@@ -8,7 +8,11 @@ ADD_SUBDIRECTORY(colormgmt)
 ADD_SUBDIRECTORY(desaxe)
 ADD_SUBDIRECTORY(fonts)
 ADD_SUBDIRECTORY(styles)
+ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(text)
+IF(WITH_TESTS)
+  ADD_SUBDIRECTORY(tests)
+ENDIF(WITH_TESTS)
 ADD_SUBDIRECTORY(unicodemap)
 IF (WANT_DESIGNER)
   ADD_SUBDIRECTORY(designer)
@@ -463,6 +467,7 @@ SET(SCRIBUS_SOURCES
   canvasmode_objimport.cpp
   canvasmode_panning.cpp
   canvasmode_rotate.cpp
+  cellarea.cpp
   chartablemodel.cpp
   chartableview.cpp
   cmserrorhandling.cpp
@@ -880,6 +885,10 @@ LINK_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}/third_party/pgf
 )
 
+IF(WITH_TESTS)
+  LINK_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/tests )
+ENDIF(WITH_TESTS)
+
 IF(HAVE_OSG)
   LINK_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR}/third_party/prc )
 ENDIF (HAVE_OSG)
@@ -890,6 +899,11 @@ ENDIF (HAVE_BOOST)
 
 SET(SCRIBUS_COLORMGMT_LIB "scribus_colormgmt_lib")
 SET(SCRIBUS_TEXT_LIB "scribus_text_lib")
+IF(WITH_TESTS)
+  SET(SCRIBUS_TESTS_LIB "scribus_tests_lib")
+ELSE(WITH_TESTS)
+  SET(SCRIBUS_TESTS_LIB "")
+ENDIF(WITH_TESTS)
 SET(SCRIBUS_STYLES_LIB "scribus_styles_lib")
 SET(SCRIBUS_FONTS_LIB "scribus_fonts_lib")
 SET(SCRIBUS_DESAXE_LIB "scribus_desaxe_lib")
@@ -1070,6 +1084,13 @@ TARGET_LINK_LIBRARIES(${EXE_NAME}
   ${SCRIBUS_PGF_LIB}
   ${LCMS_LIBRARIES}
 )
+
+IF(WITH_TESTS)
+  TARGET_LINK_LIBRARIES(${EXE_NAME} 
+  	${QT_QTTEST_LIBRARY}
+	${SCRIBUS_TESTS_LIB} 
+  )
+ENDIF(WITH_TESTS)
 
 IF(HAVE_PODOFO)
   TARGET_LINK_LIBRARIES(${EXE_NAME}

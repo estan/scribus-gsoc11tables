@@ -346,8 +346,11 @@ public:
 	virtual void invalidateLayout() { invalid = true; }
 	/// creates valid layout information
 	virtual void layout() {}
+	/// returns frame where is text end
+	PageItem * frameTextEnd();
 	/// returns true if text overflows
 	bool frameOverflows() const;
+	bool frameUnderflows() const;
 	/// returns index of first char displayed in this frame, used to be 0
 	int firstInFrame() const;
 	/// returns index of last char displayed in this frame, used to be MaxChars-1
@@ -505,8 +508,6 @@ public:
 	double CurX;
   /** Zeichen Y-Position */
 	double CurY;
-  /** Cursorposition */
-	int CPos;
   /** Text des Elements */
 	StoryText itemText;
   /** Flag fuer PDF-Bookmark */

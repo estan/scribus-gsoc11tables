@@ -35,6 +35,7 @@ SET(SCRIPTER_PLUGIN_SOURCES
   cmdsetprop.cpp
   cmdstyle.cpp
   cmdtext.cpp
+  cmdtable.cpp
   cmdutil.cpp
   guiapp.cpp
   objimageexport.cpp

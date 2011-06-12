@@ -903,7 +903,9 @@ void PageItem_TextFrame::layout()
 // 	printBacktrace(24);
 	if (BackBox != NULL && BackBox->invalid) {
 //		qDebug("textframe: len=%d, going back", itemText.length());
-		invalid = false;
+		// Why that invalid = false here? Calling prevInChain->layout() does
+		// not ensure that this box will be layouted
+		// invalid = false;
 		PageItem_TextFrame* prevInChain = dynamic_cast<PageItem_TextFrame*>(BackBox);
 		while (prevInChain && prevInChain->invalid)
 		{
@@ -2223,14 +2225,14 @@ NoRoom:
 	{
 		next->invalid = true;
 		next->firstChar = MaxChars;
-		if (CPos > signed(MaxChars))
+		if (itemText.cursorPosition() > signed(MaxChars))
 		{
-			int nCP = CPos;
+			int nCP = itemText.cursorPosition();
 //			CPos = MaxChars;
 			if (m_Doc->appMode == modeEdit)
 			{
 				//							OwnPage->Deselect(true);
-				next->CPos = qMax(nCP, signed(MaxChars));
+				next->itemText.setCursorPosition( qMax(nCP, signed(MaxChars)) );
 				//							Doc->currentPage = NextBox->OwnPage;
 				//							NextBox->OwnPage->SelectItemNr(NextBox->ItemNr);
 //				qDebug("textframe: len=%d, leaving relayout in editmode && Tinput", itemText.length());
@@ -2754,7 +2756,6 @@ void PageItem_TextFrame::clearContents()
 
 	while (nextItem != 0)
 	{
-		nextItem->CPos = 0;
 		nextItem->invalid = true;
 		nextItem = nextItem->nextInChain();
 	}
@@ -2762,7 +2763,39 @@ void PageItem_TextFrame::clearContents()
 
 void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 {
-	int oldPos = CPos; // 15-mar-2004 jjsa for cursor movement with Shift + Arrow key
+	if (frameUnderflows())
+	{
+		itemText.setCursorPosition( itemText.length() );
+		PageItem * jumpFrame = frameTextEnd();
+		if (jumpFrame)
+		{
+			m_Doc->view()->Deselect(true);
+			m_Doc->scMW()->selectItemsFromOutlines(jumpFrame);
+			m_Doc->scMW()->setTBvals(jumpFrame);
+			jumpFrame->update();
+			update();
+			switch (k->key())
+			{
+			case Qt::Key_PageDown:
+			case Qt::Key_PageUp:
+			case Qt::Key_End:
+			case Qt::Key_Home:
+			case Qt::Key_Right:
+			case Qt::Key_Left:
+			case Qt::Key_Up:
+			case Qt::Key_Down:
+			case Qt::Key_Delete:
+			case Qt::Key_Backspace:
+				break;
+			default:
+				jumpFrame->handleModeEditKey(k, keyRepeat);
+				jumpFrame->layout();
+				break;
+				}
+			return;
+		}
+	}
+	int oldPos = itemText.cursorPosition(); // 15-mar-2004 jjsa for cursor movement with Shift + Arrow key
 	int kk = k->key();
 	int as = k->text()[0].unicode();
 	QString uc = k->text();
@@ -2832,8 +2865,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 					deleteSelectedTextFromFrame();
 				if (conv < 31)
 					conv = 32;
-				itemText.insertChars(CPos, QString(QChar(conv)), true);
-				CPos += 1;
+				itemText.insertChars(QString(QChar(conv)), true);
 //				Tinput = true;
 				m_Doc->scMW()->setTBvals(this);
 				update();
@@ -2856,11 +2888,13 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		else if (kk == Qt::Key_Right) 
 			kk = Qt::Key_Left;
 	}
+
+	int oldLast = lastInFrame();
 	switch (kk)
 	{
 	case Qt::Key_Home:
 		// go to begin of line
-		if ( (pos = CPos) == firstInFrame() )
+		if ( (pos = itemText.cursorPosition()) == firstInFrame() )
 			break; // at begin of frame
 		len = lastInFrame();
 		if ( pos >= len )
@@ -2874,7 +2908,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 			//Control Home for start of frame text
 			pos = itemText.startOfFrame(pos);
 		}
-		CPos = pos;
+		itemText.setCursorPosition(pos);
 		if ( buttonModifiers & Qt::ShiftModifier )
 			ExpandSel(-1, oldPos);
 //		if ( this->itemText.lengthOfSelection() > 0 )
@@ -2884,16 +2918,16 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 	case Qt::Key_End:
 		// go to end of line
 		len = lastInFrame();
-		if ( CPos >= len )
+		if ( itemText.cursorPosition() >= len )
 			break; // at end of frame
 		if ( (buttonModifiers & Qt::ControlModifier) == 0 )
 		{
-			CPos = itemText.endOfLine(CPos);
+			itemText.setCursorPosition( itemText.endOfLine(itemText.cursorPosition()) );
 		}
 		else
 		{
 			//Control End for end of frame text
-			CPos = itemText.endOfFrame(CPos);
+			itemText.setCursorPosition( itemText.endOfFrame(itemText.cursorPosition()) );
 		}
 		if ( buttonModifiers & Qt::ShiftModifier )
 			ExpandSel(1, oldPos);
@@ -2906,31 +2940,30 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		{
 			// go to end of paragraph
 			len = itemText.length();
-			CPos = itemText.nextParagraph(CPos);
+			itemText.setCursorPosition(itemText.nextParagraph(itemText.cursorPosition()));
 			if ( buttonModifiers & Qt::ShiftModifier )
 				ExpandSel(1, oldPos);
 		}
 		else
 		{
-			if (CPos <= lastInFrame())
+			if (itemText.cursorPosition() <= lastInFrame())
 			{
-				CPos = itemText.nextLine(CPos);
+				itemText.setCursorPosition( itemText.nextLine(itemText.cursorPosition()) );
 				if ( buttonModifiers & Qt::ShiftModifier )
 				{
 					if ( buttonModifiers & Qt::AltModifier )
-						CPos = lastInFrame()+1;
+						itemText.setCursorPosition (lastInFrame()+1);
 					ExpandSel(1, oldPos);
 				}
 				else 
-					if ((itemText.lines() > 0) && (oldPos >= itemText.line(itemText.lines()-1).firstItem) && (CPos >= lastInFrame()) && (NextBox != 0))
+					if ((itemText.lines() > 0) && (oldPos >= itemText.line(itemText.lines()-1).firstItem) && (itemText.cursorPosition() >= lastInFrame()) && (NextBox != 0))
 					{
-						if (NextBox->frameDisplays(CPos))
+						if (NextBox->frameDisplays(itemText.cursorPosition()))
 						{
 							view->Deselect(true);
 							// we position the cursor at the beginning of the next frame
 							// TODO position at the right place in next frame
-							NextBox->CPos = lastInFrame() + 1;
-							view->SelectItemNr(NextBox->ItemNr);
+							m_Doc->scMW()->selectItemsFromOutlines(NextBox);
 						}
 					}
 			}
@@ -2941,8 +2974,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 					if (NextBox->frameDisplays(lastInFrame()+1))
 					{
 						view->Deselect(true);
-						NextBox->CPos = lastInFrame()+1;
-						view->SelectItemNr(NextBox->ItemNr);
+						m_Doc->scMW()->selectItemsFromOutlines(NextBox);
 					}
 				}
 			}
@@ -2954,43 +2986,43 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 	case Qt::Key_Up:
 		if (buttonModifiers & Qt::ControlModifier)
 		{
-			if ( (pos = CPos) == firstInFrame() )
+			if ( (pos = itemText.cursorPosition()) == firstInFrame() )
 				break; // at begin of frame
 			len = itemText.length();
-			CPos = itemText.prevParagraph(CPos);
+			itemText.setCursorPosition( itemText.prevParagraph(itemText.cursorPosition()) );
 			if ( buttonModifiers & Qt::ShiftModifier )
 				ExpandSel(-1, oldPos);
 		}
 		else
 		{
-			if (CPos > firstInFrame())
+			if (itemText.cursorPosition() > firstInFrame())
 			{
-				if (CPos > lastInFrame() || CPos >= itemText.length())
-					CPos = lastInFrame();
-				CPos = itemText.prevLine(CPos);
+				if (itemText.cursorPosition() > lastInFrame() || itemText.cursorPosition() >= itemText.length())
+					itemText.setCursorPosition(lastInFrame());
+				itemText.setCursorPosition( itemText.prevLine(itemText.cursorPosition()) );
 				if ( buttonModifiers & Qt::ShiftModifier )
 				{
 					if ( buttonModifiers & Qt::AltModifier )
-						CPos = firstInFrame();
+						itemText.setCursorPosition( firstInFrame() );
 					ExpandSel(-1, oldPos);
 				}
 				else
-					if ((itemText.lines() > 0) && (oldPos <= itemText.line(0).lastItem) && (CPos == firstInFrame()) && (BackBox != 0))
+					if ((itemText.lines() > 0) && (oldPos <= itemText.line(0).lastItem) && (itemText.cursorPosition()  == firstInFrame()) && (BackBox != 0))
 					{
 						view->Deselect(true);
 						// TODO position at the right place in previous frame
-						BackBox->CPos = BackBox->lastInFrame();
-						view->SelectItemNr(BackBox->ItemNr);
+						BackBox->itemText.setCursorPosition( BackBox->lastInFrame() );
+						m_Doc->scMW()->selectItemsFromOutlines(BackBox);
 					}
 			}
 			else
 			{
-				CPos = firstInFrame();
+				itemText.setCursorPosition( firstInFrame() );
 				if (BackBox != 0)
 				{
 					view->Deselect(true);
-					BackBox->CPos = BackBox->lastInFrame();
-					view->SelectItemNr(BackBox->ItemNr);
+					BackBox->itemText.setCursorPosition( BackBox->lastInFrame() );
+					m_Doc->scMW()->selectItemsFromOutlines(BackBox);
 				}
 			}
 		}
@@ -2999,13 +3031,29 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		m_Doc->scMW()->setTBvals(this);
 		break;
 	case Qt::Key_PageUp:
-		CPos = itemText.startOfFrame(CPos);
+		if (itemText.cursorPosition() == firstInFrame() && BackBox != 0)
+		{
+			view->Deselect(true);
+			BackBox->itemText.setCursorPosition( BackBox->firstInFrame() );
+			m_Doc->scMW()->selectItemsFromOutlines(BackBox);
+			//currItem = currItem->BackBox;
+		}
+		else
+			itemText.setCursorPosition( itemText.startOfFrame(itemText.cursorPosition()) );
 		if ( buttonModifiers & Qt::ShiftModifier )
 			ExpandSel(-1, oldPos);
 		m_Doc->scMW()->setTBvals(this);
 		break;
 	case Qt::Key_PageDown:
-		CPos = itemText.endOfFrame(CPos);
+		if (!frameDisplays(itemText.length()-1) && itemText.cursorPosition() >= lastInFrame() && NextBox != 0)
+		{
+			view->Deselect(true);
+			itemText.setCursorPosition( NextBox->lastInFrame() );
+			m_Doc->scMW()->selectItemsFromOutlines(NextBox);
+			//currItem = currItem->BackBox;
+		}
+		else
+			itemText.setCursorPosition( itemText.endOfFrame(itemText.cursorPosition()) );
 		if ( buttonModifiers & Qt::ShiftModifier )
 			ExpandSel(1, oldPos);
 		m_Doc->scMW()->setTBvals(this);
@@ -3019,47 +3067,46 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		}
 		else if ( buttonModifiers & Qt::ShiftModifier )
 		{
-			--CPos;
-			if ( CPos < 0 )
-				CPos = 0;
-			else
+			int pos = itemText.cursorPosition();
+			itemText.setCursorPosition(-1, true);
+			if ( pos > 0 )
 				ExpandSel(-1, oldPos);
 		}
 		else
 		{
-			--CPos;
-			if (CPos < firstInFrame())
+			itemText.setCursorPosition(-1, true);
+			if (itemText.cursorPosition() < firstInFrame())
 			{
-				CPos = firstInFrame();
+				itemText.setCursorPosition( firstInFrame() );
 				if (BackBox != 0)
 				{
 					view->Deselect(true);
-					BackBox->CPos = BackBox->lastInFrame();
-					view->SelectItemNr(BackBox->ItemNr);
+					BackBox->itemText.setCursorPosition( BackBox->lastInFrame() );
+					m_Doc->scMW()->selectItemsFromOutlines(BackBox);
 					//currItem = currItem->BackBox;
 				}
 			}
 		}
-		if ((CPos > 0) && (CPos >= lastInFrame())) // I do not see how its possible, may be dead code - pm
+		if ((itemText.cursorPosition() > 0) && (itemText.cursorPosition() >= lastInFrame())) // I do not see how its possible, may be dead code - pm
 		{
-			CPos = lastInFrame();
+			itemText.setCursorPosition( lastInFrame() );
 //			if (itemText.charStyle(CPos-1).effects() & ScStyle_SuppressSpace)
 //			{
 //				--CPos;
-				while ((CPos > 1) && (itemText.charStyle(CPos).effects() & ScStyle_SuppressSpace) && (itemText.charStyle(CPos - 1).effects() & ScStyle_SuppressSpace))
+				while ((itemText.cursorPosition() > 1) && (itemText.charStyle().effects() & ScStyle_SuppressSpace) && (itemText.charStyle(itemText.cursorPosition() - 1).effects() & ScStyle_SuppressSpace))
 				{
-					--CPos;
-					if (CPos == 0)
+					itemText.setCursorPosition(-1, true);
+					if (itemText.cursorPosition() == 0)
 						break;
 				}
 //			}
 		}
 		else
 		{
-			while ((CPos > 1) && (itemText.charStyle(CPos).effects() & ScStyle_SuppressSpace) && (itemText.charStyle(CPos - 1).effects() & ScStyle_SuppressSpace))
+			while ((itemText.cursorPosition() > 1) && (itemText.charStyle().effects() & ScStyle_SuppressSpace) && (itemText.charStyle(itemText.cursorPosition() - 1).effects() & ScStyle_SuppressSpace))
 			{
-				--CPos;
-				if (CPos == 0)
+				itemText.setCursorPosition(-1, true);
+				if (itemText.cursorPosition() == 0)
 					break;
 			}
 		}
@@ -3076,26 +3123,24 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		}
 		else if ( buttonModifiers & Qt::ShiftModifier )
 		{
-			++CPos;
-			if ( CPos > itemText.length() )
-				--CPos;
-			else
+			int pos = itemText.cursorPosition();
+			itemText.setCursorPosition(1, true);
+			if ( pos < itemText.length() )
 				ExpandSel(1, oldPos);
 		}
 		else
 		{
-			++CPos; // new position within text ?
-			if (CPos > lastInFrame())
+			itemText.setCursorPosition(1, true); // new position within text ?
+			if (itemText.cursorPosition() > lastInFrame())
 			{
 //				--CPos;
-				CPos = lastInFrame() + 1;
+				itemText.setCursorPosition(lastInFrame() + 1);
 				if (NextBox != 0)
 				{
-					if (NextBox->frameDisplays(CPos))
+					if (NextBox->frameDisplays(itemText.cursorPosition()))
 					{
 						view->Deselect(true);
-						NextBox->CPos = CPos;
-						view->SelectItemNr(NextBox->ItemNr);
+						m_Doc->scMW()->selectItemsFromOutlines(NextBox);
 						//currItem = currItem->NextBox;
 					}
 				}
@@ -3106,7 +3151,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		m_Doc->scMW()->setTBvals(this);
 		break;
 	case Qt::Key_Delete:
-		if (CPos == itemText.length())
+		if (itemText.cursorPosition() == itemText.length())
 		{
 			if (itemText.lengthOfSelection() > 0)
 			{
@@ -3123,22 +3168,22 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 			keyRepeat = false;
 			return;
 		}
-		cr = itemText.text(CPos,1);
+		cr = itemText.text(1);
 		if (itemText.lengthOfSelection() == 0)
-			itemText.select(CPos, 1, true);
+			itemText.select(itemText.cursorPosition(), 1, true);
 		deleteSelectedTextFromFrame();
 		update();
 //		Tinput = false;
 		if ((cr == QChar(13)) && (itemText.length() != 0))
 		{
-//			m_Doc->chAbStyle(this, findParagraphStyle(m_Doc, itemText.paragraphStyle(qMax(CPos-1,0))));
+//			m_Doc->chAbStyle(this, findParagraphStyle(m_Doc, itemText.paragraphStyle(qMax(itemText.cursorPosition()-1,0))));
 //			Tinput = false;
 		}
 		m_Doc->scMW()->setTBvals(this);
 //		view->RefreshItem(this);
 		break;
 	case Qt::Key_Backspace:
-		if (CPos == 0)
+		if (itemText.cursorPosition() == 0)
 		{
 			if (itemText.lengthOfSelection() > 0)
 			{
@@ -3150,11 +3195,11 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		}
 		if (itemText.length() == 0)
 			break;
-		cr = itemText.text(qMax(CPos-1,0),1);
+		cr = itemText.text(qMax((int) itemText.cursorPosition() - 1, 0), 1);
 		if (itemText.lengthOfSelection() == 0)
 		{
-			--CPos;
-			itemText.select(CPos, 1, true);
+			itemText.setCursorPosition(-1, true);
+			itemText.select(itemText.cursorPosition(), 1, true);
 		}
 		deleteSelectedTextFromFrame();
 //		Tinput = false;
@@ -3162,6 +3207,22 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		{
 //			m_Doc->chAbStyle(this, findParagraphStyle(m_Doc, itemText.paragraphStyle(qMax(CPos-1,0))));
 //			Tinput = false;
+		}
+		updateLayout();
+		if (oldLast != lastInFrame() && NextBox != 0 && NextBox->invalid)
+			NextBox->updateLayout();
+		if (itemText.cursorPosition() < firstInFrame())
+		{
+			itemText.setCursorPosition( firstInFrame() );
+			if (BackBox != 0)
+			{
+				view->Deselect(true);
+				if (BackBox->invalid)
+					BackBox->updateLayout();
+				itemText.setCursorPosition( BackBox->lastInFrame() );
+				m_Doc->scMW()->selectItemsFromOutlines(BackBox);
+				//currItem = currItem->BackBox;
+			}
 		}
 		m_Doc->scMW()->setTBvals(this);
 		update();
@@ -3200,21 +3261,19 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 		//if ((kk == Qt::Key_Tab) || ((kk == Qt::Key_Return) && (buttonState & Qt::ShiftButton)))
 		if (kk == Qt::Key_Tab)
 		{
-			itemText.insertChars(CPos, QString(SpecialChars::TAB), true);
-			CPos += 1;
+			itemText.insertChars(QString(SpecialChars::TAB), true);
 //			Tinput = true;
 //			view->RefreshItem(this);
 			doUpdate = true;
 		}
 		else if ((uc[0] > QChar(31) && m_Doc->currentStyle.charStyle().font().canRender(uc[0])) || (as == 13) || (as == 30))
 		{
-			itemText.insertChars(CPos, uc, true);
-			CPos += 1;
-			if ((m_Doc->docHyphenator->AutoCheck) && (CPos > 1))
+			itemText.insertChars(uc, true);
+			if ((m_Doc->docHyphenator->AutoCheck) && (itemText.cursorPosition() > 1))
 			{
 				Twort = "";
 				Tcoun = 0;
-				for (int hych = CPos-1; hych > -1; hych--)
+				for (int hych = itemText.cursorPosition()-1; hych > -1; hych--)
 				{
 					Tcha = itemText.text(hych,1);
 					if (Tcha[0] == ' ')
@@ -3234,7 +3293,22 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 //			view->RefreshItem(this);
 			doUpdate = true;
 		}
-		if (doUpdate) update();
+		if (doUpdate)
+		{
+			// update layout immediately, we need MaxChars to be correct to detect 
+			// if we need to move to next frame or not
+			updateLayout();
+			if (oldLast != lastInFrame() && NextBox != 0 && NextBox->invalid)
+				NextBox->updateLayout();
+		}
+		//check if cursor need to jump to next linked frame
+		if ((itemText.cursorPosition() > lastInFrame() + 1) && (lastInFrame() < (itemText.length() - 2)) && NextBox != 0)
+		{
+			view->Deselect(true);
+			view->Deselect(true);
+			NextBox->update();
+			m_Doc->scMW()->selectItemsFromOutlines(NextBox);
+		}
 		break;
 	}
 // 	update();
@@ -3249,7 +3323,7 @@ void PageItem_TextFrame::handleModeEditKey(QKeyEvent *k, bool& keyRepeat)
 void PageItem_TextFrame::deleteSelectedTextFromFrame()
 {
 	if (itemText.lengthOfSelection() > 0) {
-		CPos = itemText.startOfSelection();
+		itemText.setCursorPosition( itemText.startOfSelection() );
 		itemText.removeSelection();
 		HasSel = false;
 	}
@@ -3269,13 +3343,13 @@ void PageItem_TextFrame::setNewPos(int oldPos, int len, int dir)
 	if ( dir > 0 && oldPos < len )
 	{
 		wasSpace = itemText.text(oldPos).isSpace();
-		CPos=oldPos+1;
-		while (CPos<len)
+		itemText.setCursorPosition(oldPos + 1);
+		while (itemText.cursorPosition() < len)
 		{
-			isSpace = itemText.text(CPos).isSpace();
+			isSpace = itemText.text().isSpace();
 			if (wasSpace && !isSpace)
 				break;
-			++CPos;
+			itemText.setCursorPosition(1, true);
 			wasSpace=isSpace;
 			
 		}
@@ -3292,19 +3366,18 @@ void PageItem_TextFrame::setNewPos(int oldPos, int len, int dir)
 	}
 	else if ( dir < 0 && oldPos > 0 )
 	{
-		CPos=oldPos-1;
-		wasSpace = itemText.text(CPos).isSpace();
-		while (CPos>0)
+		itemText.setCursorPosition(oldPos - 1);
+		wasSpace = itemText.text().isSpace();
+		while (itemText.cursorPosition() > 0)
 		{
-			isSpace = itemText.text(CPos).isSpace();
+			isSpace = itemText.text().isSpace();
 			if (!wasSpace && isSpace)
 			{
-				++CPos;
+				itemText.setCursorPosition(1, true);
 				break;
 			}
-			--CPos;
+			itemText.setCursorPosition(-1, true);
 			wasSpace=isSpace;
-			
 		}
 		/*
 		oldPos--;
@@ -3367,19 +3440,19 @@ void PageItem_TextFrame::ExpandSel(int dir, int oldPos)
 	// preventing it to be less than 0 here.
 	int end = qMax(0,itemText.endOfSelection());
 	
-	if (oldPos >= end && CPos < start)
+	if (oldPos >= end && itemText.cursorPosition() < start)
 	{
 		itemText.deselectAll();
-		itemText.select(CPos, start - CPos);
+		itemText.select(itemText.cursorPosition(), start - itemText.cursorPosition());
 	}
-	else if (oldPos <= start && CPos > end)
+	else if (oldPos <= start && itemText.cursorPosition() > end)
 	{
 		itemText.deselectAll();
-		itemText.select(end, CPos - end);
+		itemText.select(end, itemText.cursorPosition() - end);
 	}
 	else
 	{
-		itemText.extendSelection(oldPos, CPos);
+		itemText.extendSelection(oldPos, itemText.cursorPosition());
 	}
 	HasSel = (itemText.lengthOfSelection() > 0);
 	if (HasSel)
@@ -3393,7 +3466,7 @@ void PageItem_TextFrame::ExpandSel(int dir, int oldPos)
 		//CB Replace with direct call for now //emit  HasNoTextSel();
 		m_Doc->scMW()->DisableTxEdit();
 	}
-	cursorBiasBackward = (oldPos > CPos);
+	cursorBiasBackward = (oldPos > itemText.cursorPosition());
 
 // 	layoutWeakLock = true;
 // 	update();

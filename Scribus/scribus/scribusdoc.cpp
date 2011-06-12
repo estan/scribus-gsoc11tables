@@ -136,7 +136,7 @@ public:
 		}
 	}
 	
-	void changed(Page* pg)
+	void changed(Page* pg, bool /*doLayout*/)
 	{
 		QRectF pagebox(pg->xOffset(), pg->yOffset(), pg->width(), pg->height());
 		doc->invalidateRegion(pagebox);
@@ -149,9 +149,11 @@ public:
 		m_docChangeNeeded = true;
 	}
 	
-	void changed(PageItem* it)
+	void changed(PageItem* it, bool doLayout)
 	{
 		it->invalidateLayout();
+		if (doLayout)
+			it->layout();
 		doc->regionsChanged()->update(it->getVisualBoundingRect());
 		if (m_updateEnabled <= 0)
 		{
@@ -6947,7 +6949,7 @@ void ScribusDoc::itemSelection_SetParagraphStyle(const ParagraphStyle & newStyle
 				start = currItem->itemText.startOfSelection();
 				stop = currItem->itemText.endOfSelection();
 				if (start >= stop)
-					start = stop = qMax(0, qMin(currItem->itemText.length(), currItem->CPos));
+					start = stop = currItem->itemText.normalizedCursorPosition();
 			}
 			for (int pos=start; pos < stop; ++pos)
 			{
@@ -7001,7 +7003,7 @@ void ScribusDoc::itemSelection_EraseParagraphStyle(Selection* customSelection)
 				start = currItem->itemText.startOfSelection();
 				stop = currItem->itemText.endOfSelection();
 				if (start >= stop)
-					start = stop = qMax(0, qMin(currItem->itemText.length(), currItem->CPos));
+					start = stop = currItem->itemText.normalizedCursorPosition();
 			}
 			for (int pos=start; pos < stop; ++pos)
 			{
@@ -7065,7 +7067,7 @@ void ScribusDoc::itemSelection_ApplyParagraphStyle(const ParagraphStyle & newSty
 				start = currItem->itemText.startOfSelection();
 				stop = currItem->itemText.endOfSelection();
 				if (start >= stop)
-					start = stop = qMax(0, qMin(currItem->itemText.length(), currItem->CPos));
+					start = stop = currItem->itemText.normalizedCursorPosition();
 			}
 			for (int pos=start; pos < stop; ++pos)
 			{
@@ -7120,8 +7122,8 @@ void ScribusDoc::itemSelection_ApplyCharStyle(const CharStyle & newStyle, Select
 				}
 				else
 				{
-					start = qMax(currItem->firstInFrame(), currItem->CPos);
-					length = (start + 1) < currItem->itemText.length()? 1 : 0;
+					start = qMax(currItem->firstInFrame(), currItem->itemText.cursorPosition());
+					length = (start + 1) < currItem->itemText.length() ? 1 : 0;
 				}
 			}
 			currItem->itemText.applyCharStyle(start, qMax(0, length), newStyle);
@@ -7179,7 +7181,7 @@ void ScribusDoc::itemSelection_SetCharStyle(const CharStyle & newStyle, Selectio
 				}
 				else
 				{
-					start = qMax(currItem->firstInFrame(), currItem->CPos);
+					start = qMax(currItem->firstInFrame(), currItem->itemText.cursorPosition());
 					length = (start + 1) < currItem->itemText.length()? 1 : 0;
 				}
 			}
@@ -7237,7 +7239,7 @@ void ScribusDoc::itemSelection_EraseCharStyle(Selection* customSelection)
 				}
 				else
 				{
-					start = qMax(currItem->firstInFrame(), currItem->CPos);
+					start = qMax(currItem->firstInFrame(), currItem->itemText.cursorPosition());
 					length = (start + 1) < currItem->itemText.length()? 1 : 0;
 				}
 			}
@@ -9074,6 +9076,22 @@ void ScribusDoc::itemSelection_DeleteItem(Selection* customSelection, bool force
 		}
 	}
 	changed();
+}
+
+void ScribusDoc::itemSelection_SetItemTextReversed(bool reversed)
+{
+	uint selectedItemCount=m_Selection->count();
+	if (selectedItemCount != 0)
+	{
+		for (uint i = 0; i < selectedItemCount; ++i)
+		{
+			PageItem *currItem = m_Selection->itemAt(i);
+			currItem->setImageFlippedH(reversed);
+			currItem->setReversed(reversed);
+		}
+		regionsChanged()->update(QRectF());
+		changed();
+	}
 }
 
 
@@ -12553,38 +12571,43 @@ void ScribusDoc::itemSelection_UniteItems(Selection* /*customSelection*/)
 void ScribusDoc::itemSelection_SplitItems(Selection* /*customSelection*/)
 {
 	PageItem *bb;
-	uint StartInd = 0;
 	m_Selection->delaySignalsOn();
-	PageItem *currItem = m_Selection->itemAt(0);
-	int currItemNr = currItem->ItemNr;
-	uint EndInd = currItem->PoLine.size();
-	for (uint a = EndInd-1; a > 0; --a)
+	for (int i = 0; i < m_Selection->count(); ++i)
 	{
-		if (currItem->PoLine.point(a).x() > 900000)
+		PageItem *currItem = m_Selection->itemAt(i);
+		if (!currItem->isPolygon() || currItem->Segments.count() <= 0)
+			continue;
+		uint StartInd = 0;
+		int currItemNr = currItem->ItemNr;
+		uint EndInd = currItem->PoLine.size();
+		for (uint a = EndInd-1; a > 0; --a)
 		{
-			StartInd = a + 1;
-			bb = new PageItem_Polygon(*currItem);
-			currItemNr++;
-			Items->insert(currItemNr, bb);
-			bb->ItemNr = currItemNr;
-			bb->convertTo(PageItem::Polygon);
-			bb->Frame = false;
-			bb->FrameType = 3;
-			bb->PoLine.resize(0);
-			bb->PoLine.putPoints(0, EndInd - StartInd, currItem->PoLine, StartInd);
-			bb->setRotation(currItem->rotation());
-			AdjustItemSize(bb);
-			bb->ContourLine = bb->PoLine.copy();
-			bb->ClipEdited = true;
-			m_Selection->addItem(bb, false);
-			a -= 3;
-			EndInd = StartInd - 4;
+			if (currItem->PoLine.point(a).x() > 900000)
+			{
+				StartInd = a + 1;
+				bb = new PageItem_Polygon(*currItem);
+				currItemNr++;
+				Items->insert(currItemNr, bb);
+				bb->ItemNr = currItemNr;
+				bb->convertTo(PageItem::Polygon);
+				bb->Frame = false;
+				bb->FrameType = 3;
+				bb->PoLine.resize(0);
+				bb->PoLine.putPoints(0, EndInd - StartInd, currItem->PoLine, StartInd);
+				bb->setRotation(currItem->rotation());
+				AdjustItemSize(bb);
+				bb->ContourLine = bb->PoLine.copy();
+				bb->ClipEdited = true;
+				m_Selection->addItem(bb, false);
+				a -= 3;
+				EndInd = StartInd - 4;
+			}
 		}
+		currItem->PoLine.resize(StartInd-4);
+		AdjustItemSize(currItem);
+		currItem->ContourLine = currItem->PoLine.copy();
+		currItem->ClipEdited = true;
 	}
-	currItem->PoLine.resize(StartInd-4);
-	AdjustItemSize(currItem);
-	currItem->ContourLine = currItem->PoLine.copy();
-	currItem->ClipEdited = true;
 	m_Selection->delaySignalsOff();
 	renumberItemsInListOrder();
 	//FIXME: stop using m_View

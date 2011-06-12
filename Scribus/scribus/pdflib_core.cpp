@@ -2038,10 +2038,7 @@ bool PDFLibCore::PDF_TemplatePage(const Page* pag, bool )
 								PutPage(tmpOut);
 							}
 							PutPage(SetClipPath(ite));
-							if (ite->fillRule)
-								PutPage("h\nf*\n");
-							else
-								PutPage("h\nf\n");
+							PutPage(ite->fillRule ? "h\nf*\n" : "h\nf\n");
 						}
 						PutPage("q\n");
 						if (ite->imageClip.size() != 0)
@@ -2212,20 +2209,14 @@ bool PDFLibCore::PDF_TemplatePage(const Page* pag, bool )
 							}
 							PutPage(tmpOut);
 							PutPage(SetClipPath(ite));
-							if (ite->fillRule)
-								PutPage("h\nf*\n");
-							else
-								PutPage("h\nf\n");
+							PutPage(ite->fillRule ? "h\nf*\n" : "h\nf\n");
 						}
 						else
 						{
 							if (ite->fillColor() != CommonStrings::None)
 							{
 								PutPage(SetClipPath(ite));
-								if (ite->fillRule)
-									PutPage("h\nf*\n");
-								else
-									PutPage("h\nf\n");
+								PutPage(ite->fillRule ? "h\nf*\n" : "h\nf\n");
 							}
 						}
 						PutPage("Q\n");
@@ -2304,20 +2295,14 @@ bool PDFLibCore::PDF_TemplatePage(const Page* pag, bool )
 								}
 								PutPage(tmpOut);
 								PutPage(SetClipPath(ite));
-								if (ite->fillRule)
-									PutPage("h\nf*\n");
-								else
-									PutPage("h\nf\n");
+								PutPage(ite->fillRule ? "h\nf*\n" : "h\nf\n");
 							}
 							else
 							{
 								if (ite->fillColor() != CommonStrings::None)
 								{
 									PutPage(SetClipPath(ite));
-									if (ite->fillRule)
-										PutPage("h\nf*\n");
-									else
-										PutPage("h\nf\n");
+									PutPage(ite->fillRule ? "h\nf*\n" : "h\nf\n");
 								}
 							}
 							PutPage("Q\n");
@@ -3706,18 +3691,12 @@ bool PDFLibCore::PDF_ProcessItem(QString& output, PageItem* ite, const Page* pag
 					}
 					tmp += tmpOut;
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 				else
 				{
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 			}
 			tmp += "q\n";
@@ -3821,18 +3800,12 @@ bool PDFLibCore::PDF_ProcessItem(QString& output, PageItem* ite, const Page* pag
 					}
 					tmp += tmpOut;
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 				else
 				{
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 			}
 			tmp += "q\n";
@@ -3991,20 +3964,14 @@ bool PDFLibCore::PDF_ProcessItem(QString& output, PageItem* ite, const Page* pag
 				}
 				tmp += tmpOut;
 				tmp += SetClipPath(ite);
-				if (ite->fillRule)
-					tmp += "h\nf*\n";
-				else
-					tmp += "h\nf\n";
+				tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 			}
 			else
 			{
 				if (ite->fillColor() != CommonStrings::None)
 				{
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 			}
 			tmp += "Q\n";
@@ -4084,20 +4051,14 @@ bool PDFLibCore::PDF_ProcessItem(QString& output, PageItem* ite, const Page* pag
 					}
 					tmp += tmpOut;
 					tmp += SetClipPath(ite);
-					if (ite->fillRule)
-						tmp += "h\nf*\n";
-					else
-						tmp += "h\nf\n";
+					tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 				}
 				else
 				{
 					if (ite->fillColor() != CommonStrings::None)
 					{
 						tmp += SetClipPath(ite);
-						if (ite->fillRule)
-							tmp += "h\nf*\n";
-						else
-							tmp += "h\nf\n";
+						tmp += (ite->fillRule ? "h\nf*\n" : "h\nf\n");
 					}
 				}
 				tmp += "Q\n";
@@ -4729,30 +4690,8 @@ QString PDFLibCore::setStrokeMulti(struct SingleLine *sl)
 			putColor(sl->Color, sl->Shade, false) +
 			FToStr(sl->Width)+" w\n"
 			);
-	QString Dt = FToStr(qMax(1*sl->Width, 1.0));
-	QString Sp = FToStr(qMax(2*sl->Width, 1.0));
-	QString Da = FToStr(qMax(4*sl->Width, 1.0));
-	switch (static_cast<Qt::PenStyle>(sl->Dash))
-	{
-		case Qt::SolidLine:
-			tmp += "[] 0 d\n";
-			break;
-		case Qt::DashLine:
-			tmp += "["+Da+" "+Sp+"] 0 d\n";
-			break;
-		case Qt::DotLine:
-			tmp += "["+Dt+" "+Sp+"] 0 d\n";
-			break;
-		case Qt::DashDotLine:
-			tmp += "["+Da+" "+Sp+" "+Dt+" "+Sp+"] 0 d\n";
-			break;
-		case Qt::DashDotDotLine:
-			tmp += "["+Da+" "+Sp+" "+Dt+" "+Sp+" "+Dt+" "+Sp+"] 0 d\n";
-			break;
-		default:
-			tmp += "[] 0 d\n";
-			break;
-		}
+	QString Ds = getDashString(sl->Dash, sl->Width);
+	tmp += Ds.isEmpty() ? "[] 0 d\n" : QString("[%1] 0 d\n").arg(Ds);
 	switch (static_cast<Qt::PenCapStyle>(sl->LineEnd))
 	{
 		case Qt::FlatCap:

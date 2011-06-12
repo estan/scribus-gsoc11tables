@@ -159,7 +159,6 @@ PageItem::PageItem(const PageItem & other)
 	BBoxH(other.BBoxH),
 	CurX(other.CurX),
 	CurY(other.CurY),
-	CPos(other.CPos),
 	itemText(other.itemText),
 	isBookmark(other.isBookmark),
 	HasSel(other.HasSel),
@@ -461,7 +460,6 @@ PageItem::PageItem(ScribusDoc *pa, ItemType newType, double x, double y, double 
 	FrameType = 0;
 	CurX = 0;
 	CurY = 0;
-	CPos = 0;
 	Extra = m_Doc->itemToolPrefs().textDistances.Left;
 	TExtra = m_Doc->itemToolPrefs().textDistances.Top;
 	BExtra = m_Doc->itemToolPrefs().textDistances.Bottom;
@@ -566,6 +564,10 @@ PageItem::PageItem(ScribusDoc *pa, ItemType newType, double x, double y, double 
 	case Spiral:
 		AnName = tr("Spiral");
 		setUPixmap(Um::IPolygon);
+		break;
+	case Table:
+		AnName = tr("Table");
+		//setUPixmap(Um::IPolygon); // TODO: Fix this.
 		break;
 	default:
 		AnName = "Item";
@@ -1036,9 +1038,33 @@ void PageItem::setImageRotation(const double newRotation)
 
 void PageItem::setReversed(bool newReversed)
 {
+	if (UndoManager::undoEnabled())
+	{
+		SimpleState *ss = new SimpleState(Um::FlipH, 0, Um::IFlipH);
+		ss->set("REVERSE_TEXT", "REVERSE_TEXT");
+		undoManager->action(this, ss);
+	}
 	Reverse=newReversed;
 }
 
+//return frame where is text end
+PageItem * PageItem::frameTextEnd()
+{
+	PageItem * LastBox = this;
+	if (frameOverflows() && NextBox)
+	{ // text ending in some next frame
+		LastBox = NextBox;
+		while (LastBox != 0 && !LastBox->frameDisplays(itemText.length()-1))
+			LastBox = LastBox->nextInChain();
+	}
+	else if (frameUnderflows() && BackBox)
+	{ //text ending in some previous frame
+		LastBox = BackBox;
+		while (LastBox != 0 && !LastBox->frameDisplays(itemText.length()-1))
+			LastBox = LastBox->prevInChain();
+	}
+	return LastBox;
+}
 
 /// returns true if text overflows
 bool PageItem::frameOverflows() const
@@ -1055,6 +1081,17 @@ bool PageItem::frameOverflows() const
 #else
 	return false; // FIXME:NLS
 #endif
+}
+
+/// returns true if text is ending before that frame
+bool PageItem::frameUnderflows() const
+{
+	if (BackBox == NULL)
+		return false;
+	//FIX ME - I have found that condition if frame is empty
+	//and has been linked with previous frame
+	//if you will find any better solution - fix that function
+	return (firstInFrame() > lastInFrame());
 }
 
 int PageItem::firstInFrame() const
@@ -1238,8 +1275,8 @@ bool PageItem::frameDisplays(int textpos) const
 /// returns the style at the current charpos
 const ParagraphStyle& PageItem::currentStyle() const
 {
-	if (frameDisplays(CPos))
-		return itemText.paragraphStyle(CPos);
+	if (frameDisplays(itemText.cursorPosition()))
+		return itemText.paragraphStyle(itemText.cursorPosition());
 	else
 		return itemText.defaultStyle();
 }
@@ -1247,8 +1284,8 @@ const ParagraphStyle& PageItem::currentStyle() const
 /// returns the style at the current charpos for changing
 ParagraphStyle& PageItem::changeCurrentStyle()
 {
-	if (frameDisplays(CPos))
-		return const_cast<ParagraphStyle&>(itemText.paragraphStyle(CPos));
+	if (frameDisplays(itemText.cursorPosition()))
+		return const_cast<ParagraphStyle&>(itemText.paragraphStyle(itemText.cursorPosition()));
 	else
 		return const_cast<ParagraphStyle&>(itemText.defaultStyle());
 }
@@ -1256,8 +1293,8 @@ ParagraphStyle& PageItem::changeCurrentStyle()
 /// returns the style at the current charpos
 const CharStyle& PageItem::currentCharStyle() const
 {
-	if (frameDisplays(CPos))
-		return itemText.charStyle(CPos);
+	if (frameDisplays(itemText.cursorPosition()))
+		return itemText.charStyle(itemText.cursorPosition());
 	else
 		return itemText.defaultStyle().charStyle();
 }
@@ -5142,8 +5179,8 @@ void PageItem::getBoundingRect(double *x1, double *y1, double *x2, double *y2) c
 	{
 		*x1 = Xpos;
 		*y1 = Ypos;
-		*x2 = Xpos + qMax(Width, m_lineWidth);
-		*y2 = Ypos + qMax(Height, m_lineWidth);
+		*x2 = Xpos + qMax(1.0, qMax(Width, m_lineWidth));
+		*y2 = Ypos + qMax(1.0, qMax(Height, m_lineWidth));
 	}
 	QRectF totalRect = QRectF(QPointF(*x1, *y1), QPointF(*x2, *y2));
 	if (m_startArrowIndex != 0)
