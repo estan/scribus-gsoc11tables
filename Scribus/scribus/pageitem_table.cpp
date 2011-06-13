@@ -329,6 +329,14 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 
 	// Just draw the grid with decorative lines for now.
 	p->save();
+	FPoint topLeft(0.0, 0.0);
+	FPoint topRight(m_columnPositions.last() + m_columnWidths.last(), 0.0);
+	FPoint bottomRight(m_columnPositions.last() + m_columnWidths.last(), m_rowPositions.last() + m_rowHeights.last());
+	FPoint bottomLeft(0.0, m_rowPositions.last() + m_rowHeights.last());
+	drawGridLine(topLeft, topRight, p);
+	drawGridLine(topRight, bottomRight, p);
+	drawGridLine(bottomRight, bottomLeft, p);
+	drawGridLine(bottomLeft, topLeft, p);
 
 	for (int row = 0; row < rows(); ++row)
 	{
