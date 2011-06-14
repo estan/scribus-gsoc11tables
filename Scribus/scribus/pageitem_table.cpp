@@ -69,8 +69,6 @@ void PageItem_Table::insertRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveDown(numRows);
 	}
-
-	debug();
 }
 
 void PageItem_Table::removeRows(int index, int numRows)
@@ -110,8 +108,6 @@ void PageItem_Table::removeRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveUp(numRows);
 	}
-
-	debug();
 }
 
 qreal PageItem_Table::rowHeight(int row) const
@@ -175,8 +171,6 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveRight(numColumns);
 	}
-
-	debug();
 }
 
 void PageItem_Table::removeColumns(int index, int numColumns)
@@ -214,8 +208,6 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveLeft(numColumns);
 	}
-
-	debug();
 }
 
 qreal PageItem_Table::columnWidth(int column) const
