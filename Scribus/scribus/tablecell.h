@@ -90,7 +90,7 @@ public:
 	QString style() const { return isValid() ? d->style : QString(); }
 
 	/**
-	 * Converts the cell to a QString with format <code>"<row>,<column> <rowSpan>x<columnSpan>"</code>.
+	 * Converts the cell to a QString with format <code>"<row>,<column> <columnSpan>x<rowSpan>"</code>.
 	 */
 	operator QString() { return QString("(%1,%2 %3x%4)").arg(row()).arg(column()).arg(columnSpan()).arg(rowSpan()); }
 private:
