@@ -24,8 +24,6 @@ class FRect;
 
 /**
  * The PageItem_Table class represents a table item.
- *
- * It is just a dummy class for now.
  */
 class SCRIBUS_API PageItem_Table : public PageItem
 {
