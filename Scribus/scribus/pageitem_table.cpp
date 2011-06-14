@@ -18,8 +18,9 @@ for which a new license (GPL+exception) is in place.
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
 	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
-	insertRows(0, qMax(1, numRows));
+	// NOTE: The order here is important as insertRows() assumes that columns() > 0.
 	insertColumns(0, qMax(1, numColumns));
+	insertRows(0, qMax(1, numRows));
 	adjustToFrame();
 }
 
@@ -28,25 +29,48 @@ void PageItem_Table::insertRows(int index, int numRows)
 	if (index < 0 || index > rows() || numRows < 1)
 		return;
 
-	// Insert row heights and positions.
+	// Height and position of first inserted row.
 	qreal rowHeight = rows() == 0 ? height() : m_rowHeights.at(qMax(index - 1, 0));
 	qreal rowPosition = index == 0 ? 0.0 : m_rowPositions.at(qMax(index - 1, 0)) + rowHeight;
-	for (int i = 0; i < numRows; ++i)
+
+	// Insert row heights, row positions and a new row of cells.
+	for (int row = index; row < index + numRows; ++row)
 	{
-		m_rowHeights.insert(index + i, rowHeight);
-		m_rowPositions.insert(index + i, rowPosition);
+		// Insert row height and position.
+		m_rowHeights.insert(row, rowHeight);
+		m_rowPositions.insert(row, rowPosition);
 		rowPosition += rowHeight;
+
+		// Insert a new row of cells if table is non-empty.
+		if (columns() > 0 || index > 0)
+		{
+			// NOTE: We assume here that columns() > 0.
+			QList<TableCell> cellRow;
+			for (int col = 0; col < columns(); ++col)
+				cellRow.append(TableCell(row, col, this));
+			m_cellRows.insert(row, cellRow);
+		}
 	}
+
+	// Increase number of rows.
+	m_rows += numRows;
 
 	// Update row spans.
 	updateSpans(index, numRows, RowsInserted);
 
-	m_rows += numRows;
-
-	// Adjust positions of following rows.
+	// Adjust following rows.
 	qreal insertedHeight = rowHeight * numRows;
 	for (int nextRow = index + numRows; nextRow < rows(); ++nextRow)
+	{
+		// Adjust position of following row.
 		m_rowPositions[nextRow] += insertedHeight;
+
+		// "Move" cells in following row down.
+		foreach (TableCell cell, m_cellRows[nextRow])
+			cell.moveDown(numRows);
+	}
+
+	debug();
 }
 
 void PageItem_Table::removeRows(int index, int numRows)
@@ -54,28 +78,47 @@ void PageItem_Table::removeRows(int index, int numRows)
 	if (!validRow(index) || numRows < 1 || numRows >= rows() || index + numRows > rows())
 		return;
 
-	// Remove row heights and positions.
+	// Remove row heights, row positions and rows of cells.
 	qreal removedHeight = 0.0;
 	for (int i = 0; i < numRows; ++i)
 	{
+		// Remove row height and position.
 		removedHeight += m_rowHeights.takeAt(index);
 		m_rowPositions.removeAt(index);
+
+		// Invalidate removed cells.
+		foreach (TableCell removedCell, m_cellRows[index])
+			removedCell.setValid(false);
+
+		// Remove row of cells.
+		m_cellRows.removeAt(index);
 	}
+
+	// Decrease number of rows.
+	m_rows -= numRows;
 
 	// Update row spans.
 	updateSpans(index, numRows, RowsRemoved);
 
-	m_rows -= numRows;
-
-	// Adjust positions of following rows.
+	// Adjust following rows.
 	for (int nextRow = index; nextRow < rows(); ++nextRow)
+	{
+		// Adjust position of following row.
 		m_rowPositions[nextRow] -= removedHeight;
+
+		// "Move" cells in following row up.
+		foreach (TableCell cell, m_cellRows[nextRow])
+			cell.moveUp(numRows);
+	}
+
+	debug();
 }
 
 qreal PageItem_Table::rowHeight(int row) const
 {
 	if (!validRow(row))
 		return 0.0;
+
 	return m_rowHeights.at(row);
 }
 
@@ -84,6 +127,7 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 	if (!validRow(row) || height <= 0.0)
 		return;
 
+	// Set the height and save the change.
 	qreal deltaHeight = height - m_rowHeights.at(row);
 	m_rowHeights[row] = height;
 
@@ -97,25 +141,42 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
-	// Insert column widths and positions.
+	// Width and position of first inserted column.
 	qreal columnWidth = columns() == 0 ? width() : m_columnWidths.at(qMax(index - 1, 0));
 	qreal columnPosition = index == 0 ? 0.0 : m_columnPositions.at(qMax(index - 1, 0)) + columnWidth;
-	for (int i = 0; i < numColumns; ++i)
+
+	// Insert column widths, column positions and a new column of cells.
+	for (int col = index; col < index + numColumns; ++col)
 	{
-		m_columnWidths.insert(index + i, columnWidth);
-		m_columnPositions.insert(index + i, columnPosition);
+		// Insert column widths and positions.
+		m_columnWidths.insert(col, columnWidth);
+		m_columnPositions.insert(col, columnPosition);
 		columnPosition += columnWidth;
+
+		// Insert a new column of cells.
+		for (int row = 0; row < rows(); ++row)
+			m_cellRows[row].insert(col, TableCell(row, col, this));
 	}
+
+	// Increase number of columns.
+	m_columns += numColumns;
 
 	// Update column spans.
 	updateSpans(index, numColumns, ColumnsInserted);
 
-	m_columns += numColumns;
-
-	// Adjust positions of following columns.
+	// Adjust following columns.
 	qreal insertedWidth = columnWidth * numColumns;
 	for (int nextColumn = index + numColumns; nextColumn < columns(); ++nextColumn)
+	{
+		// Adjust position of following column.
 		m_columnPositions[nextColumn] += insertedWidth;
+
+		// "Move" cells in following column right.
+		foreach (QList<TableCell> cellRow, m_cellRows)
+			cellRow[nextColumn].moveRight(numColumns);
+	}
+
+	debug();
 }
 
 void PageItem_Table::removeColumns(int index, int numColumns)
@@ -123,28 +184,45 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	if (!validColumn(index) || numColumns < 1 || numColumns >= columns() || index + numColumns > columns())
 		return;
 
-	// Remove column widths and positions.
+	// Remove column widths, column positions and columns of cells.
 	qreal removedWidth = 0.0;
 	for (int i = 0; i < numColumns; ++i)
 	{
+		// Remove columns widths and positions.
 		removedWidth += m_columnWidths.takeAt(index);
 		m_columnPositions.removeAt(index);
+
+		// Remove and invalidate cells.
+		QMutableListIterator<QList<TableCell> > rowIt(m_cellRows);
+		while (rowIt.hasNext())
+			rowIt.next().takeAt(index).setValid(false);
 	}
+
+	// Decrease number of columns.
+	m_columns -= numColumns;
 
 	// Update column spans.
 	updateSpans(index, numColumns, ColumnsRemoved);
 
-	m_columns -= numColumns;
-
-	// Adjust positions of following columns.
+	// Adjust following columns.
 	for (int nextColumn = index; nextColumn < columns(); ++nextColumn)
+	{
+		// Adjust position of following column.
 		m_columnPositions[nextColumn] -= removedWidth;
+
+		// "Move" cells in following column left.
+		foreach (QList<TableCell> cellRow, m_cellRows)
+			cellRow[nextColumn].moveLeft(numColumns);
+	}
+
+	debug();
 }
 
 qreal PageItem_Table::columnWidth(int column) const
 {
 	if (!validColumn(column))
 		return 0.0;
+
 	return m_columnWidths.at(column);
 }
 
@@ -152,6 +230,8 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 {
 	if (!validColumn(column) || width <= 0.0)
 		return;
+
+	// Set the width and save the change.
 	qreal deltaWidth = width - m_columnWidths.at(column);
 	m_columnWidths[column] = width;
 
@@ -179,6 +259,8 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 			areaIt.remove();
 		}
 	}
+
+	// TODO: Should covered cells be invalidated here or not?
 
 	m_cellAreas.append(newArea);
 }
@@ -262,7 +344,7 @@ void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 			// If the area was affected by the change we either..
 			if (newArea.height() < 2)
 			{
-				// ..remove areas that would become less than 2 in height or..
+				// ..remove areas that have become less than 2 in height or..
 				areaIt.remove();
 			}
 			else
@@ -286,6 +368,22 @@ void PageItem_Table::debug() const
 	qDebug() << "m_rowPositions: " <<  m_rowPositions;
 	qDebug() << "m_rowHeights: " <<  m_rowHeights;
 	qDebug() << "m_cellSpans: " <<  m_cellAreas;
+	qDebug() << "m_cells: ";
+	for (int row = 0; row < m_cellRows.size(); ++row)
+	{
+		QString rowStr = QString("row %1:").arg(row);
+		QList<TableCell> cellRow = m_cellRows[row];
+		for (int col = 0; col < cellRow.size(); ++col)
+		{
+			TableCell cell = cellRow[col];
+			rowStr += QString(" [r=%1,").arg(cell.row());
+			rowStr += QString("c=%1,").arg(cell.column());
+			rowStr += QString("rs=%1,").arg(cell.rowSpan());
+			rowStr += QString("cs=%1,").arg(cell.columnSpan());
+			rowStr += QString("v=%1]").arg(cell.isValid());
+		}
+		qDebug().nospace() << rowStr;
+	}
 	qDebug() << "-------------------------------------------------";
 }
 

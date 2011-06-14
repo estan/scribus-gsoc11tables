@@ -196,7 +196,7 @@ private:
 
 private:
 	/// List of rows of cells in the table.
-	QList<QList<TableCell> > m_cells;
+	QList<QList<TableCell> > m_cellRows;
 
 	/// Number of rows.
 	int m_rows;
