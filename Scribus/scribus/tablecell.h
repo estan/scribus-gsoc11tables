@@ -91,8 +91,8 @@ public:
 
 private:
 	/**
-	 * Construct a new valid table cell at @a row, @a column in the table @a table, spanning
-	 * @a rowSpan rows and @a columnSpan columns.
+	 * Construct a new valid table cell at @a row, @a column in the table @a table.
+	 * The new cell will span <code>1</code> row and <code>1</code> column.
 	 */
 	TableCell(int row, int column, PageItem_Table *table);
 	/// Constructs a new invalid table cell.
@@ -108,6 +108,15 @@ private:
 	void setColumnSpan(int columnSpan) { d->columnSpan = columnSpan; }
 	/// Sets the valid state of the cell to @a isValid.
 	void setValid(bool isValid) { d->isValid = isValid; }
+
+	/// "Move" the cell down by @a numRows. E.g. increase its row by @a numRows.
+	void moveDown(int numRows) { d->row += numRows; }
+	/// "Move" the cell up by @a numRows. E.g. decrease its row by @a numRows.
+	void moveUp(int numRows) { d->row -= numRows; }
+	/// "Move" the cell right by @a numColumns. E.g. increase its column by @a numColumns.
+	void moveRight(int numColumns) { d->column += numColumns; }
+	/// "Move" the cell left by @a numColumns. E.g. decrease its column by @a numColumns.
+	void moveLeft(int numColumns) { d->column -= numColumns; }
 
 private:
 	friend class PageItem_Table;
