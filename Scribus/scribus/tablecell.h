@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 #define TABLECELL_H
 
 #include <QString>
+#include <QDebug>
 #include <QExplicitlySharedDataPointer>
 #include <QSharedData>
 
@@ -88,6 +89,10 @@ public:
 	 */
 	QString style() const { return isValid() ? d->style : QString(); }
 
+	/**
+	 * Converts the cell to a QString with format <code>"<row>,<column> <rowSpan>x<columnSpan>"</code>.
+	 */
+	operator QString() { return QString("(%1,%2 %3x%4)").arg(row()).arg(column()).arg(columnSpan()).arg(rowSpan()); }
 private:
 	/**
 	 * Construct a new valid table cell at @a row, @a column in the table @a table.
@@ -121,5 +126,7 @@ private:
 	friend class PageItem_Table;
 	QExplicitlySharedDataPointer<TableCellData> d;
 };
+
+QDebug operator<<(QDebug debug, const TableCell& cell);
 
 #endif // TABLECELL_H

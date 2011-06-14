@@ -21,3 +21,9 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 
 	d->table = table;
 }
+
+QDebug operator<<(QDebug debug, const TableCell& cell)
+{
+	debug.nospace() << cell;
+	return debug.space();
+}

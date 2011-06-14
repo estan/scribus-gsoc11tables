@@ -120,6 +120,14 @@ public:
 	void splitCell(int row, int column, int numRows, int numCols);
 
 	/**
+	 * Returns the cell at @a row, @a column.
+	 *
+	 * If the cell is covered by a spanning cell, the spanning cell is returned. If the cell is
+	 * not in this table, an invalid cell is returned.
+	 */
+	TableCell cellAt(int row, int column) const;
+
+	/**
 	 * Returns <code>true</code> if the cell at @a row, @a column is covered by a span.
 	 */
 	bool isCovered(int row, int column) const;

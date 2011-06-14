@@ -21,6 +21,7 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 	// NOTE: The order here is important as insertRows() assumes that columns() > 0.
 	insertColumns(0, qMax(1, numColumns));
 	insertRows(0, qMax(1, numRows));
+
 	adjustToFrame();
 }
 
@@ -262,6 +263,28 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 	// Not implemented.
 }
 
+TableCell PageItem_Table::cellAt(int row, int column) const
+{
+	if (!validCell(row, column))
+		return TableCell();
+
+	TableCell cell = m_cellRows[row][column];
+
+	QList<CellArea>::const_iterator areaIt;
+	for (areaIt = m_cellAreas.begin(); areaIt != m_cellAreas.end(); ++areaIt)
+	{
+		CellArea area = (*areaIt);
+		if (area.contains(row, column))
+		{
+			// Cell was contained in merged area, so use spanning cell.
+			cell = m_cellRows[area.row()][area.column()];
+			break;
+		}
+	}
+
+	return cell;
+}
+
 bool PageItem_Table::isCovered(int row, int column) const
 {
 	if (!validCell(row, column))
@@ -363,17 +386,10 @@ void PageItem_Table::debug() const
 	qDebug() << "m_cells: ";
 	for (int row = 0; row < m_cellRows.size(); ++row)
 	{
-		QString rowStr = QString("row %1:").arg(row);
+		QString rowStr = QString("row %1: ").arg(row);
 		QList<TableCell> cellRow = m_cellRows[row];
 		for (int col = 0; col < cellRow.size(); ++col)
-		{
-			TableCell cell = cellRow[col];
-			rowStr += QString(" [r=%1,").arg(cell.row());
-			rowStr += QString("c=%1,").arg(cell.column());
-			rowStr += QString("rs=%1,").arg(cell.rowSpan());
-			rowStr += QString("cs=%1,").arg(cell.columnSpan());
-			rowStr += QString("v=%1]").arg(cell.isValid());
-		}
+			rowStr += cellAt(row, col); // Use cellAt(..) to exercise the API a little.
 		qDebug().nospace() << rowStr;
 	}
 	qDebug() << "-------------------------------------------------";
