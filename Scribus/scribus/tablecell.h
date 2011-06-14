@@ -48,6 +48,9 @@ public:
 class TableCell
 {
 public:
+	/// Construct a new table cell as a shallow copy of @a other.
+	TableCell(const TableCell& other) : d(other.d) {}
+
 	/**
 	 * Returns <code>true</code> if this cell is valid.
 	 */
@@ -93,8 +96,6 @@ private:
 	TableCell(int row, int column, PageItem_Table *table);
 	/// Constructs a new invalid table cell.
 	TableCell() : d(new TableCellData) { setValid(false); }
-	/// Construct a new table cell as a shallow copy of @a other.
-	TableCell(const TableCell& other) : d(other.d) {}
 
 	/// Set the row of the table that contains this cell to @a row.
 	void setRow(int row) { d->row = row; }
