@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 #define TABLECELL_H
 
 #include <QString>
+#include <QExplicitlySharedDataPointer>
 #include <QSharedData>
 
 class PageItem_Table;
@@ -110,7 +111,7 @@ private:
 
 private:
 	friend class PageItem_Table;
-	QSharedDataPointer<TableCellData> d;
+	QExplicitlySharedDataPointer<TableCellData> d;
 };
 
 #endif // TABLECELL_H
