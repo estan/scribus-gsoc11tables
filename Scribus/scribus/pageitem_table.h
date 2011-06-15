@@ -199,8 +199,11 @@ private:
 	/// Draws a decorative dotted grid line from @a start to @a end.
 	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
 
-	/// Prints internal table information.
+	/// Prints internal table information. For internal use.
 	void debug() const;
+
+	/// Table sanity check. Very slow. For internal use.
+	void assertValid() const;
 
 private:
 	/// List of rows of cells in the table.

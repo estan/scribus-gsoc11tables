@@ -15,6 +15,12 @@ for which a new license (GPL+exception) is in place.
 #include "scribusdoc.h"
 #include "scpainter.h"
 
+#ifdef WANT_DEBUG
+	#define ASSERT_VALID() qt_noop()
+#else
+	#define ASSERT_VALID() assertValid(); qt_noop()
+#endif
+
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
 	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
@@ -27,6 +33,8 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 
 void PageItem_Table::insertRows(int index, int numRows)
 {
+	ASSERT_VALID();
+
 	if (index < 0 || index > rows() || numRows < 1)
 		return;
 
@@ -70,10 +78,14 @@ void PageItem_Table::insertRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveDown(numRows);
 	}
+
+	ASSERT_VALID();
 }
 
 void PageItem_Table::removeRows(int index, int numRows)
 {
+	ASSERT_VALID();
+
 	if (!validRow(index) || numRows < 1 || numRows >= rows() || index + numRows > rows())
 		return;
 
@@ -109,6 +121,8 @@ void PageItem_Table::removeRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveUp(numRows);
 	}
+
+	ASSERT_VALID();
 }
 
 qreal PageItem_Table::rowHeight(int row) const
@@ -135,6 +149,8 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 
 void PageItem_Table::insertColumns(int index, int numColumns)
 {
+	ASSERT_VALID();
+
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
@@ -172,10 +188,14 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveRight(numColumns);
 	}
+
+	ASSERT_VALID();
 }
 
 void PageItem_Table::removeColumns(int index, int numColumns)
 {
+	ASSERT_VALID();
+
 	if (!validColumn(index) || numColumns < 1 || numColumns >= columns() || index + numColumns > columns())
 		return;
 
@@ -209,6 +229,8 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveLeft(numColumns);
 	}
+
+	ASSERT_VALID();
 }
 
 qreal PageItem_Table::columnWidth(int column) const
@@ -235,6 +257,8 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 
 void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 {
+	ASSERT_VALID();
+
 	if (!validCell(row, column) || !validCell(row + numRows - 1, column + numCols - 1))
 		return;
 
@@ -263,6 +287,8 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 	newSpanningCell.setRowSpan(newArea.height());
 	newSpanningCell.setColumnSpan(newArea.width());
 	m_cellAreas.append(newArea);
+
+	ASSERT_VALID();
 }
 
 void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
@@ -419,6 +445,66 @@ void PageItem_Table::debug() const
 		qDebug().nospace() << rowStr;
 	}
 	qDebug() << "-------------------------------------------------";
+}
+
+void PageItem_Table::assertValid() const
+{
+	// Check list sizes.
+	Q_ASSERT_X(rows() == m_rowPositions.size(), "isValid", "rows() != m_rowPositions.size()");
+	Q_ASSERT_X(rows() == m_rowHeights.size(), "isValid", "rows() != m_rowHeights.size()");
+	Q_ASSERT_X(columns() == m_columnPositions.size(), "isValid", "columns() != m_columnPositions.size()");
+	Q_ASSERT_X(columns() == m_columnWidths.size(), "isValid", "columns() != m_columnWidths.size()");
+	Q_ASSERT_X(rows() == m_cellRows.size(), "isValid", "rows() != m_cellRows.size()");
+	foreach (QList<TableCell> cellRow, m_cellRows)
+		Q_ASSERT_X(columns() == cellRow.size(), "isValid", "columns() != cellRow.size()");
+
+	// Check that cells report correct row, column, row span and column span.
+	int numberOfSpanningCells = 0;
+	for (int row = 0; row < rows(); ++row)
+	{
+		for (int col = 0; col < columns(); ++col)
+		{
+			TableCell cell = m_cellRows[row][col];
+			Q_ASSERT_X(cell.row() == row, "isValid", "cell.row() != row");
+			Q_ASSERT_X(cell.column() == col, "isValid", "cell.column() != col");
+			if (cell.rowSpan() > 1 || cell.columnSpan() > 1)
+			{
+				// Cell has row or column span, so check that there's a matching cell area.
+				numberOfSpanningCells++;
+				int matchingCellAreas = 0;
+				foreach (CellArea area, m_cellAreas)
+				{
+					if (area.row() == cell.row() && area.column() == cell.column() &&
+							area.height() == cell.rowSpan() && area.width() == cell.columnSpan())
+						++matchingCellAreas;
+				}
+				Q_ASSERT_X(matchingCellAreas == 1, "isValid", "matchingCellAreas != 1");
+			}
+		}
+	}
+
+	// Check that number of cell areas matches number of spanning cells.
+	Q_ASSERT_X(m_cellAreas.size() == numberOfSpanningCells, "isValid", "m_cellAreas.size() != numberOfSpanningCells");
+
+	// Check that cellAt(int, int) has correct behavior on covered cells.
+	for (int row = 0; row < rows(); ++row)
+	{
+		for (int col = 0; col < columns(); ++col)
+		{
+			TableCell cell = cellAt(row, col);
+			foreach (CellArea area, m_cellAreas)
+			{
+				if (area.contains(row, col))
+				{
+					// Area contains the requested row and column, so cellAt should report spanning cell.
+					Q_ASSERT_X(area.width() < 2 || area.height() < 2, "isValid", "Cell area less than 2x2");
+					Q_ASSERT_X(cell.row() == area.row() && cell.column() == area.column() &&
+							   cell.rowSpan() == area.height() && cell.columnSpan() == area.width(),
+							   "isValid", "cellAt(int, int) reports wrong cell");
+				}
+			}
+		}
+	}
 }
 
 void PageItem_Table::drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const
