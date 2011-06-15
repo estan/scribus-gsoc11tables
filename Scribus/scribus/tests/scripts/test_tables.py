@@ -240,7 +240,96 @@ class TableTests:
 
     def test_merge_cells(self):
         """ Test for mergeTableCells(...) """
-        pass # TODO
+        # Test valid API usage.
+
+        # Create a 7x7 table.
+        table1 = createTable(50, 50, 90, 90, 7, 7)
+
+        # Merge the area (2,2 3x3).
+        mergeTableCells(2, 2, 3, 3, table1)
+        # We expect getCellRowSpan(...) == getCellColumnSpan(...) == 3 inside (2,2 3x3).
+        area1 = set([
+                (2, 2), (2, 3), (2, 4),
+                (3, 2), (3, 3), (3, 4),
+                (4, 2), (4, 3), (4, 4)])
+        self.check_spans(area1, 3, 3, table1)
+
+        # Merge the area (1,2 1x2), which overlaps the previous area at the top.
+        mergeTableCells(1, 2, 2, 1, table1);
+        # We expect getCellRowSpan(...) == 4, getCellColumnSpan(...) == 3 inside (1,2 3x4).
+        area2 = set([
+                (1, 2), (1, 3), (1, 4),
+                (2, 2), (2, 3), (2, 4),
+                (3, 2), (3, 3), (3, 4),
+                (4, 2), (4, 3), (4, 4)])
+        self.check_spans(area2, 4, 3, table1)
+
+        # Merge the area (4,4 2x1), which overlaps the previous area on the right.
+        mergeTableCells(4, 4, 1, 2, table1);
+        # We expect getCellRowSpan(...) == getCellColumnSpan(...) == 4 inside (1,2 4x4).
+        area3 = set([
+                (1, 2), (1, 3), (1, 4), (1, 5),
+                (2, 2), (2, 3), (2, 4), (2, 5),
+                (3, 2), (3, 3), (3, 4), (3, 5),
+                (4, 2), (4, 3), (4, 4), (4, 5)])
+        self.check_spans(area3, 4, 4, table1)
+
+        # Merge the area (4,3 1x2), which overlaps the previous area at the bottom.
+        mergeTableCells(4, 3, 2, 1, table1);
+        # We expect getCellRowSpan(...) == 5, getCellColumnSpan(...) == 4 inside (1,2 4x5).
+        area4 = set([
+                (1, 2), (1, 3), (1, 4), (1, 5),
+                (2, 2), (2, 3), (2, 4), (2, 5),
+                (3, 2), (3, 3), (3, 4), (3, 5),
+                (4, 2), (4, 3), (4, 4), (4, 5),
+                (5, 2), (5, 3), (5, 4), (5, 5)])
+        self.check_spans(area4, 5, 4, table1)
+
+        # Merge the area (4,1 2x1), which overlaps the previous area on the left.
+        mergeTableCells(4, 1, 1, 2, table1);
+        # We expect getCellRowSpan(...) == getCellColumnSpan(...) == 5 inside (1,1 5x5).
+        area5 = set([
+                (1, 1), (1, 2), (1, 3), (1, 4), (1, 5),
+                (2, 1), (2, 2), (2, 3), (2, 4), (2, 5),
+                (3, 1), (3, 2), (3, 3), (3, 4), (3, 5),
+                (4, 1), (4, 2), (4, 3), (4, 4), (4, 5),
+                (5, 1), (5, 2), (5, 3), (5, 4), (5, 5)])
+        self.check_spans(area5, 5, 5, table1)
+
+        deleteObject(table1)
+
+        # Test invalid API usage.
+        bad_args = [(-1, 1, 2, 2), (1, -1, 2, 2), (1, 1, 0, 2), (1, 1, 2, 0),
+                    (1, 1, -2, 2), (1, 1, 2, -2), (-1, -1, -2, -2)]
+        for args in bad_args:
+            try:
+                table2 = createTable(50, 50, 90, 90, 3, 3)
+                mergeTableCells(args[0], args[1], args[2], args[3], table2)
+                fail('Expected ValueError, row=%i, col=%i, numRows=%i, numColumns=%i' %
+                        (args[0], args[1], args[2], args[3]))
+            except ValueError:
+                pass # Expected.
+            finally:
+                if objectExists(table2):
+                    deleteObject(table2)
+
+    def check_spans(self, area, expected_row_span, expected_column_span, table):
+        """
+        Utility method for cell span checking.
+
+        Given a table and an area of cells as a set of (row, column) tuples, checks
+        that getCellRowSpan(...) returns expected_row_span and getCellColumnSpan(...)
+        returns expected_column_span for every cell in the area, and that they both
+        return 1 for each cell in the table that is outside the area.
+        """
+        for row in range(getTableRows(table)):
+            for col in range(getTableColumns(table)):
+                if (row, col) in area:
+                    check(getCellRowSpan(row, col, table) == expected_row_span)
+                    check(getCellColumnSpan(row, col, table) == expected_column_span)
+                else:
+                    check(getCellRowSpan(row, col, table) == 1)
+                    check(getCellColumnSpan(row, col, table) == 1)
 
 #
 # Test "framework" code below.

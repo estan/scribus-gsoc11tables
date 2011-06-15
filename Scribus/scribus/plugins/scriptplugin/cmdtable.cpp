@@ -322,6 +322,46 @@ PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyObject *scribus_getcellrowspan(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell row span from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyInt_FromLong(static_cast<long>(table->cellAt(row, column).rowSpan()));
+}
+
+PyObject *scribus_getcellcolumnspan(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell column span from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyInt_FromLong(static_cast<long>(table->cellAt(row, column).columnSpan()));
+}
+
 /*! HACK: this removes "warning: 'blah' defined but not used" compiler warnings
 with header files structure untouched (docstrings are kept near declarations)
 PV */
@@ -333,5 +373,6 @@ void cmdtabledocwarnings()
 	  << scribus_inserttablecolumns__doc__ << scribus_removetablecolumns__doc__
 	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
 	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
-	  << scribus_mergetablecells__doc__;
+	  << scribus_mergetablecells__doc__ << scribus_getcellrowspan__doc__
+	  << scribus_getcellcolumnspan__doc__;
 }

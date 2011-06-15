@@ -140,4 +140,26 @@ May throw ValueError if number if numRows or numColumns is less than 1 or the sp
 /*! Merge table cells */
 PyObject *scribus_mergetablecells(PyObject * /*self*/, PyObject* args);
 
+/*! docstring */
+PyDoc_STRVAR(scribus_getcellrowspan__doc__,
+QT_TR_NOOP("getCellRowSpan(row, column, [\"name\"]) -> int\n\
+\n\
+Returns the row span of the cell at \"row\", \"column\" in the table \"name\" or -1 if the\n\
+cell does not exist. If the cell is covered by another spanning cell, the row span of the\n\
+spanning cell is returned. If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Get cell row span */
+PyObject *scribus_getcellrowspan(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_getcellcolumnspan__doc__,
+QT_TR_NOOP("getCellColumnSpan(row, column, [\"name\"]) -> int\n\
+\n\
+Returns the column span of the cell at \"row\", \"column\" in the table \"name\" or -1 if the\n\
+cell does not exist. If the cell is covered by another spanning cell, the column span of the\n\
+spanning cell is returned. If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Get cell column span */
+PyObject *scribus_getcellcolumnspan(PyObject * /*self*/, PyObject* args);
+
 #endif // CMDTABLE_H
