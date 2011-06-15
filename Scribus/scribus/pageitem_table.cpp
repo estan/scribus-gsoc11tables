@@ -244,17 +244,24 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 	QMutableListIterator<CellArea> areaIt(m_cellAreas);
 	while (areaIt.hasNext())
 	{
-		CellArea area = areaIt.next();
-		if (newArea.intersects(area))
+		CellArea oldArea = areaIt.next();
+		if (newArea.intersects(oldArea))
 		{
 			// The two areas intersect, so unite them.
-			newArea = newArea.united(area);
+			newArea = newArea.united(oldArea);
+
+			// Reset row/column span of old spanning cell, then remove old area.
+			TableCell oldSpanningCell = cellAt(oldArea.row(), oldArea.column());
+			oldSpanningCell.setRowSpan(1);
+			oldSpanningCell.setColumnSpan(1);
 			areaIt.remove();
 		}
 	}
 
-	// TODO: Should covered cells be invalidated here or not?
-
+	// Set row/column span of new spanning cell, and finally add new area.
+	TableCell newSpanningCell = cellAt(newArea.row(), newArea.column());
+	newSpanningCell.setRowSpan(newArea.height());
+	newSpanningCell.setColumnSpan(newArea.width());
 	m_cellAreas.append(newArea);
 }
 
@@ -332,40 +339,50 @@ void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 	QMutableListIterator<CellArea> areaIt(m_cellAreas);
 	while (areaIt.hasNext())
 	{
-		CellArea area = areaIt.next();
+		CellArea oldArea = areaIt.next();
 
 		// Get a copy of the area adjusted to the change.
 		CellArea newArea;
 		switch (changeType)
 		{
 			case RowsInserted:
-				newArea = area.adjustedForRowInsertion(index, number);
+				newArea = oldArea.adjustedForRowInsertion(index, number);
 				break;
 			case RowsRemoved:
-				newArea = area.adjustedForRowRemoval(index, number);
+				newArea = oldArea.adjustedForRowRemoval(index, number);
 				break;
 			case ColumnsInserted:
-				newArea = area.adjustedForColumnInsertion(index, number);
+				newArea = oldArea.adjustedForColumnInsertion(index, number);
 				break;
 			case ColumnsRemoved:
-				newArea = area.adjustedForColumnRemoval(index, number);
+				newArea = oldArea.adjustedForColumnRemoval(index, number);
 				break;
 			default:
 				break;
 		}
 
-		if (newArea != area)
+		// Check if the area was affected by the change.
+		if (newArea != oldArea)
 		{
-			// If the area was affected by the change we either..
-			if (newArea.height() < 2)
+			if (newArea.height() < 2 && newArea.width() < 2)
 			{
-				// ..remove areas that have become less than 2 in height or..
+				// Adjusted area is less than 2x2, so remove it.
 				areaIt.remove();
+
+				// And reset row/column span of spanning cell to 1.
+				TableCell oldSpanningCell = cellAt(oldArea.row(), oldArea.column());
+				oldSpanningCell.setRowSpan(1);
+				oldSpanningCell.setColumnSpan(1);
 			}
 			else
 			{
-				// ..replace the area with the adjusted copy.
+				// Replace the area with the adjusted copy.
 				areaIt.setValue(newArea);
+
+				// And set row/column spanning of spanning cell.
+				TableCell newSpanningCell = cellAt(newArea.row(), newArea.column());
+				newSpanningCell.setRowSpan(newArea.height());
+				newSpanningCell.setColumnSpan(newArea.width());
 			}
 		}
 	}
@@ -383,13 +400,22 @@ void PageItem_Table::debug() const
 	qDebug() << "m_rowPositions: " <<  m_rowPositions;
 	qDebug() << "m_rowHeights: " <<  m_rowHeights;
 	qDebug() << "m_cellSpans: " <<  m_cellAreas;
-	qDebug() << "m_cells: ";
+	qDebug() << "m_cellRows: ";
 	for (int row = 0; row < m_cellRows.size(); ++row)
 	{
 		QString rowStr = QString("row %1: ").arg(row);
 		QList<TableCell> cellRow = m_cellRows[row];
 		for (int col = 0; col < cellRow.size(); ++col)
-			rowStr += cellAt(row, col); // Use cellAt(..) to exercise the API a little.
+			rowStr += cellRow[col];
+		qDebug().nospace() << rowStr;
+	}
+	qDebug() << "cellAt(row, column) reports:";
+	for (int row = 0; row < rows(); ++row)
+	{
+		QString rowStr = QString("row %1: ").arg(row);
+		QList<TableCell> cellRow = m_cellRows[row];
+		for (int col = 0; col < columns(); ++col)
+			rowStr += cellAt(row, col);
 		qDebug().nospace() << rowStr;
 	}
 	qDebug() << "-------------------------------------------------";
