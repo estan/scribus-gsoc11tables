@@ -392,7 +392,7 @@ void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 		{
 			if (newArea.height() < 2 && newArea.width() < 2)
 			{
-				// Adjusted area is less than 2x2, so remove it.
+				// Adjusted area is 1x1 or less, so remove it.
 				areaIt.remove();
 
 				// And reset row/column span of spanning cell to 1.
@@ -497,7 +497,8 @@ void PageItem_Table::assertValid() const
 				if (area.contains(row, col))
 				{
 					// Area contains the requested row and column, so cellAt should report spanning cell.
-					Q_ASSERT_X(area.width() < 2 || area.height() < 2, "isValid", "Cell area less than 2x2");
+					Q_ASSERT_X(area.width() > 0 && area.height() > 0 && (area.width() > 1 || area.height() > 1),
+							   "isValid", "Invalid cell area size");
 					Q_ASSERT_X(cell.row() == area.row() && cell.column() == area.column() &&
 							   cell.rowSpan() == area.height() && cell.columnSpan() == area.width(),
 							   "isValid", "cellAt(int, int) reports wrong cell");
