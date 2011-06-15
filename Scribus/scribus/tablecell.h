@@ -93,6 +93,7 @@ public:
 	 * Converts the cell to a QString with format <code>"<row>,<column> <columnSpan>x<rowSpan>"</code>.
 	 */
 	operator QString() { return QString("(%1,%2 %3x%4)").arg(row()).arg(column()).arg(columnSpan()).arg(rowSpan()); }
+
 private:
 	/**
 	 * Construct a new valid table cell at @a row, @a column in the table @a table.
