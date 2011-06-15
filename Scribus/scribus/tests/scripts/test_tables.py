@@ -300,7 +300,7 @@ class TableTests:
 
         # Test invalid API usage.
         bad_args = [(-1, 1, 2, 2), (1, -1, 2, 2), (1, 1, 0, 2), (1, 1, 2, 0),
-                    (1, 1, -2, 2), (1, 1, 2, -2), (-1, -1, -2, -2)]
+                    (1, 1, -2, 2), (1, 1, 2, -2), (-1, -1, -2, -2), (1, 1, 3, 3)]
         for args in bad_args:
             try:
                 table2 = createTable(50, 50, 90, 90, 3, 3)
