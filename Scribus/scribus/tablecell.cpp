@@ -24,6 +24,6 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 
 QDebug operator<<(QDebug debug, const TableCell& cell)
 {
-	debug.nospace() << cell;
+	debug.nospace() << QString("(%1,%2 %3x%4)").arg(cell.row()).arg(cell.column()).arg(cell.columnSpan()).arg(cell.rowSpan());
 	return debug.space();
 }
