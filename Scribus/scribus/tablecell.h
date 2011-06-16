@@ -15,6 +15,8 @@ for which a new license (GPL+exception) is in place.
 #include <QExplicitlySharedDataPointer>
 #include <QSharedData>
 
+#include "commonstrings.h"
+
 class PageItem_Table;
 class CellStyle;
 
@@ -24,18 +26,70 @@ class CellStyle;
 class TableCellData : public QSharedData
 {
 public:
-	TableCellData() : isValid(false), row(-1), column(-1), rowSpan(-1), columnSpan(-1), table(0) {}
-	TableCellData(const TableCellData& other) : QSharedData(other), isValid(other.isValid), row(other.row),
-		column(other.column), rowSpan(other.rowSpan), columnSpan(other.columnSpan) {}
+	/// Construct data for an invalid cell.
+	TableCellData() :
+		isValid(false),
+		row(-1),
+		column(-1),
+		rowSpan(-1),
+		columnSpan(-1),
+		leftBorderWidth(1.0),
+		rightBorderWidth(1.0),
+		topBorderWidth(1.0),
+		bottomBorderWidth(1.0),
+		leftBorderColor(CommonStrings::None),
+		rightBorderColor(CommonStrings::None),
+		topBorderColor(CommonStrings::None),
+		bottomBorderColor(CommonStrings::None),
+		table(0) {}
+	/// Copy constructor.
+	TableCellData(const TableCellData& other) : QSharedData(other),
+		isValid(other.isValid),
+		row(other.row),
+		column(other.column),
+		rowSpan(other.rowSpan),
+		columnSpan(other.columnSpan),
+		leftBorderWidth(other.leftBorderWidth),
+		rightBorderWidth(other.rightBorderWidth),
+		topBorderWidth(other.topBorderWidth),
+		bottomBorderWidth(other.bottomBorderWidth),
+		leftBorderColor(other.leftBorderColor),
+		rightBorderColor(other.rightBorderColor),
+		topBorderColor(other.topBorderColor),
+		bottomBorderColor(other.bottomBorderColor),
+		table(other.table) {}
 	~TableCellData() {}
 
 public:
+	/// Cell valid state.
 	bool isValid;
+	/// Row of the table the cell is in.
 	int row;
+	/// Column of the table the cell is in.
 	int column;
+	/// Number of rows the cell spans.
 	int rowSpan;
+	/// Number of columns the cell spans.
 	int columnSpan;
+	/// Width of the left border.
+	qreal leftBorderWidth;
+	/// Width of the right border.
+	qreal rightBorderWidth;
+	/// Width of the top border.
+	qreal topBorderWidth;
+	/// Width of the bottom border.
+	qreal bottomBorderWidth;
+	/// Color of the left border.
+	QString leftBorderColor;
+	/// Color of the right border.
+	QString rightBorderColor;
+	/// Color of the top border.
+	QString topBorderColor;
+	/// Color of the bottom border.
+	QString bottomBorderColor;
+	/// Style of the cell.
 	QString style;
+	/// Table containing the cell.
 	PageItem_Table *table;
 };
 
@@ -43,8 +97,8 @@ public:
  * The TableCell class represents a cell in a table.
  *
  * It provides an interface for setting and getting cell properties. A cell may be
- * marked as invalid if the row or column it is in is removed. The valid state of a
- * cell may be queried for using the <code>isValid()</code> function.
+ * marked as invalid if the row or column containing the cell is removed. The valid
+ * state of a cell may be queried using the <code>isValid()</code> function.
  */
 class TableCell
 {
@@ -52,47 +106,77 @@ public:
 	/// Construct a new table cell as a shallow copy of @a other.
 	TableCell(const TableCell& other) : d(other.d) {}
 
-	/**
-	 * Returns <code>true</code> if this cell is valid.
-	 */
+	/// Returns <code>true</code> if this cell is valid.
 	bool isValid() const { return d->isValid && d->table; }
 
-	/**
-	 * Returns the number of the row in the table that contains this cell, or <code>-1</code> if
-	 * the cell is invalid.
-	 */
-	int row() const { return isValid() ? d->row : -1; }
+	/// Returns the row in the table that contains this cell.
+	int row() const { return d->row; }
 
-	/**
-	 * Returns the number of the column in the table that contains this cell, or <code>-1</code> if
-	 * the cell is invalid.
-	 */
-	int column() const { return isValid() ? d->column : -1; }
+	/// Returns the column in the table that contains this cell.
+	int column() const { return d->column; }
 
-	/**
-	 * Returns the number of rows this cell spans, or <code>-1</code> if the cell is invalid.
-	 */
-	int rowSpan() const { return isValid() ? d->rowSpan : -1; }
+	/// Returns the number of rows this cell spans.
+	int rowSpan() const { return d->rowSpan; }
 
-	/**
-	 * Returns the number of columns this cell spans, or <code>-1</code> if the cell is invalid.
-	 */
-	int columnSpan() const { return isValid() ? d->columnSpan : -1; }
+	/// Returns the number of columns this cell spans.
+	int columnSpan() const { return d->columnSpan; }
 
-	/**
-	 * Sets the cell style for this cell to @a style, or do nothing if the cell is invalid.
-	 */
-	void setStyle(const QString& style) { if (isValid()) d->style = style; }
+	/// Sets the width of the left border of this cell to @a width.
+	void setLeftBorderWidth(qreal width) { d->leftBorderWidth = width; }
 
-	/**
-	 * Returns the cell style for this cell, or QString() if the cell is invalid.
-	 */
-	QString style() const { return isValid() ? d->style : QString(); }
+	/// Returns the width of the left border of this cell.
+	qreal leftBorderWidth() const { return d->leftBorderWidth; }
 
-	/**
-	 * Converts the cell to a QString with format <code>"<row>,<column> <columnSpan>x<rowSpan>"</code>.
-	 */
-	operator QString() { return QString("(%1,%2 %3x%4)").arg(row()).arg(column()).arg(columnSpan()).arg(rowSpan()); }
+	/// Sets the width of the right border of this cell to @a width.
+	void setRightBorderWidth(qreal width) { d->rightBorderWidth = width; }
+
+	/// Returns the width of the right border of this cell.
+	qreal rightBorderWidth() const { return d->rightBorderWidth; }
+
+	/// Sets the width of the top border of this cell to @a width.
+	void setTopBorderWidth(qreal width) { d->topBorderWidth = width; }
+
+	/// Returns the width of the top border of this cell.
+	qreal topBorderWidth() const { return d->topBorderWidth; }
+
+	/// Sets the width of the bottom border of this cell to @a width.
+	void setBottomBorderWidth(qreal width) { d->bottomBorderWidth = width; }
+
+	/// Returns the width of the bottom border of this cell.
+	qreal bottomBorderWidth() const { return d->bottomBorderWidth; }
+
+	/// Sets the color of the left border of this cell to @a color.
+	void setLeftBorderColor(const QString& color) { d->leftBorderColor = color; }
+
+	/// Returns the color of the left border of this cell.
+	QString leftBorderColor() const { return d->leftBorderColor; }
+
+	/// Sets the color of the right border of this cell to @a color.
+	void setRightBorderColor(const QString& color) { d->rightBorderColor = color; }
+
+	/// Returns the color of the right border of this cell.
+	QString rightBorderColor() const { return d->rightBorderColor; }
+
+	/// Sets the color of the top border of this cell to @a color.
+	void setTopBorderColor(const QString& color) { d->topBorderColor = color; }
+
+	/// Returns the color of the top border of this cell.
+	QString topBorderColor() const { return d->topBorderColor; }
+
+	/// Sets the color of the bottom border of this cell to @a color.
+	void setBottomBorderColor(const QString& color) { d->bottomBorderColor = color; }
+
+	/// Returns the color of the left border of this cell.
+	QString bottomBorderColor() const { return d->bottomBorderColor; }
+
+	/// Sets the cell style for this cell to @a style.
+	void setStyle(const QString& style) { d->style = style; }
+
+	/// Returns the cell style for this cell.
+	QString style() const { return d->style; }
+
+	/// Returns the cell as a string. Useful for debugging. The format is subject to change.
+	QString asString() const;
 
 private:
 	/**

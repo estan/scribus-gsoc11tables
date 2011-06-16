@@ -426,24 +426,10 @@ void PageItem_Table::debug() const
 	qDebug() << "m_rowPositions: " <<  m_rowPositions;
 	qDebug() << "m_rowHeights: " <<  m_rowHeights;
 	qDebug() << "m_cellSpans: " <<  m_cellAreas;
-	qDebug() << "m_cellRows: ";
-	for (int row = 0; row < m_cellRows.size(); ++row)
-	{
-		QString rowStr = QString("row %1: ").arg(row);
-		QList<TableCell> cellRow = m_cellRows[row];
-		for (int col = 0; col < cellRow.size(); ++col)
-			rowStr += cellRow[col];
-		qDebug().nospace() << rowStr;
-	}
-	qDebug() << "cellAt(row, column) reports:";
-	for (int row = 0; row < rows(); ++row)
-	{
-		QString rowStr = QString("row %1: ").arg(row);
-		QList<TableCell> cellRow = m_cellRows[row];
-		for (int col = 0; col < columns(); ++col)
-			rowStr += cellAt(row, col);
-		qDebug().nospace() << rowStr;
-	}
+	qDebug() << "m_cellRows contains: ";
+	foreach(QList<TableCell> cellRow, m_cellRows)
+		foreach(TableCell cell, cellRow)
+			qDebug() << cell.asString();
 	qDebug() << "-------------------------------------------------";
 }
 
