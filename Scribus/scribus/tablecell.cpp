@@ -31,6 +31,7 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 	setRightBorderColor(CommonStrings::None);
 	setTopBorderColor(CommonStrings::None);
 	setBottomBorderColor(CommonStrings::None);
+	setStyle(CommonStrings::None);
 
 	d->table = table;
 }
