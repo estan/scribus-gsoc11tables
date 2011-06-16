@@ -14,6 +14,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "commonstrings.h"
 #include "pageitem_table.h"
+#include "scpainter.h"
 
 TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCellData)
 {
@@ -46,6 +47,26 @@ QString TableCell::asString() const
 	str += QString(")");
 
 	return str;
+}
+
+void TableCell::drawLeftBorder(ScPainter *p) const
+{
+	// Not implemented.
+}
+
+void TableCell::drawRightBorder(ScPainter *p) const
+{
+	// Not implemented.
+}
+
+void TableCell::drawTopBorder(ScPainter *p) const
+{
+	// Not implemented.
+}
+
+void TableCell::drawBottomBorder(ScPainter *p) const
+{
+	// Not implemented.
 }
 
 QDebug operator<<(QDebug debug, const TableCell& cell)

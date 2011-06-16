@@ -16,9 +16,11 @@ for which a new license (GPL+exception) is in place.
 #include <QSharedData>
 
 #include "commonstrings.h"
+#include "text/frect.h"
 
 class PageItem_Table;
 class CellStyle;
+class ScPainter;
 
 /**
  * Shared data class for TableCell.
@@ -206,6 +208,12 @@ private:
 	void moveRight(int numColumns) { d->column += numColumns; }
 	/// "Move" the cell left by @a numColumns. E.g. decrease its column by @a numColumns.
 	void moveLeft(int numColumns) { d->column -= numColumns; }
+
+	void drawLeftBorder(ScPainter *p) const;
+	void drawRightBorder(ScPainter *p) const;
+	void drawTopBorder(ScPainter *p) const;
+	void drawBottomBorder(ScPainter *p) const;
+	void drawBackground(ScPainter *p) const;
 
 private:
 	friend class PageItem_Table;
