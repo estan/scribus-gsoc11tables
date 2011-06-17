@@ -325,14 +325,9 @@ bool PageItem_Table::isCovered(int row, int column) const
 	if (!validCell(row, column))
 		return false;
 
-	QList<CellArea>::const_iterator areaIt;
-	for (areaIt = m_cellAreas.begin(); areaIt != m_cellAreas.end(); ++areaIt)
-	{
-		CellArea area = (*areaIt);
-		if (area.contains(row, column) && !(area.row() == row && area.column() == column))
-			return true;
-	}
-	return false;
+	TableCell cell = cellAt(row, column);
+
+	return row != cell.row() || column != cell.column();
 }
 
 FRect PageItem_Table::cellRect(int row, int column) const
@@ -340,25 +335,21 @@ FRect PageItem_Table::cellRect(int row, int column) const
 	if (!validCell(row, column))
 		return FRect();
 
-	FRect rect(m_columnPositions.at(column), m_rowPositions.at(row),
-				m_columnWidths.at(column), m_rowHeights.at(row));
+	TableCell cell = cellAt(row, column);
 
-	// Adjust the rectangle if it's part of a area.
-	QList<CellArea>::const_iterator areaIt;
-	for (areaIt = m_cellAreas.begin(); areaIt != m_cellAreas.end(); ++areaIt)
-	{
-		CellArea area = (*areaIt);
-		if (area.contains(row, column))
-		{
-			// Cell is contained in area, so use rectangle of the area.
-			rect.setCoords(m_columnPositions.at(area.column()), m_rowPositions.at(area.row()),
-						   m_columnPositions.at(area.right()) + m_columnWidths.at(area.right()) - 1,
-						   m_rowPositions.at(area.bottom()) + m_rowHeights.at(area.bottom()) - 1);
-			break;
-		}
-	}
+	// Determine where the cell starts and ends.
+	int startRow = cell.row();
+	int startColumn = cell.column();
+	int endRow = startRow + cell.rowSpan() - 1;
+	int endColumn = startColumn + cell.columnSpan() - 1;
 
-	return rect;
+	// Calculate cell geometry.
+	qreal left = m_columnPositions[startColumn];
+	qreal top = m_rowPositions[startRow];
+	qreal width = m_columnPositions[endColumn] + m_columnWidths[endColumn] - left;
+	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - top;
+
+	return FRect(left, top, width, height);
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
