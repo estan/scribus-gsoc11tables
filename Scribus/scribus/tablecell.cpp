@@ -23,14 +23,6 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 	setColumn(column);
 	setRowSpan(1);
 	setColumnSpan(1);
-	setLeftBorderWidth(1.0);
-	setRightBorderWidth(1.0);
-	setTopBorderWidth(1.0);
-	setBottomBorderWidth(1.0);
-	setLeftBorderColor(CommonStrings::None);
-	setRightBorderColor(CommonStrings::None);
-	setTopBorderColor(CommonStrings::None);
-	setBottomBorderColor(CommonStrings::None);
 	setStyle(CommonStrings::None);
 
 	d->table = table;
