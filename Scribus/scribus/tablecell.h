@@ -75,7 +75,7 @@ public:
 
 /**
  * The TableCell class represents a cell in a table.
- *
+ * <p>
  * It provides an interface for setting and getting cell properties. A cell may be
  * marked as invalid if the row or column containing the cell is removed. The valid
  * state of a cell may be queried using the <code>isValid()</code> function.

@@ -25,7 +25,24 @@ class ScribusDoc;
 class FRect;
 
 /**
- * The PageItem_Table class represents a table item.
+ * The PageItem_Table class represents a table.
+ * <p>
+ * A table is a group of cells ordered into rows and columns. Each table contains at least
+ * one row and one column.
+ * <p>
+ * A table's size can be changed by using <code>insertRows()</code>,
+ * <code>insertColumns()</code>, <code>removeRows()</code>, or <code>removeColumns()</code>.
+ * Use <code>cellAt()</code> to retrieve table cells.
+ * <p>
+ * Heights and widths of rows and columns can be set by using <code>setRowHeight()</code>
+ * and <code>setColumnWidth()</code>.
+ * <p>
+ * Cells in the table can be merged by using <code>mergeCells()</code>. Cells that have been
+ * previously merged can be split up again by using <code>splitCells()</code>.
+ * <p>
+ * The style of the table can be controlled by setting a named style for the table using
+ * <code>setStyle()</code>. Formatting properties can also be set directly on the table.
+ * Directly set properties overrides properties from the style.
  */
 class SCRIBUS_API PageItem_Table : public PageItem
 {
@@ -141,7 +158,8 @@ public:
 	 * Returns the cell at @a row, @a column.
 	 *
 	 * If the cell is covered by a spanning cell, the spanning cell is returned. If the cell is
-	 * not in this table, an invalid cell is returned.
+	 * not in this table, an invalid cell is returned. The table may later mark cells returned
+	 * by this function as invalid, if the row or column containing the cell is removed.
 	 */
 	TableCell cellAt(int row, int column) const;
 
