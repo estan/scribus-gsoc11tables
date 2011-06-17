@@ -35,6 +35,7 @@ for which a new license (GPL+exception) is in place.
 #include "cmdsetprop.h"
 #include "cmdtext.h"
 #include "cmdtable.h"
+#include "cmdcell.h"
 #include "cmdutil.h"
 #include "cmdstyle.h"
 #include "ui/customfdialog.h"
