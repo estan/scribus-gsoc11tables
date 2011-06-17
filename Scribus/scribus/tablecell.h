@@ -208,6 +208,8 @@ private:
 	const QVariant property(Property key) const { return d->properties.value(key); }
 	/// Returns <code>true</code> if the cell has the property with key @a key set.
 	bool hasProperty(Property key) const { return d->properties.contains(key); }
+	/// Clears the property with key @a key.
+	void clearProperty(Property key) { d->properties.remove(key); }
 	/// Clears all set properties of the cell.
 	void clearProperties() { d->properties.clear(); }
 
