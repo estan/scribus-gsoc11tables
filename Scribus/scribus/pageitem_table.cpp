@@ -7,6 +7,8 @@ a copyright and/or license notice that predates the release of Scribus 1.3.2
 for which a new license (GPL+exception) is in place.
 */
 #include <QRectF>
+#include <QHash>
+#include <QVariant>
 
 #include "pageitem.h"
 #include "pageitem_table.h"

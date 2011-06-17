@@ -11,6 +11,8 @@ for which a new license (GPL+exception) is in place.
 
 #include <QString>
 #include <QList>
+#include <QHash>
+#include <QVariant>
 #include <QRectF>
 
 #include "scribusapi.h"
@@ -30,8 +32,24 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_OBJECT
 
 public:
+	/// Table formatting properties.
+	enum Property
+	{
+		BackgroundColor,
+		LeftBorderWidth,
+		RightBorderWidth,
+		TopBorderWidth,
+		BottomBorderWidth,
+		LeftBorderColor,
+		RightBorderColor,
+		TopBorderColor,
+		BottomBorderColor
+	};
+
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
 	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
+
+	/// Destructor.
 	~PageItem_Table() {};
 
 	/// Returns the number of rows in the table.
@@ -140,6 +158,56 @@ public:
 	 */
 	void adjustToFrame();
 
+	// Formatting properties setters/getters.
+
+	/// Sets the width of the left border of this table to @a width.
+	void setLeftBorderWidth(qreal width) { setProperty(LeftBorderWidth, QVariant(width)); }
+
+	/// Returns the width of the left border of this table.
+	qreal leftBorderWidth() const { return property(LeftBorderWidth).toReal(); }
+
+	/// Sets the width of the right border of this table to @a width.
+	void setRightBorderWidth(qreal width) { setProperty(RightBorderWidth, QVariant(width)); }
+
+	/// Returns the width of the right border of this table.
+	qreal rightBorderWidth() const { return property(RightBorderWidth).toReal(); }
+
+	/// Sets the width of the top border of this table to @a width.
+	void setTopBorderWidth(qreal width) { setProperty(TopBorderWidth, QVariant(width)); }
+
+	/// Returns the width of the top border of this table.
+	qreal topBorderWidth() const { return property(TopBorderWidth).toReal(); }
+
+	/// Sets the width of the bottom border of this table to @a width.
+	void setBottomBorderWidth(qreal width) { setProperty(BottomBorderWidth, QVariant(width)); }
+
+	/// Returns the width of the bottom border of this table.
+	qreal bottomBorderWidth() const { return property(BottomBorderWidth).toReal(); }
+
+	/// Sets the color of the left border of this table to @a color.
+	void setLeftBorderColor(const QString& color) { setProperty(LeftBorderColor, QVariant(color)); }
+
+	/// Returns the color of the left border of this table.
+	QString leftBorderColor() const { return property(LeftBorderColor).toString(); }
+
+	/// Sets the color of the right border of this table to @a color.
+	void setRightBorderColor(const QString& color) { setProperty(RightBorderColor, QVariant(color)); }
+
+	/// Returns the color of the right border of this table.
+	QString rightBorderColor() const { return property(RightBorderColor).toString(); }
+
+	/// Sets the color of the top border of this table to @a color.
+	void setTopBorderColor(const QString& color) { setProperty(TopBorderColor, QVariant(color)); }
+
+	/// Returns the color of the top border of this table.
+	QString topBorderColor() const { return property(TopBorderColor).toString(); }
+
+	/// Sets the color of the bottom border of this table to @a color.
+	void setBottomBorderColor(const QString& color) { setProperty(BottomBorderColor, QVariant(color)); }
+
+	/// Returns the color of the bottom border of this table.
+	QString bottomBorderColor() const { return property(BottomBorderColor).toString(); }
+
 	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
 	virtual bool isTable() const { return true; }
@@ -160,6 +228,17 @@ private:
 		ColumnsInserted, /**< Columns were inserted. */
 		ColumnsRemoved   /**< Columns were removed. */
 	};
+
+	/// Sets the property with key @a key to @a value.
+	void setProperty(Property key, const QVariant& value) { m_properties.insert(key, value); }
+	/// Returns the property with key @a key.
+	const QVariant property(Property key) const { return m_properties.value(key); }
+	/// Returns <code>true</code> if the cell has the property with key @a key set.
+	bool hasProperty(Property key) const { return m_properties.contains(key); }
+	/// Clears the property with key @a key.
+	void clearProperty(Property key) { m_properties.remove(key); }
+	/// Clears all set properties of the cell.
+	void clearProperties() { m_properties.clear(); }
 
 	/// Returns true if @a row is a row in this table.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }
@@ -226,6 +305,9 @@ private:
 
 	/// List of areas of merged cells.
 	QList<CellArea> m_cellAreas;
+
+	/// Table formatting properties.
+	QHash<int, QVariant> m_properties;
 };
 
 #endif // PAGEITEM_TABLE_H

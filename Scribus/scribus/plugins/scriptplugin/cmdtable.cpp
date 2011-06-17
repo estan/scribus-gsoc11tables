@@ -322,6 +322,346 @@ PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyObject *scribus_gettableleftborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table left border width from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyFloat_FromDouble(static_cast<double>(table->leftBorderWidth()));
+}
+
+PyObject *scribus_settableleftborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	double width;
+	if (!PyArg_ParseTuple(args, "d|es", &width, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table left border width on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (width < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table left border width must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setLeftBorderWidth(width);
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettablerightborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table right border width from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyFloat_FromDouble(static_cast<double>(table->rightBorderWidth()));
+}
+
+PyObject *scribus_settablerightborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	double width;
+	if (!PyArg_ParseTuple(args, "d|es", &width, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table right border width on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (width < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table right border width must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setRightBorderWidth(width);
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettabletopborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table top border width from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyFloat_FromDouble(static_cast<double>(table->topBorderWidth()));
+}
+
+PyObject *scribus_settabletopborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	double width;
+	if (!PyArg_ParseTuple(args, "d|es", &width, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table top border width on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (width < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table top border width must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setTopBorderWidth(width);
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettablebottomborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table bottom border width from non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyFloat_FromDouble(static_cast<double>(table->bottomBorderWidth()));
+}
+
+PyObject *scribus_settablebottomborderwidth(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	double width;
+	if (!PyArg_ParseTuple(args, "d|es", &width, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table bottom border width on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (width < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Table bottom border width must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setBottomBorderWidth(width);
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettableleftbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table left border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->leftBorderColor().toUtf8());
+}
+
+PyObject *scribus_settableleftbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *color;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table left border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setLeftBorderColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettablerightbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table right border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->rightBorderColor().toUtf8());
+}
+
+PyObject *scribus_settablerightbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *color;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table right border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setRightBorderColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettabletopbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table top border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->topBorderColor().toUtf8());
+}
+
+PyObject *scribus_settabletopbordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *color;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table top border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setTopBorderColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettablebottombordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table bottom border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->bottomBorderColor().toUtf8());
+}
+
+PyObject *scribus_settablebottombordercolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *color;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table bottom border color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setBottomBorderColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
 /*! HACK: this removes "warning: 'blah' defined but not used" compiler warnings
 with header files structure untouched (docstrings are kept near declarations)
 PV */
@@ -333,5 +673,13 @@ void cmdtabledocwarnings()
 	  << scribus_inserttablecolumns__doc__ << scribus_removetablecolumns__doc__
 	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
 	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
-	  << scribus_mergetablecells__doc__;
+	  << scribus_mergetablecells__doc__ << scribus_gettableleftborderwidth__doc__
+	  << scribus_settableleftborderwidth__doc__ << scribus_gettablerightborderwidth__doc__
+	  << scribus_settablerightborderwidth__doc__ << scribus_gettabletopborderwidth__doc__
+	  << scribus_settabletopborderwidth__doc__ << scribus_gettablebottomborderwidth__doc__
+	  << scribus_settablebottomborderwidth__doc__ << scribus_gettableleftbordercolor__doc__
+	  << scribus_settableleftbordercolor__doc__ << scribus_gettablerightbordercolor__doc__
+	  << scribus_settablerightbordercolor__doc__ << scribus_gettabletopbordercolor__doc__
+	  << scribus_settabletopbordercolor__doc__ << scribus_gettablebottombordercolor__doc__
+	  << scribus_settablebottombordercolor__doc__;
 }
