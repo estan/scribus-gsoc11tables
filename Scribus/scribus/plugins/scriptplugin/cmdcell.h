@@ -52,7 +52,7 @@ PyObject *scribus_getcellleftborderwidth(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellleftborderwidth__doc__,
 QT_TR_NOOP("setCellLeftBorderWidth(row, column, width, [\"name\"])\n\
 \n\
-Sets the width of the left border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the width of the left border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"width\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the width is less than 0 or the cell does not exist.\n\
@@ -75,7 +75,7 @@ PyObject *scribus_getcellrightborderwidth(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellrightborderwidth__doc__,
 QT_TR_NOOP("setCellRightBorderWidth(row, column, width, [\"name\"])\n\
 \n\
-Sets the width of the right border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the width of the right border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"width\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the width is less than 0 or the cell does not exist.\n\
@@ -98,7 +98,7 @@ PyObject *scribus_getcelltopborderwidth(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcelltopborderwidth__doc__,
 QT_TR_NOOP("setCellTopBorderWidth(row, column, width, [\"name\"])\n\
 \n\
-Sets the width of the top border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the width of the top border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"width\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the width is less than 0 or the cell does not exist.\n\
@@ -121,7 +121,7 @@ PyObject *scribus_getcellbottomborderwidth(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellbottomborderwidth__doc__,
 QT_TR_NOOP("setCellBottomBorderWidth(row, column, width, [\"name\"])\n\
 \n\
-Sets the width of the bottom border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the width of the bottom border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"width\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the width is less than 0 or the cell does not exist.\n\
@@ -143,7 +143,7 @@ PyObject *scribus_getcellleftbordercolor(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellleftbordercolor__doc__,
 QT_TR_NOOP("setCellLeftBorderColor(row, column, color, [\"name\"])\n\
 \n\
-Sets the color of the left border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the color of the left border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"color\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist.\n\
@@ -165,7 +165,7 @@ PyObject *scribus_getcellrightbordercolor(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellrightbordercolor__doc__,
 QT_TR_NOOP("setCellRightBorderColor(row, column, color, [\"name\"])\n\
 \n\
-Sets the color of the right border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the color of the right border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"color\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist.\n\
@@ -187,7 +187,7 @@ PyObject *scribus_getcelltopbordercolor(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcelltopbordercolor__doc__,
 QT_TR_NOOP("setCellTopBorderColor(row, column, color, [\"name\"])\n\
 \n\
-Sets the color of the top border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the color of the top border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"color\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist.\n\
@@ -209,7 +209,7 @@ PyObject *scribus_getcellbottombordercolor(PyObject * /*self*/, PyObject* args);
 PyDoc_STRVAR(scribus_setcellbottombordercolor__doc__,
 QT_TR_NOOP("setCellBottomBorderColor(row, column, color, [\"name\"])\n\
 \n\
-Sets the color of the bottom border of the cell at \"row\", \"column\" in the table \"name\".\n\
+Sets the color of the bottom border of the cell at \"row\", \"column\" in the table \"name\"\n\
 to \"color\". If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist.\n\
