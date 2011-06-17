@@ -70,7 +70,7 @@ public:
 	/// Table containing the cell.
 	PageItem_Table *table;
 
-	// Cell properties.
+	/// Cell formatting properties.
 	QHash<int, QVariant> properties;
 };
 
@@ -84,7 +84,7 @@ public:
 class TableCell
 {
 public:
-	/// Cell properties.
+	/// Cell formatting properties.
 	enum Property
 	{
 		BackgroundColor,
