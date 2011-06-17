@@ -25,6 +25,7 @@ SET(SCRIPTER_PLUGIN_MOC_CLASSES
 SET(SCRIPTER_PLUGIN_SOURCES
   cmdcolor.cpp
   cmddialog.cpp
+  cmdcell.cpp
   cmddoc.cpp
   cmdgetprop.cpp
   cmdgetsetprop.cpp
