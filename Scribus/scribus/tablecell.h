@@ -39,8 +39,7 @@ public:
 		rowSpan(-1),
 		columnSpan(-1),
 		style(CommonStrings::None),
-		table(0),
-		properties(QHash<int, QVariant>()) {}
+		table(0) {}
 	/// Construct data from data in @a other.
 	TableCellData(const TableCellData& other) : QSharedData(other),
 		isValid(other.isValid),
