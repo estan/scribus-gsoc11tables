@@ -161,7 +161,7 @@ public:
 	/// Sets the color of the bottom border of this cell to @a color.
 	void setBottomBorderColor(const QString& color) { setProperty(BottomBorderColor, QVariant(color)); }
 
-	/// Returns the color of the left border of this cell.
+	/// Returns the color of the bottom border of this cell.
 	QString bottomBorderColor() const { return property(BottomBorderColor).toString(); }
 
 	/// Sets the cell style for this cell to @a style.
