@@ -19,6 +19,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "commonstrings.h"
 #include "text/frect.h"
+#include "styles/cellstyle.h"
 
 class PageItem_Table;
 class CellStyle;
@@ -38,7 +39,6 @@ public:
 		column(-1),
 		rowSpan(-1),
 		columnSpan(-1),
-		style(""),
 		table(0) {}
 	/// Construct data from data in @a other.
 	TableCellData(const TableCellData& other) : QSharedData(other),
@@ -65,10 +65,9 @@ public:
 	int columnSpan;
 
 	/// Style of the cell.
-	QString style;
+	CellStyle style;
 	/// Table containing the cell.
 	PageItem_Table *table;
-
 	/// Cell formatting properties.
 	QHash<int, QVariant> properties;
 };
@@ -116,58 +115,58 @@ public:
 	int columnSpan() const { return d->columnSpan; }
 
 	/// Sets the width of the left border of this cell to @a width.
-	void setLeftBorderWidth(qreal width) { setProperty(LeftBorderWidth, QVariant(width)); }
+	void setLeftBorderWidth(qreal width) { d->style.setLeftBorderWidth(width); }
 
 	/// Returns the width of the left border of this cell.
-	qreal leftBorderWidth() const { return property(LeftBorderWidth).toReal(); }
+	qreal leftBorderWidth() const { return d->style.leftBorderWidth(); }
 
 	/// Sets the width of the right border of this cell to @a width.
-	void setRightBorderWidth(qreal width) { setProperty(RightBorderWidth, QVariant(width)); }
+	void setRightBorderWidth(qreal width) { d->style.setRightBorderWidth(width); }
 
 	/// Returns the width of the right border of this cell.
-	qreal rightBorderWidth() const { return property(RightBorderWidth).toReal(); }
+	qreal rightBorderWidth() const { return d->style.rightBorderWidth(); }
 
 	/// Sets the width of the top border of this cell to @a width.
-	void setTopBorderWidth(qreal width) { setProperty(TopBorderWidth, QVariant(width)); }
+	void setTopBorderWidth(qreal width) { d->style.setTopBorderWidth(width); }
 
 	/// Returns the width of the top border of this cell.
-	qreal topBorderWidth() const { return property(TopBorderWidth).toReal(); }
+	qreal topBorderWidth() const { return d->style.topBorderWidth(); }
 
 	/// Sets the width of the bottom border of this cell to @a width.
-	void setBottomBorderWidth(qreal width) { setProperty(BottomBorderWidth, QVariant(width)); }
+	void setBottomBorderWidth(qreal width) { d->style.setBottomBorderWidth(width); }
 
 	/// Returns the width of the bottom border of this cell.
-	qreal bottomBorderWidth() const { return property(BottomBorderWidth).toReal(); }
+	qreal bottomBorderWidth() const { return d->style.bottomBorderWidth(); }
 
 	/// Sets the color of the left border of this cell to @a color.
-	void setLeftBorderColor(const QString& color) { setProperty(LeftBorderColor, QVariant(color)); }
+	void setLeftBorderColor(const QString& color) { d->style.setLeftBorderColor(color); }
 
 	/// Returns the color of the left border of this cell.
-	QString leftBorderColor() const { return property(LeftBorderColor).toString(); }
+	QString leftBorderColor() const { return d->style.leftBorderColor(); }
 
 	/// Sets the color of the right border of this cell to @a color.
-	void setRightBorderColor(const QString& color) { setProperty(RightBorderColor, QVariant(color)); }
+	void setRightBorderColor(const QString& color) { d->style.setRightBorderColor(color); }
 
 	/// Returns the color of the right border of this cell.
-	QString rightBorderColor() const { return property(RightBorderColor).toString(); }
+	QString rightBorderColor() const { return d->style.rightBorderColor(); }
 
 	/// Sets the color of the top border of this cell to @a color.
-	void setTopBorderColor(const QString& color) { setProperty(TopBorderColor, QVariant(color)); }
+	void setTopBorderColor(const QString& color) { d->style.setTopBorderColor(color); }
 
 	/// Returns the color of the top border of this cell.
-	QString topBorderColor() const { return property(TopBorderColor).toString(); }
+	QString topBorderColor() const { return d->style.topBorderColor(); }
 
 	/// Sets the color of the bottom border of this cell to @a color.
-	void setBottomBorderColor(const QString& color) { setProperty(BottomBorderColor, QVariant(color)); }
+	void setBottomBorderColor(const QString& color) { d->style.setBottomBorderColor(color); }
 
 	/// Returns the color of the bottom border of this cell.
-	QString bottomBorderColor() const { return property(BottomBorderColor).toString(); }
+	QString bottomBorderColor() const { return d->style.bottomBorderColor(); }
 
 	/// Sets the cell style for this cell to @a style.
-	void setStyle(const QString& style) { d->style = style; }
+	void setStyle(const QString& style) { d->style.setParent(style); }
 
-	/// Returns the cell style for this cell.
-	QString style() const { return d->style; }
+	/// Returns the named cell style for this cell.
+	QString style() const { return d->style.parent(); }
 
 	/// Returns the cell as a string. Useful for debugging. The format is subject to change.
 	QString asString() const;
