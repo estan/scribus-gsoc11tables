@@ -50,6 +50,10 @@ void TableStyle::getNamedResources(ResourceCollection& lists) const
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())
 		lists.collectCellStyle(style->name());
 	lists.collectColor(backgroundColor());
+	lists.collectColor(leftBorderColor());
+	lists.collectColor(rightBorderColor());
+	lists.collectColor(topBorderColor());
+	lists.collectColor(bottomBorderColor());
 }
 
 void TableStyle::replaceNamedResources(ResourceCollection& newNames)

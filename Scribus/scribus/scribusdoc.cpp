@@ -478,6 +478,14 @@ void ScribusDoc::init()
 	TableStyle defaultTableStyle;
 	defaultTableStyle.setName(CommonStrings::DefaultTableStyle);
 	defaultTableStyle.setBackgroundColor(CommonStrings::None);
+	defaultTableStyle.setLeftBorderWidth(1.0);
+	defaultTableStyle.setRightBorderWidth(1.0);
+	defaultTableStyle.setTopBorderWidth(1.0);
+	defaultTableStyle.setBottomBorderWidth(1.0);
+	defaultTableStyle.setLeftBorderColor("Black");
+	defaultTableStyle.setRightBorderColor("Black");
+	defaultTableStyle.setTopBorderColor("Black");
+	defaultTableStyle.setBottomBorderColor("Black");
 	docTableStyles.create(defaultTableStyle);
 	docTableStyles.makeDefault(&(docTableStyles[0]));
 
@@ -486,6 +494,14 @@ void ScribusDoc::init()
 	CellStyle defaultCellStyle;
 	defaultCellStyle.setName(CommonStrings::DefaultCellStyle);
 	defaultCellStyle.setBackgroundColor(CommonStrings::None);
+	defaultCellStyle.setLeftBorderWidth(1.0);
+	defaultCellStyle.setRightBorderWidth(1.0);
+	defaultCellStyle.setTopBorderWidth(1.0);
+	defaultCellStyle.setBottomBorderWidth(1.0);
+	defaultCellStyle.setLeftBorderColor("Black");
+	defaultCellStyle.setRightBorderColor("Black");
+	defaultCellStyle.setTopBorderColor("Black");
+	defaultCellStyle.setBottomBorderColor("Black");
 	docCellStyles.create(defaultCellStyle);
 	docCellStyles.makeDefault(&(docCellStyles[0]));
 	

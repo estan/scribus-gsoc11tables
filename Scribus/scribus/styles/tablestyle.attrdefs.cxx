@@ -19,3 +19,11 @@
 //Syntax: ATTRDEF( datatype, gettername, name, defaultvalue)
 
 ATTRDEF(QString, backgroundColor, BackgroundColor, CommonStrings::None)
+ATTRDEF(double, leftBorderWidth, LeftBorderWidth, 0)
+ATTRDEF(double, rightBorderWidth, RightBorderWidth, 0)
+ATTRDEF(double, topBorderWidth, TopBorderWidth, 0)
+ATTRDEF(double, bottomBorderWidth, BottomBorderWidth, 0)
+ATTRDEF(QString, leftBorderColor, LeftBorderColor, "Black")
+ATTRDEF(QString, rightBorderColor, RightBorderColor, "Black")
+ATTRDEF(QString, topBorderColor, TopBorderColor, "Black")
+ATTRDEF(QString, bottomBorderColor, BottomBorderColor, "Black")
