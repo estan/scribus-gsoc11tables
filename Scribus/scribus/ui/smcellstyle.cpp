@@ -184,9 +184,27 @@ QString SMCellStyle::newStyle(const QString &fromStyle)
 
 void SMCellStyle::apply()
 {
-	// TODO: Implement this once we have cell items and cell
-	//       styles stored in the document. Something like
-	//       m_doc->redefineCellStyles() / m_doc->replaceCellStyles().
+	if (!m_doc)
+		return; // No document available.
+
+	// Handle replacement of deleted styles.
+	QMap<QString, QString> replacement;
+	for (int i = 0; i < m_deleted.count(); ++i)
+	{
+		if (m_deleted[i].first == m_deleted[i].second)
+			continue; // Nothing to do.
+		replacement[m_deleted[i].first] = m_deleted[i].second;
+	}
+
+	m_doc->redefineCellStyles(m_cachedStyles, false);
+	m_doc->replaceCellStyles(replacement);
+
+	m_deleted.clear(); // Deletion done at this point.
+
+	// TODO: We should probably have something similar to this for tables/cells.
+	//m_doc->scMW()->requestUpdate(reqTextStylesUpdate);
+
+	m_doc->changed();
 }
 
 void SMCellStyle::editMode(bool isOn)
@@ -382,13 +400,10 @@ void SMCellStyle::updateStylesCache()
 		return; // No document available.
 
 	m_selection.clear();
-	//m_cachedStyles.clear();
+	m_cachedStyles.clear();
+	m_deleted.clear();
 
-	// TODO: Fix this once we have actual cell items and
-	//       store have e.g. m_doc->cellStyles().
-	//m_cachedStyles.redefine(m_doc->cellStyles(), true);
-	
-	// ..so for now just do nothing.
+	m_cachedStyles.redefine(m_doc->cellStyles(), true);
 }
 
 void SMCellStyle::setupConnections()
