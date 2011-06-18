@@ -1,3 +1,7 @@
+------------------------------------------------------------------------------------
+NOTE: This doc is now kept at http://wiki.scribus.net/canvas/Styles_System_Overview
+------------------------------------------------------------------------------------
+
 This doc is supposed to provide a global picture on Scribus's style system.
 
 Central classes are Style and its subclasses, StyleContext and StyleSet.
