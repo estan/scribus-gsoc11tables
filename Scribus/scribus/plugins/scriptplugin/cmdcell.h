@@ -16,6 +16,30 @@
 #define CMDCELL_H
 
 /*! docstring */
+PyDoc_STRVAR(scribus_getcellstyle__doc__,
+QT_TR_NOOP("getCellStyle(row, column, [\"name\"]) -> string\n\
+\n\
+Returns the named style of the cell at \"row\", \"column\" in the table \"name\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError if the cell does not exist.\n\
+"));
+/*! Get cell style */
+PyObject *scribus_getcellstyle(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_setcellstyle__doc__,
+QT_TR_NOOP("setCellStyle(row, column, style, [\"name\"])\n\
+\n\
+Sets the named style of the cell at \"row\", \"column\" in the table \"name\" to \"style\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError if the cell does not exist.\n\
+"));
+/*! Set cell style */
+PyObject *scribus_setcellstyle(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
 PyDoc_STRVAR(scribus_getcellrowspan__doc__,
 QT_TR_NOOP("getCellRowSpan(row, column, [\"name\"]) -> int\n\
 \n\
