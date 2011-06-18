@@ -33,6 +33,7 @@ QString TableCell::asString() const
 	QString str("cell(");
 	str += QString("row=%1, column=%2, ").arg(row()).arg(column());
 	str += QString("rowSpan=%1, columnSpan=%2, ").arg(rowSpan()).arg(columnSpan());
+	str += QString("style=%1, ").arg(d->style);
 	str += QString("leftBorderWidth=%1, rightBorderWidth=%2, ").arg(leftBorderWidth()).arg(rightBorderWidth());
 	str += QString("topBorderWidth=%1, bottomBorderWidth=%2, ").arg(topBorderWidth()).arg(bottomBorderWidth());
 	str += QString("leftBorderColor=%1, rightBorderColor=%2, ").arg(leftBorderColor()).arg(rightBorderColor());
