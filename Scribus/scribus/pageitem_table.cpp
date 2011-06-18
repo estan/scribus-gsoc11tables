@@ -435,7 +435,6 @@ void PageItem_Table::assertValid() const
 		Q_ASSERT_X(columns() == cellRow.size(), "isValid", "columns() != cellRow.size()");
 
 	// Check that cells report correct row, column, row span and column span.
-	int numberOfSpanningCells = 0;
 	for (int row = 0; row < rows(); ++row)
 	{
 		for (int col = 0; col < columns(); ++col)
@@ -445,22 +444,12 @@ void PageItem_Table::assertValid() const
 			Q_ASSERT_X(cell.column() == col, "isValid", "cell.column() != col");
 			if (cell.rowSpan() > 1 || cell.columnSpan() > 1)
 			{
-				// Cell has row or column span, so check that there's a matching cell area.
-				numberOfSpanningCells++;
-				int matchingCellAreas = 0;
-				foreach (CellArea area, m_cellAreas)
-				{
-					if (area.row() == cell.row() && area.column() == cell.column() &&
-							area.height() == cell.rowSpan() && area.width() == cell.columnSpan())
-						++matchingCellAreas;
-				}
-				Q_ASSERT_X(matchingCellAreas == 1, "isValid", "matchingCellAreas != 1");
+				// Cell has row or column span, so check that there's exactly one matching area.
+				CellArea expectedArea(cell.row(), cell.column(), cell.columnSpan(), cell.rowSpan());
+				Q_ASSERT_X(m_cellAreas.count(expectedArea) == 1, "isValid", "Unexpected number of cell areas");
 			}
 		}
 	}
-
-	// Check that number of cell areas matches number of spanning cells.
-	Q_ASSERT_X(m_cellAreas.size() == numberOfSpanningCells, "isValid", "m_cellAreas.size() != numberOfSpanningCells");
 
 	// Check that cellAt(int, int) has correct behavior on covered cells.
 	for (int row = 0; row < rows(); ++row)
