@@ -38,7 +38,7 @@ public:
 		column(-1),
 		rowSpan(-1),
 		columnSpan(-1),
-		style(CommonStrings::None),
+		style(""),
 		table(0) {}
 	/// Construct data from data in @a other.
 	TableCellData(const TableCellData& other) : QSharedData(other),
