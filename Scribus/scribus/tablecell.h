@@ -114,6 +114,12 @@ public:
 	/// Returns the number of columns this cell spans.
 	int columnSpan() const { return d->columnSpan; }
 
+	/// Sets the background color of this cell to @a color.
+	void setBackgroundColor(const QString& color) { d->style.setBackgroundColor(color); }
+
+	/// Returns the background color of this cell.
+	QString backgroundColor() const { return d->style.backgroundColor(); }
+
 	/// Sets the width of the left border of this cell to @a width.
 	void setLeftBorderWidth(qreal width) { d->style.setLeftBorderWidth(width); }
 

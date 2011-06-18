@@ -62,6 +62,28 @@ spanning cell is returned. If \"name\" is not given the currently selected item 
 PyObject *scribus_getcellcolumnspan(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
+PyDoc_STRVAR(scribus_getcellbackgroundcolor__doc__,
+QT_TR_NOOP("getCellBackgroundColor(row, column, [\"name\"]) -> string\n\
+\n\
+Returns the color of the background of the cell at \"row\", \"column\" in the table \"name\"\n\
+If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Get cell background color */
+PyObject *scribus_getcellbackgroundcolor(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_setcellbackgroundcolor__doc__,
+QT_TR_NOOP("setCellBackgroundColor(row, column, color, [\"name\"])\n\
+\n\
+Sets the color of the background of the cell at \"row\", \"column\" in the table \"name\"\n\
+to \"color\". If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the cell does not exist.\n\
+"));
+/*! Set cell background color */
+PyObject *scribus_setcellbackgroundcolor(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
 PyDoc_STRVAR(scribus_getcellleftborderwidth__doc__,
 QT_TR_NOOP("getCellLeftBorderWidth(row, column, [\"name\"]) -> float\n\
 \n\

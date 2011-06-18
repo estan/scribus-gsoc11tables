@@ -103,6 +103,58 @@ PyObject *scribus_getcellcolumnspan(PyObject* /* self */, PyObject* args)
 	return PyInt_FromLong(static_cast<long>(table->cellAt(row, column).columnSpan()));
 }
 
+PyObject *scribus_getcellbackgroundcolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell background color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->cellAt(row, column).backgroundColor().toUtf8());
+}
+
+PyObject *scribus_setcellbackgroundcolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	char *color;
+	if (!PyArg_ParseTuple(args, "iies|es", &row, &column, "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell background color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	table->cellAt(row, column).setBackgroundColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
 PyObject *scribus_getcellleftborderwidth(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
@@ -527,6 +579,7 @@ void cmdcelldocwarnings()
 	QStringList s;
 	s << scribus_getcellstyle__doc__ << scribus_setcellstyle__doc__
 	  << scribus_getcellrowspan__doc__ << scribus_getcellcolumnspan__doc__
+	  << scribus_getcellbackgroundcolor__doc__ << scribus_setcellbackgroundcolor__doc__
 	  << scribus_getcellleftborderwidth__doc__ << scribus_setcellleftborderwidth__doc__
 	  << scribus_getcellrightborderwidth__doc__ << scribus_setcellrightborderwidth__doc__
 	  << scribus_getcelltopborderwidth__doc__ << scribus_setcelltopborderwidth__doc__
