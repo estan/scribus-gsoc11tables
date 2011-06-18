@@ -214,6 +214,8 @@ ScribusDoc::ScribusDoc() : UndoObject( tr("Document")), Observable<ScribusDoc>(N
 	DragElements(),
 	docParagraphStyles(),
 	docCharStyles(),
+	docTableStyles(),
+	docCellStyles(),
 	Layers(),
 	GroupCounter(1),
 	colorEngine(ScCore->defaultEngine),
@@ -303,6 +305,8 @@ ScribusDoc::ScribusDoc(const QString& docName, int unitindex, const PageSize& pa
 	DragElements(),
 	docParagraphStyles(),
 	docCharStyles(),
+	docTableStyles(),
+	docCellStyles(),
 	Layers(),
 	GroupCounter(1),
 	colorEngine(ScCore->defaultEngine),
@@ -468,6 +472,22 @@ void ScribusDoc::init()
 //	docParagraphStyles[0].charStyle().setName( "cdocdefault" ); // DONT TRANSLATE
 
 	currentStyle = pstyle;
+
+	// Create default table style.
+	// TODO: We should have preferences for the default values.
+	TableStyle defaultTableStyle;
+	defaultTableStyle.setName(CommonStrings::DefaultTableStyle);
+	defaultTableStyle.setBackgroundColor(CommonStrings::None);
+	docTableStyles.create(defaultTableStyle);
+	docTableStyles.makeDefault(&(docTableStyles[0]));
+
+	// Create default table cell style.
+	// TODO: We should have preferences for the default values.
+	CellStyle defaultCellStyle;
+	defaultCellStyle.setName(CommonStrings::DefaultCellStyle);
+	defaultCellStyle.setBackgroundColor(CommonStrings::None);
+	docCellStyles.create(defaultCellStyle);
+	docCellStyles.makeDefault(&(docCellStyles[0]));
 	
 	Layers.addLayer( tr("Background") );
 	// FIXME: Check PDF version input
@@ -987,6 +1007,10 @@ void ScribusDoc::getNamedResources(ResourceCollection& lists) const
 		docParagraphStyles[i].getNamedResources(lists);
 	for (int i = 0; i < docCharStyles.count(); ++i)
 		docCharStyles[i].getNamedResources(lists);
+	for (int i = 0; i < docTableStyles.count(); ++i)
+		docTableStyles[i].getNamedResources(lists);
+	for (int i = 0; i < docCellStyles.count(); ++i)
+		docCellStyles[i].getNamedResources(lists);
 //	for (uint i = 0; i < docLineStyles.count(); ++i)
 //		docLineStyles[i].getNamedResources(lists);
 	
@@ -1137,6 +1161,20 @@ void ScribusDoc::replaceNamedResources(ResourceCollection& newNames)
 		else
 			docCharStyles[i].replaceNamedResources(newNames);
 	}
+	for (int i = docTableStyles.count() - 1; i >= 0; --i)
+	{
+		if (newNames.tableStyles().contains(docTableStyles[i].name()))
+			docTableStyles.remove(i);
+		else
+			docTableStyles[i].replaceNamedResources(newNames);
+	}
+	for (int i = docCellStyles.count() - 1; i >= 0; --i)
+	{
+		if (newNames.cellStyles().contains(docCellStyles[i].name()))
+			docCellStyles.remove(i);
+		else
+			docCellStyles[i].replaceNamedResources(newNames);
+	}
 
 	QMap<QString,ScPattern>::Iterator it;
 	for (it = docPatterns.begin(); it != docPatterns.end(); ++it)
@@ -1178,16 +1216,23 @@ void ScribusDoc::replaceNamedResources(ResourceCollection& newNames)
 	{
 		docCharStyles.invalidate();
 		docParagraphStyles.invalidate();	
+		docTableStyles.invalidate();
+		docCellStyles.invalidate();
 	}
 	else
 	{
 		if (newNames.charStyles().count() > 0)
 			docCharStyles.invalidate();
 		if (newNames.styles().count() > 0)
-			docParagraphStyles.invalidate();	
+			docParagraphStyles.invalidate();
+		if (newNames.tableStyles().count() > 0)
+			docTableStyles.invalidate();
+		if (newNames.cellStyles().count() > 0)
+			docCellStyles.invalidate();
 	}
 	if (!isLoading() && !(newNames.colors().isEmpty() && newNames.fonts().isEmpty() && newNames.patterns().isEmpty() 
-						  && newNames.styles().isEmpty() && newNames.charStyles().isEmpty() && newNames.lineStyles().isEmpty()) )
+						  && newNames.styles().isEmpty() && newNames.charStyles().isEmpty() && newNames.lineStyles().isEmpty()
+						  && newNames.tableStyles().isEmpty() && newNames.cellStyles().isEmpty()))
 		changed();
 }
 
@@ -1237,6 +1282,19 @@ void ScribusDoc::replaceCharStyles(const QMap<QString,QString>& newNameForOld)
 	*/
 }
 
+void ScribusDoc::replaceTableStyles(const QMap<QString, QString>& newNameForOld)
+{
+	ResourceCollection newNames;
+	newNames.mapTableStyles(newNameForOld);
+	replaceNamedResources(newNames);
+}
+
+void ScribusDoc::replaceCellStyles(const QMap<QString, QString>& newNameForOld)
+{
+	ResourceCollection newNames;
+	newNames.mapCellStyles(newNameForOld);
+	replaceNamedResources(newNames);
+}
 
 void ScribusDoc::redefineStyles(const StyleSet<ParagraphStyle>& newStyles, bool removeUnused)
 {
@@ -1292,6 +1350,47 @@ void ScribusDoc::redefineCharStyles(const StyleSet<CharStyle>& newStyles, bool r
 	docCharStyles.invalidate();
 }
 
+void ScribusDoc::redefineTableStyles(const StyleSet<TableStyle>& newStyles, bool removeUnused)
+{
+	docTableStyles.redefine(newStyles, false);
+	if (removeUnused)
+	{
+		QMap<QString, QString> deletion;
+		QString deflt("");
+		for (int i = 0; i < docTableStyles.count(); ++i)
+		{
+			const QString& nam(docTableStyles[i].name());
+			if (newStyles.find(nam) < 0)
+			{
+				deletion[nam] = deflt;
+			}
+		}
+		if (deletion.count() > 0)
+			replaceTableStyles(deletion);
+	}
+	docTableStyles.invalidate();
+}
+
+void ScribusDoc::redefineCellStyles(const StyleSet<CellStyle>& newStyles, bool removeUnused)
+{
+	docCellStyles.redefine(newStyles, false);
+	if (removeUnused)
+	{
+		QMap<QString, QString> deletion;
+		QString deflt("");
+		for (int i = 0; i < docCellStyles.count(); ++i)
+		{
+			const QString& nam(docCellStyles[i].name());
+			if (newStyles.find(nam) < 0)
+			{
+				deletion[nam] = deflt;
+			}
+		}
+		if (deletion.count() > 0)
+			replaceCellStyles(deletion);
+	}
+	docCellStyles.invalidate();
+}
 
 /*
  * Split out from loadStyles in editFormats.cpp so it's callable from anywhere,

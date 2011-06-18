@@ -18,5 +18,4 @@
 
 //Syntax: ATTRDEF( datatype, gettername, name, defaultvalue)
 
-// NOTE: These attributes are preliminary.
-ATTRDEF(QString, backgroundColor, BackgroundColor, "None")
+ATTRDEF(QString, backgroundColor, BackgroundColor, CommonStrings::None)

@@ -48,6 +48,8 @@ for which a new license (GPL+exception) is in place.
 #include "scguardedptr.h"
 #include "sclayer.h"
 #include "styles/styleset.h"
+#include "styles/tablestyle.h"
+#include "styles/cellstyle.h"
 #include "undoobject.h"
 #include "updatemanager.h"
 #include "usertaskstructs.h"
@@ -516,6 +518,56 @@ public:
 	bool isDefaultStyle( const ParagraphStyle& p ) const { return docParagraphStyles.isDefault(p); }
 	bool isDefaultStyle( const CharStyle& c ) const { return docCharStyles.isDefault(c); }
 // 	bool isDefaultStyle( LineStyle& l ) const { return MLineStyles......; }
+
+	/**
+	 * Returns the table style named @a name.
+	 */
+	const TableStyle& tableStyle(QString name) { return docTableStyles.get(name); }
+	/**
+	 * Returns the set of table styles in the document.
+	 */
+	const StyleSet<TableStyle>& tableStyles()   { return docTableStyles; }
+	/**
+	 * Returns <code>true</code> if @a style is the default table style.
+	 */
+	bool isDefaultStyle(const TableStyle& style) const { return docTableStyles.isDefault(style); }
+	/**
+	 * Redefines the set of table styles in the document using styles in @a newStyles.
+	 * Removes unused table styles if @a removeUnused is <code>true</code>.
+	 */
+	void redefineTableStyles(const StyleSet<TableStyle>& newStyles, bool removeUnused = false);
+	/**
+	 * Remove any reference to old table styles and replace with new name.
+	 * This needs to be called when a style was removed. New name may be "".
+	 * @a newNameForOld is a map which maps the name of any style to remove
+	 * to a new table style name
+	 */
+	void replaceTableStyles(const QMap<QString, QString>& newNameForOld);
+
+	/**
+	 * Returns the table cell style named @a name.
+	 */
+	const CellStyle& cellStyle(QString name) { return docCellStyles.get(name); }
+	/**
+	 * Returns the set of table cell styles in the document.
+	 */
+	const StyleSet<CellStyle>& cellStyles()   { return docCellStyles; }
+	/**
+	 * Returns <code>true</code> if @a style is the default table cell style.
+	 */
+	bool isDefaultStyle(const CellStyle& style) const { return docCellStyles.isDefault(style); }
+	/**
+	 * Redefines the set of table cell styles in the document using styles in @a newStyles.
+	 * Removes unused table cell styles if @a removeUnused is <code>true</code>.
+	 */
+	void redefineCellStyles(const StyleSet<CellStyle>& newStyles, bool removeUnused = false);
+	/**
+	 * Remove any reference to old table cell styles and replace with new name.
+	 * This needs to be called when a style was removed. New name may be "".
+	 * @a newNameForOld is a map which maps the name of any style to remove
+	 * to a new table cell style name
+	 */
+	void replaceCellStyles(const QMap<QString, QString>& newNameForOld);
 
 	void getNamedResources(ResourceCollection& lists) const;
 	void replaceNamedResources(ResourceCollection& newNames);
@@ -1120,6 +1172,8 @@ public: // Public attributes
 private:
 	StyleSet<ParagraphStyle> docParagraphStyles;
 	StyleSet<CharStyle> docCharStyles;
+	StyleSet<TableStyle> docTableStyles;
+	StyleSet<CellStyle> docCellStyles;
 public:
 	ScLayers Layers;
 	//bool marginColored;

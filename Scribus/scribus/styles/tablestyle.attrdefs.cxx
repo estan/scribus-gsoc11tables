@@ -18,12 +18,4 @@
 
 //Syntax: ATTRDEF( datatype, gettername, name, defaultvalue)
 
-// NOTE: These attributes are preliminary.
-ATTRDEF(double, width, Width, 0)
-ATTRDEF(double, height, Height, 0)
-ATTRDEF(double, margin, Margin, 0)
-ATTRDEF(double, leftMargin, LeftMargin, 0)
-ATTRDEF(double, rightMargin, RightMargin, 0)
-ATTRDEF(double, topMargin, TopMargin, 0)
-ATTRDEF(double, bottomMargin, BottomMargin, 0)
-ATTRDEF(QString, backgroundColor, BackgroundColor, "None")
+ATTRDEF(QString, backgroundColor, BackgroundColor, CommonStrings::None)

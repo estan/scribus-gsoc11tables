@@ -19,6 +19,8 @@
 #define TABLESTYLE_H
 
 #include "style.h"
+#include "commonstrings.h"
+#include "resourcecollection.h"
 #include "styles/stylecontextproxy.h"
 
 /**
@@ -79,6 +81,16 @@ public:
 	 * Resets all non-inherited attributes in this style to their default values.
 	 */
 	void erase();
+
+	/**
+	 * Collects named resources used by the table style in @a lists.
+	 */
+	void getNamedResources(ResourceCollection& lists) const;
+
+	/**
+	 * Replaces named resources used by the table style with names in @a newNames.
+	 */
+	void replaceNamedResources(ResourceCollection& newNames);
 
 	/**
 	 * Gets the value of the attribute.

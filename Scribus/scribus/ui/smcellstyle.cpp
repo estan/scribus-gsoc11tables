@@ -127,8 +127,8 @@ void SMCellStyle::selected(const QStringList &styleNames)
 	{
 		int index = m_cachedStyles.find(styleName);
 		// FIXME: #7133: Use .isDefaultStyle() instead here rather than relying on tr text comparison
-		if (index < 0 && styleName == CommonStrings::trDefaultCharacterStyle)
-			index = m_cachedStyles.find(CommonStrings::DefaultCharacterStyle);
+		if (index < 0 && styleName == CommonStrings::trDefaultCellStyle)
+			index = m_cachedStyles.find(CommonStrings::DefaultCellStyle);
 		if (index > -1)
 			m_selection.append(&m_cachedStyles[index]);
 	}
@@ -164,8 +164,8 @@ QString SMCellStyle::newStyle(const QString &fromStyle)
 	// #7179, do our name switch yet again to handle this properly for default styles
 	// FIXME: use isDefaultStyle somehow
 	QString fromStyleName(fromStyle);
-	if (fromStyle == CommonStrings::trDefaultCharacterStyle)
-		fromStyleName = CommonStrings::DefaultCharacterStyle;
+	if (fromStyle == CommonStrings::trDefaultCellStyle)
+		fromStyleName = CommonStrings::DefaultCellStyle;
 
 	Q_ASSERT(m_cachedStyles.resolve(fromStyleName));
 	if (!m_cachedStyles.resolve(fromStyleName))
@@ -203,9 +203,9 @@ bool SMCellStyle::isDefaultStyle(const QString &styleName) const
 		result = m_cachedStyles[index].isDefaultStyle();
 	else
 	{
-		if (CommonStrings::trDefaultCharacterStyle == styleName)
+		if (CommonStrings::trDefaultCellStyle == styleName)
 		{
-			index = m_cachedStyles.find(CommonStrings::DefaultCharacterStyle);
+			index = m_cachedStyles.find(CommonStrings::DefaultCellStyle);
 			if (index > -1)
 				result = m_cachedStyles[index].isDefaultStyle();
 		}
@@ -237,9 +237,9 @@ QString SMCellStyle::shortcut(const QString &styleName) const
 	else
 	{
 		// FIXME: Use isDefaultStyle somehow.
-		if (CommonStrings::trDefaultCharacterStyle == styleName)
+		if (CommonStrings::trDefaultCellStyle == styleName)
 		{
-			index = m_cachedStyles.find(CommonStrings::DefaultCharacterStyle);
+			index = m_cachedStyles.find(CommonStrings::DefaultCellStyle);
 			if (index > -1)
 				result = m_cachedStyles[index].shortcut();
 		}

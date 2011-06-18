@@ -14,7 +14,7 @@
 QString TableStyle::displayName() const
 {
 	if (isDefaultStyle())
-		return CommonStrings::trDefaultCharacterStyle;
+		return CommonStrings::trDefaultTableStyle;
 	if (hasName() || !hasParent() || !m_context)
 		return name();
 	else 
@@ -45,3 +45,19 @@ void TableStyle::erase()
 	//updateFeatures(); TODO: Investigate this.
 }
 
+void TableStyle::getNamedResources(ResourceCollection& lists) const
+{
+	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())
+		lists.collectCellStyle(style->name());
+	lists.collectColor(backgroundColor());
+}
+
+void TableStyle::replaceNamedResources(ResourceCollection& newNames)
+{
+	QMap<QString, QString>::ConstIterator it;
+
+	if (!isInhBackgroundColor() && (it = newNames.colors().find(backgroundColor())) != newNames.colors().end())
+		setBackgroundColor(it.value());
+
+	// TODO: Do we need to do something else? E.g. CharStyle calls its updateFeatures().
+}
