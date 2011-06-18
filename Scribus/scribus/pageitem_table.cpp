@@ -53,14 +53,11 @@ void PageItem_Table::insertRows(int index, int numRows)
 		rowPosition += rowHeight;
 
 		// Insert a new row of cells if table is non-empty.
-		if (columns() > 0 || index > 0)
-		{
-			// NOTE: We assume here that columns() > 0.
-			QList<TableCell> cellRow;
-			for (int col = 0; col < columns(); ++col)
-				cellRow.append(TableCell(row, col, this));
-			m_cellRows.insert(row, cellRow);
-		}
+		// NOTE: We assume here that columns() > 0.
+		QList<TableCell> cellRow;
+		for (int col = 0; col < columns(); ++col)
+			cellRow.append(TableCell(row, col, this));
+		m_cellRows.insert(row, cellRow);
 	}
 
 	// Increase number of rows.
