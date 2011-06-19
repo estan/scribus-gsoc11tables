@@ -546,8 +546,16 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 				cell.drawRightBorder(p);
 			if (cell.row() + cell.rowSpan() != rows())
 				cell.drawBottomBorder(p);
-		}
-	}
 
-	// TODO: Draw cell borders around the table.
+			if (row == 0)
+			{
+				// Draw top border of first cell in column and bottom border of last.
+				cellAt(0, col).drawTopBorder(p);
+				cellAt(rows() - 1, col).drawBottomBorder(p);
+			}
+		}
+		// Draw left border of first cell in row and right border of last.
+		cellAt(row, 0).drawLeftBorder(p);
+		cellAt(row, columns() - 1).drawRightBorder(p);
+	}
 }
