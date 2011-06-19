@@ -7,11 +7,10 @@ a copyright and/or license notice that predates the release of Scribus 1.3.2
 for which a new license (GPL+exception) is in place.
 */
 #include <QRectF>
-#include <QHash>
-#include <QVariant>
 
 #include "pageitem.h"
 #include "pageitem_table.h"
+#include "styles/tablestyle.h"
 #include "cellarea.h"
 #include "text/frect.h"
 #include "scribusdoc.h"
@@ -30,6 +29,7 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 	insertColumns(0, qMax(1, numColumns));
 	insertRows(0, qMax(1, numRows));
 
+	setStyle("");
 	adjustToFrame();
 }
 

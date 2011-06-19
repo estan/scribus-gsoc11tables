@@ -11,12 +11,11 @@ for which a new license (GPL+exception) is in place.
 
 #include <QString>
 #include <QList>
-#include <QHash>
-#include <QVariant>
 #include <QRectF>
 
 #include "scribusapi.h"
 #include "pageitem.h"
+#include "styles/tablestyle.h"
 #include "tablecell.h"
 #include "cellarea.h"
 
@@ -49,20 +48,6 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_OBJECT
 
 public:
-	/// Table formatting properties.
-	enum Property
-	{
-		BackgroundColor,
-		LeftBorderWidth,
-		RightBorderWidth,
-		TopBorderWidth,
-		BottomBorderWidth,
-		LeftBorderColor,
-		RightBorderColor,
-		TopBorderColor,
-		BottomBorderColor
-	};
-
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
 	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
 
@@ -178,53 +163,65 @@ public:
 
 	// Formatting properties setters/getters.
 
+	/// Sets the background color of this table to @a color.
+	void setBackgroundColor(const QString& color) { m_style.setBackgroundColor(color); }
+
+	/// Returns the background color of this table.
+	QString backgroundColor() const { return m_style.backgroundColor(); }
+
 	/// Sets the width of the left border of this table to @a width.
-	void setLeftBorderWidth(qreal width) { setProperty(LeftBorderWidth, QVariant(width)); }
+	void setLeftBorderWidth(qreal width) { m_style.setLeftBorderWidth(width); }
 
 	/// Returns the width of the left border of this table.
-	qreal leftBorderWidth() const { return property(LeftBorderWidth).toReal(); }
+	qreal leftBorderWidth() const { return m_style.leftBorderWidth(); }
 
 	/// Sets the width of the right border of this table to @a width.
-	void setRightBorderWidth(qreal width) { setProperty(RightBorderWidth, QVariant(width)); }
+	void setRightBorderWidth(qreal width) { m_style.setRightBorderWidth(width); }
 
 	/// Returns the width of the right border of this table.
-	qreal rightBorderWidth() const { return property(RightBorderWidth).toReal(); }
+	qreal rightBorderWidth() const { return m_style.rightBorderWidth(); }
 
 	/// Sets the width of the top border of this table to @a width.
-	void setTopBorderWidth(qreal width) { setProperty(TopBorderWidth, QVariant(width)); }
+	void setTopBorderWidth(qreal width) { m_style.setTopBorderWidth(width); }
 
 	/// Returns the width of the top border of this table.
-	qreal topBorderWidth() const { return property(TopBorderWidth).toReal(); }
+	qreal topBorderWidth() const { return m_style.topBorderWidth(); }
 
 	/// Sets the width of the bottom border of this table to @a width.
-	void setBottomBorderWidth(qreal width) { setProperty(BottomBorderWidth, QVariant(width)); }
+	void setBottomBorderWidth(qreal width) { m_style.setBottomBorderWidth(width); }
 
 	/// Returns the width of the bottom border of this table.
-	qreal bottomBorderWidth() const { return property(BottomBorderWidth).toReal(); }
+	qreal bottomBorderWidth() const { return m_style.bottomBorderWidth(); }
 
 	/// Sets the color of the left border of this table to @a color.
-	void setLeftBorderColor(const QString& color) { setProperty(LeftBorderColor, QVariant(color)); }
+	void setLeftBorderColor(const QString& color) { m_style.setLeftBorderColor(color); }
 
 	/// Returns the color of the left border of this table.
-	QString leftBorderColor() const { return property(LeftBorderColor).toString(); }
+	QString leftBorderColor() const { return m_style.leftBorderColor(); }
 
 	/// Sets the color of the right border of this table to @a color.
-	void setRightBorderColor(const QString& color) { setProperty(RightBorderColor, QVariant(color)); }
+	void setRightBorderColor(const QString& color) { m_style.setRightBorderColor(color); }
 
 	/// Returns the color of the right border of this table.
-	QString rightBorderColor() const { return property(RightBorderColor).toString(); }
+	QString rightBorderColor() const { return m_style.rightBorderColor(); }
 
 	/// Sets the color of the top border of this table to @a color.
-	void setTopBorderColor(const QString& color) { setProperty(TopBorderColor, QVariant(color)); }
+	void setTopBorderColor(const QString& color) { m_style.setTopBorderColor(color); }
 
 	/// Returns the color of the top border of this table.
-	QString topBorderColor() const { return property(TopBorderColor).toString(); }
+	QString topBorderColor() const { return m_style.topBorderColor(); }
 
 	/// Sets the color of the bottom border of this table to @a color.
-	void setBottomBorderColor(const QString& color) { setProperty(BottomBorderColor, QVariant(color)); }
+	void setBottomBorderColor(const QString& color) { m_style.setBottomBorderColor(color); }
 
 	/// Returns the color of the bottom border of this table.
-	QString bottomBorderColor() const { return property(BottomBorderColor).toString(); }
+	QString bottomBorderColor() const { return m_style.bottomBorderColor(); }
+
+	/// Sets the table style for this table to @a style.
+	void setStyle(const QString& style) { m_style.setParent(style); }
+
+	/// Returns the named table style for this table.
+	QString style() const { return m_style.parent(); }
 
 	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
@@ -246,17 +243,6 @@ private:
 		ColumnsInserted, /**< Columns were inserted. */
 		ColumnsRemoved   /**< Columns were removed. */
 	};
-
-	/// Sets the property with key @a key to @a value.
-	void setProperty(Property key, const QVariant& value) { m_properties.insert(key, value); }
-	/// Returns the property with key @a key.
-	const QVariant property(Property key) const { return m_properties.value(key); }
-	/// Returns <code>true</code> if the cell has the property with key @a key set.
-	bool hasProperty(Property key) const { return m_properties.contains(key); }
-	/// Clears the property with key @a key.
-	void clearProperty(Property key) { m_properties.remove(key); }
-	/// Clears all set properties of the cell.
-	void clearProperties() { m_properties.clear(); }
 
 	/// Returns true if @a row is a row in this table.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }
@@ -326,8 +312,8 @@ private:
 	/// List of areas of merged cells.
 	QList<CellArea> m_cellAreas;
 
-	/// Table formatting properties.
-	QHash<int, QVariant> m_properties;
+	/// Style of the table.
+	TableStyle m_style;
 };
 
 #endif // PAGEITEM_TABLE_H
