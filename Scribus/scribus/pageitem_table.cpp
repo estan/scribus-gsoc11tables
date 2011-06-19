@@ -64,15 +64,9 @@ void PageItem_Table::insertRows(int index, int numRows)
 		m_cellRows.insert(row, cellRow);
 	}
 
-	// Increase number of rows.
-	m_rows += numRows;
-
-	// Update row spans.
-	updateSpans(index, numRows, RowsInserted);
-
 	// Adjust following rows.
 	qreal insertedHeight = rowHeight * numRows;
-	for (int nextRow = index + numRows; nextRow < rows(); ++nextRow)
+	for (int nextRow = index + numRows; nextRow < rows() + numRows; ++nextRow)
 	{
 		// Adjust position of following row.
 		m_rowPositions[nextRow] += insertedHeight;
@@ -81,6 +75,12 @@ void PageItem_Table::insertRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveDown(numRows);
 	}
+
+	// Update row spans.
+	updateSpans(index, numRows, RowsInserted);
+
+	// Increase number of rows.
+	m_rows += numRows;
 
 	ASSERT_VALID();
 }
@@ -108,14 +108,8 @@ void PageItem_Table::removeRows(int index, int numRows)
 		m_cellRows.removeAt(index);
 	}
 
-	// Decrease number of rows.
-	m_rows -= numRows;
-
-	// Update row spans.
-	updateSpans(index, numRows, RowsRemoved);
-
 	// Adjust following rows.
-	for (int nextRow = index; nextRow < rows(); ++nextRow)
+	for (int nextRow = index; nextRow < rows() - numRows; ++nextRow)
 	{
 		// Adjust position of following row.
 		m_rowPositions[nextRow] -= removedHeight;
@@ -124,6 +118,12 @@ void PageItem_Table::removeRows(int index, int numRows)
 		foreach (TableCell cell, m_cellRows[nextRow])
 			cell.moveUp(numRows);
 	}
+
+	// Update row spans.
+	updateSpans(index, numRows, RowsRemoved);
+
+	// Decrease number of rows.
+	m_rows -= numRows;
 
 	ASSERT_VALID();
 }
@@ -174,15 +174,9 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 			m_cellRows[row].insert(col, TableCell(row, col, this));
 	}
 
-	// Increase number of columns.
-	m_columns += numColumns;
-
-	// Update column spans.
-	updateSpans(index, numColumns, ColumnsInserted);
-
 	// Adjust following columns.
 	qreal insertedWidth = columnWidth * numColumns;
-	for (int nextColumn = index + numColumns; nextColumn < columns(); ++nextColumn)
+	for (int nextColumn = index + numColumns; nextColumn < columns() + numColumns; ++nextColumn)
 	{
 		// Adjust position of following column.
 		m_columnPositions[nextColumn] += insertedWidth;
@@ -191,6 +185,12 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveRight(numColumns);
 	}
+
+	// Update column spans.
+	updateSpans(index, numColumns, ColumnsInserted);
+
+	// Increase number of columns.
+	m_columns += numColumns;
 
 	ASSERT_VALID();
 }
@@ -216,14 +216,8 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 			rowIt.next().takeAt(index).setValid(false);
 	}
 
-	// Decrease number of columns.
-	m_columns -= numColumns;
-
-	// Update column spans.
-	updateSpans(index, numColumns, ColumnsRemoved);
-
 	// Adjust following columns.
-	for (int nextColumn = index; nextColumn < columns(); ++nextColumn)
+	for (int nextColumn = index; nextColumn < columns() - numColumns; ++nextColumn)
 	{
 		// Adjust position of following column.
 		m_columnPositions[nextColumn] -= removedWidth;
@@ -232,6 +226,12 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		foreach (QList<TableCell> cellRow, m_cellRows)
 			cellRow[nextColumn].moveLeft(numColumns);
 	}
+
+	// Update column spans.
+	updateSpans(index, numColumns, ColumnsRemoved);
+
+	// Decrease number of columns.
+	m_columns -= numColumns;
 
 	ASSERT_VALID();
 }
