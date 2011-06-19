@@ -645,7 +645,8 @@ void ScPainter::strokePath()
 {
 //	if( LineWidth == 0 )
 //		return;
-	drawVPath( 1 );
+	if (strokeMode != None)
+		drawVPath( 1 );
 }
 
 QColor ScPainter::pen()
