@@ -491,7 +491,6 @@ void PageItem_Table::drawBackground(ScPainter* p)
 	qreal width = m_columnPositions.last() + m_columnWidths.last() - x;
 	qreal height = m_rowPositions.last() + m_rowHeights.last() - y;
 
-	// TODO: SetQColor is deprecated, but what else to use?
 	QColor color;
 	SetQColor(&color, colorName, 100.0);
 	p->setBrush(color);

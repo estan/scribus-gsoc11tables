@@ -57,7 +57,6 @@ void TableCell::drawBackground(ScPainter* p)
 
 	FRect cellRect = d->table->cellRect(row(), column());
 
-	// TODO: SetQColor is deprecated, but what else to use?
 	QColor color;
 	d->table->SetQColor(&color, colorName, 100.0); // Hack!
 	p->setBrush(color);
