@@ -187,11 +187,17 @@ private:
 	/// "Move" the cell left by @a numColumns. E.g. decrease its column by @a numColumns.
 	void moveLeft(int numColumns) { d->column -= numColumns; }
 
+	/// Draws the cell background.
+	void drawBackground(ScPainter* p);
+
 	void drawLeftBorder(ScPainter *p) const;
 	void drawRightBorder(ScPainter *p) const;
 	void drawTopBorder(ScPainter *p) const;
 	void drawBottomBorder(ScPainter *p) const;
 	void drawBackground(ScPainter *p) const;
+
+	/// Draws a decorative line from @a start to @a end.
+	void drawDecorativeLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
 
 private:
 	friend class PageItem_Table;

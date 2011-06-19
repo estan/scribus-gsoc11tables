@@ -279,8 +279,8 @@ private:
 	/// Removes @a numColumns columns of cells starting with the column at @a index.
 	void removeCellColumns(int index, int numColumns);
 
-	/// Draws a decorative dotted grid line from @a start to @a end.
-	void drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const;
+	/// Draws the background of the table.
+	void drawBackground(ScPainter* p);
 
 	/// Prints internal table information. For internal use.
 	void debug() const;

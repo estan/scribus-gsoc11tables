@@ -15,6 +15,7 @@ for which a new license (GPL+exception) is in place.
 #include "text/frect.h"
 #include "scribusdoc.h"
 #include "scpainter.h"
+#include "util_color.h"
 
 #ifdef WANT_DEBUG
 	#define ASSERT_VALID() qt_noop()
@@ -476,13 +477,28 @@ void PageItem_Table::assertValid() const
 	}
 }
 
-void PageItem_Table::drawGridLine(const FPoint& start, const FPoint& end, ScPainter *p) const
+void PageItem_Table::drawBackground(ScPainter* p)
 {
+	QString colorName = m_style.backgroundColor();
+
+	if (colorName == CommonStrings::None)
+		return;
+
 	p->save();
-	// TODO: Color should be configurable.
-	double width = 0.5 / qMax(p->zoomFactor(), 1.0);
-	p->setPen(Qt::red, width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	p->drawLine(start, end);
+
+	qreal x = m_columnPositions.first();
+	qreal y = m_rowPositions.first();
+	qreal width = m_columnPositions.last() + m_columnWidths.last() - x;
+	qreal height = m_rowPositions.last() + m_rowHeights.last() - y;
+
+	// TODO: SetQColor is deprecated, but what else to use?
+	QColor color;
+	SetQColor(&color, colorName, 100.0);
+	p->setBrush(color);
+	p->setFillMode(ScPainter::Solid);
+	p->setStrokeMode(ScPainter::None);
+	p->drawRect(x, y, width, height);
+
 	p->restore();
 }
 
@@ -514,32 +530,25 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->RePos)
 		return;
 
-	// Just draw the grid with decorative lines for now.
-	p->save();
-	FPoint topLeft(0.0, 0.0);
-	FPoint topRight(m_columnPositions.last() + m_columnWidths.last(), 0.0);
-	FPoint bottomRight(m_columnPositions.last() + m_columnWidths.last(), m_rowPositions.last() + m_rowHeights.last());
-	FPoint bottomLeft(0.0, m_rowPositions.last() + m_rowHeights.last());
-	drawGridLine(topLeft, topRight, p);
-	drawGridLine(topRight, bottomRight, p);
-	drawGridLine(bottomRight, bottomLeft, p);
-	drawGridLine(bottomLeft, topLeft, p);
+	// Draw table background.
+	drawBackground(p);
 
 	for (int row = 0; row < rows(); ++row)
 	{
-		for (int col = 0; col < columns(); ++col)
+		TableCell cell;
+		for (int col = 0; col < columns(); col += cell.columnSpan())
 		{
-			if (!isCovered(row, col))
-			{
-				FRect rect = cellRect(row, col);
-				rect.setRight(rect.right() + 1);
-				rect.setBottom(rect.bottom() + 1);
-				if (col != columns() - 1)
-					drawGridLine(rect.topRight(), rect.bottomRight(), p);
-				if (row != rows() - 1)
-					drawGridLine(rect.bottomRight(), rect.bottomLeft(), p);
-			}
+			cell = cellAt(row, col);
+			// Draw cell background.
+			cell.drawBackground(p);
+
+			// Draw cell borders inside the table.
+			if (cell.column() + cell.columnSpan() != columns())
+				cell.drawRightBorder(p);
+			if (cell.row() + cell.rowSpan() != rows())
+				cell.drawBottomBorder(p);
 		}
 	}
-	p->restore();
+
+	// TODO: Draw cell borders around the table.
 }
