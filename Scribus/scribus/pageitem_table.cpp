@@ -25,6 +25,9 @@ for which a new license (GPL+exception) is in place.
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
 	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
 {
+	Q_ASSERT(m_Doc);
+	m_style.setContext(&m_Doc->tableStyles());
+
 	// NOTE: The order here is important as insertRows() assumes that columns() > 0.
 	insertColumns(0, qMax(1, numColumns));
 	insertRows(0, qMax(1, numRows));
