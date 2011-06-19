@@ -4,6 +4,7 @@
 #define STYLESET_H
 
 #include <QList>
+#include <QDebug>
 
 #include <assert.h>
 #include "style.h"

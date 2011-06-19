@@ -45,6 +45,20 @@ void CellStyle::erase()
 	//updateFeatures(); TODO: Investigate this.
 }
 
+void CellStyle::update(const StyleContext* context)
+{
+	Style::update(context);
+	const CellStyle* parent = dynamic_cast<const CellStyle*>(parentStyle());
+	if (parent) {
+#define ATTRDEF(attr_TYPE, attr_GETTER, attr_NAME, attr_DEFAULT) \
+		if (inh_##attr_NAME) \
+			m_##attr_NAME = parent->attr_GETTER();
+#include "cellstyle.attrdefs.cxx"
+#undef ATTRDEF
+	}
+	//updateFeatures(); TODO: Investigate this.
+}
+
 void CellStyle::getNamedResources(ResourceCollection& lists) const
 {
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())

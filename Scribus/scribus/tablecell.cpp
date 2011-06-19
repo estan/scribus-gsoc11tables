@@ -14,18 +14,21 @@ for which a new license (GPL+exception) is in place.
 
 #include "commonstrings.h"
 #include "pageitem_table.h"
+#include "scribusdoc.h"
 #include "scpainter.h"
 
 TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCellData)
 {
+	Q_ASSERT(table);
+	d->table = table;
+	d->style.setContext(&d->table->m_Doc->cellStyles());
+
 	setValid(true);
 	setRow(row);
 	setColumn(column);
 	setRowSpan(1);
 	setColumnSpan(1);
 	setStyle("");
-
-	d->table = table;
 }
 
 QString TableCell::asString() const

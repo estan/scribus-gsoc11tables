@@ -303,6 +303,8 @@ private:
 	void assertValid() const;
 
 private:
+	friend class TableCell;
+
 	/// List of rows of cells in the table.
 	QList<QList<TableCell> > m_cellRows;
 

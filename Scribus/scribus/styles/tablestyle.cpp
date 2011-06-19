@@ -45,6 +45,20 @@ void TableStyle::erase()
 	//updateFeatures(); TODO: Investigate this.
 }
 
+void TableStyle::update(const StyleContext* context)
+{
+	Style::update(context);
+	const TableStyle* parent = dynamic_cast<const TableStyle*>(parentStyle());
+	if (parent) {
+#define ATTRDEF(attr_TYPE, attr_GETTER, attr_NAME, attr_DEFAULT) \
+		if (inh_##attr_NAME) \
+			m_##attr_NAME = parent->attr_GETTER();
+#include "tablestyle.attrdefs.cxx"
+#undef ATTRDEF
+	}
+	//updateFeatures(); TODO: Investigate this.
+}
+
 void TableStyle::getNamedResources(ResourceCollection& lists) const
 {
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())

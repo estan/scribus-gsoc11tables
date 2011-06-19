@@ -83,6 +83,11 @@ public:
 	void erase();
 
 	/**
+	 * Sets the style context to @a context and update locally cached property values.
+	 */
+	void update(const StyleContext* context);
+
+	/**
 	 * Collects named resources used by the cell style in @a lists.
 	 */
 	void getNamedResources(ResourceCollection& lists) const;
