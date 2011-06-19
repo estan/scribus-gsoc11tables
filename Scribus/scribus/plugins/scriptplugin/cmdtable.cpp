@@ -322,6 +322,86 @@ PyObject *scribus_mergetablecells(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyObject *scribus_gettablestyle(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table style on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->style().toUtf8());
+}
+
+PyObject *scribus_settablestyle(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *style;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &style, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table style on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setStyle(QString::fromUtf8(style));
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_gettablebackgroundcolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table background color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	return PyString_FromString(table->backgroundColor().toUtf8());
+}
+
+PyObject *scribus_settablebackgroundcolor(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	char *color;
+	if (!PyArg_ParseTuple(args, "es|es", "utf-8", &color, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table background color on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->setBackgroundColor(QString::fromUtf8(color));
+	Py_RETURN_NONE;
+}
+
 PyObject *scribus_gettableleftborderwidth(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
@@ -673,7 +753,9 @@ void cmdtabledocwarnings()
 	  << scribus_inserttablecolumns__doc__ << scribus_removetablecolumns__doc__
 	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
 	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
-	  << scribus_mergetablecells__doc__ << scribus_gettableleftborderwidth__doc__
+	  << scribus_mergetablecells__doc__ << scribus_settablestyle__doc__
+	  << scribus_gettablestyle__doc__ << scribus_settablebackgroundcolor__doc__
+	  << scribus_gettablebackgroundcolor__doc__ << scribus_gettableleftborderwidth__doc__
 	  << scribus_settableleftborderwidth__doc__ << scribus_gettablerightborderwidth__doc__
 	  << scribus_settablerightborderwidth__doc__ << scribus_gettabletopborderwidth__doc__
 	  << scribus_settabletopborderwidth__doc__ << scribus_gettablebottomborderwidth__doc__

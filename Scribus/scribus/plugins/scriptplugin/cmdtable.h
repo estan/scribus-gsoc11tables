@@ -141,6 +141,48 @@ May throw ValueError if number if numRows or numColumns is less than 1 or the sp
 PyObject *scribus_mergetablecells(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
+PyDoc_STRVAR(scribus_gettablestyle__doc__,
+QT_TR_NOOP("getTableStyle([\"name\"]) -> string\n\
+\n\
+Returns the named style of the table \"name\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Get table style */
+PyObject *scribus_gettablestyle(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_settablestyle__doc__,
+QT_TR_NOOP("setTableStyle(style, [\"name\"])\n\
+\n\
+Sets the named style of the table \"name\" to \"style\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Set table style */
+PyObject *scribus_settablestyle(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_gettablebackgroundcolor__doc__,
+QT_TR_NOOP("getTableBackgroundColor([\"name\"]) -> string\n\
+\n\
+Returns the color of the background of the table \"name\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+"));
+/*! Get table background color */
+PyObject *scribus_gettablebackgroundcolor(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_settablebackgroundcolor__doc__,
+QT_TR_NOOP("setTableBackgroundColor(color, [\"name\"])\n\
+\n\
+Sets the color of the background of the table \"name\" to \"color\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the table does not exist.\n\
+"));
+/*! Set table background color */
+PyObject *scribus_settablebackgroundcolor(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
 PyDoc_STRVAR(scribus_gettableleftborderwidth__doc__,
 QT_TR_NOOP("getTableLeftBorderWidth([\"name\"]) -> float\n\
 \n\
