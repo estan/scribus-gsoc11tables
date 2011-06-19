@@ -12,8 +12,6 @@ for which a new license (GPL+exception) is in place.
 
 #include <QString>
 #include <QDebug>
-#include <QVariant>
-#include <QHash>
 #include <QExplicitlySharedDataPointer>
 #include <QSharedData>
 
@@ -48,8 +46,7 @@ public:
 		rowSpan(other.rowSpan),
 		columnSpan(other.columnSpan),
 		style(other.style),
-		table(other.table),
-		properties(other.properties) {}
+		table(other.table) {}
 	~TableCellData() {}
 
 public:
@@ -68,8 +65,6 @@ public:
 	CellStyle style;
 	/// Table containing the cell.
 	PageItem_Table *table;
-	/// Cell formatting properties.
-	QHash<int, QVariant> properties;
 };
 
 /**
@@ -82,20 +77,6 @@ public:
 class TableCell
 {
 public:
-	/// Cell formatting properties.
-	enum Property
-	{
-		BackgroundColor,
-		LeftBorderWidth,
-		RightBorderWidth,
-		TopBorderWidth,
-		BottomBorderWidth,
-		LeftBorderColor,
-		RightBorderColor,
-		TopBorderColor,
-		BottomBorderColor
-	};
-
 	/// Construct a new table cell as a shallow copy of @a other.
 	TableCell(const TableCell& other) : d(other.d) {}
 
@@ -205,17 +186,6 @@ private:
 	void moveRight(int numColumns) { d->column += numColumns; }
 	/// "Move" the cell left by @a numColumns. E.g. decrease its column by @a numColumns.
 	void moveLeft(int numColumns) { d->column -= numColumns; }
-
-	/// Sets the property with key @a key to @a value.
-	void setProperty(Property key, const QVariant& value) { d->properties.insert(key, value); }
-	/// Returns the property with key @a key.
-	const QVariant property(Property key) const { return d->properties.value(key); }
-	/// Returns <code>true</code> if the cell has the property with key @a key set.
-	bool hasProperty(Property key) const { return d->properties.contains(key); }
-	/// Clears the property with key @a key.
-	void clearProperty(Property key) { d->properties.remove(key); }
-	/// Clears all set properties of the cell.
-	void clearProperties() { d->properties.clear(); }
 
 	void drawLeftBorder(ScPainter *p) const;
 	void drawRightBorder(ScPainter *p) const;
