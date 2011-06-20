@@ -127,6 +127,7 @@ SET(SCRIBUS_UI_SRC
   ui/propertiespalette_imagebase.ui
   ui/propertiespalette_linebase.ui
   ui/propertiespalette_shapebase.ui
+  ui/propertiespalette_tablebase.ui
   ui/propertiespalette_textbase.ui
   ui/propertiespalette_xyzbase.ui
   ui/propertywidget_advancedbase.ui
@@ -360,6 +361,7 @@ SET(SCRIBUS_MOC_CLASSES
   ui/propertiespalette_image.h
   ui/propertiespalette_line.h
   ui/propertiespalette_shape.h
+  ui/propertiespalette_table.h
   ui/propertiespalette_text.h
   ui/propertiespalette_utils.h
   ui/propertiespalette_xyz.h
@@ -762,6 +764,7 @@ SET(SCRIBUS_SOURCES
   ui/propertiespalette_group.cpp
   ui/propertiespalette_line.cpp
   ui/propertiespalette_shape.cpp
+  ui/propertiespalette_table.cpp
   ui/propertiespalette_text.cpp
   ui/propertiespalette_utils.cpp
   ui/propertiespalette_xyz.cpp
