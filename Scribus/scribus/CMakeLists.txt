@@ -476,6 +476,7 @@ SET(SCRIBUS_SOURCES
   chartableview.cpp
   cmserrorhandling.cpp
   cmsettings.cpp
+  collapsedbordercollector.cpp
   collect4output.cpp
   colorblind.cpp
   colorsetmanager.cpp
@@ -613,6 +614,7 @@ SET(SCRIBUS_SOURCES
   selection.cpp
   serializer.cpp
   styleitem.cpp
+  tablebordercollector.cpp
   tablecell.cpp
   textwriter.cpp
   tocgenerator.cpp
