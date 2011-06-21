@@ -217,6 +217,18 @@ public:
 	/// Returns the color of the bottom border of this table.
 	QString bottomBorderColor() const { return m_style.bottomBorderColor(); }
 
+	/// Sets the border model of this table to @a model.
+	void setBorderModel(TableStyle::BorderModel model) { m_style.setBorderModel(model); }
+
+	/// Returns the border model of this table.
+	TableStyle::BorderModel borderModel() const { return m_style.borderModel(); }
+
+	/// Sets the border drawing options of this table to @a options.
+	void setBorderModel(TableStyle::BorderDrawingOptions options) { m_style.setBorderDrawingOptions(options); }
+
+	/// Returns the border drawing options of this table.
+	TableStyle::BorderDrawingOptions borderDrawingOptions() const { return m_style.borderDrawingOptions(); }
+
 	/// Sets the table style for this table to @a style.
 	void setStyle(const QString& style) { m_style.setParent(style); }
 

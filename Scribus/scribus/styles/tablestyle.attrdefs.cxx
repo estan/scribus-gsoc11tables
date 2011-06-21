@@ -15,7 +15,6 @@
 *                                                                         *
 ***************************************************************************/
 
-
 //Syntax: ATTRDEF( datatype, gettername, name, defaultvalue)
 
 ATTRDEF(QString, backgroundColor, BackgroundColor, CommonStrings::None)
@@ -27,3 +26,5 @@ ATTRDEF(QString, leftBorderColor, LeftBorderColor, "Black")
 ATTRDEF(QString, rightBorderColor, RightBorderColor, "Black")
 ATTRDEF(QString, topBorderColor, TopBorderColor, "Black")
 ATTRDEF(QString, bottomBorderColor, BottomBorderColor, "Black")
+ATTRDEF(BorderModel, borderModel, BorderModel, Collapsed)
+ATTRDEF(BorderDrawingOptions, borderDrawingOptions, BorderDrawingOptions, HorizontalFirst)
