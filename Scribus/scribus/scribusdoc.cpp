@@ -477,6 +477,8 @@ void ScribusDoc::init()
 	// TODO: We should have preferences for the default values.
 	TableStyle defaultTableStyle;
 	defaultTableStyle.setName(CommonStrings::DefaultTableStyle);
+	defaultTableStyle.setBorderModel(TableStyle::Collapsed);
+	defaultTableStyle.setBorderDrawingOptions(TableStyle::VerticalFirst);
 	defaultTableStyle.setBackgroundColor(CommonStrings::None);
 	defaultTableStyle.setLeftBorderWidth(1.0);
 	defaultTableStyle.setRightBorderWidth(1.0);
