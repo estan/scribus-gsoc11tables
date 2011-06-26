@@ -358,4 +358,16 @@ May throw ValueError the table does not exist.\n\
 /*! Set table bottom border color */
 PyObject *scribus_settablebottombordercolor(PyObject * /*self*/, PyObject* args);
 
+/*! docstring */
+PyDoc_STRVAR(scribus_settableborderdrawingoptions__doc__,
+QT_TR_NOOP("setTableBorderDrawingOptions(options, [\"name\"])\n\
+\n\
+Sets the border drawing options of the table \"name\" to \"options\".\n\
+\"options\" can be either HORIZONTAL_FIRST or VERTICAL_FIRST, optionally\n\
+combined with JOINED. If \"name\" is not given the currently selected item\n\
+is used.\n\
+"));
+/*! Set table border drawing options */
+PyObject *scribus_settableborderdrawingoptions(PyObject * /*self*/, PyObject* args);
+
 #endif // CMDTABLE_H

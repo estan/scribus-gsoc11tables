@@ -742,6 +742,33 @@ PyObject *scribus_settablebottombordercolor(PyObject* /* self */, PyObject* args
 	Py_RETURN_NONE;
 }
 
+PyObject *scribus_settableborderdrawingoptions(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int optionsInt;
+	if (!PyArg_ParseTuple(args, "i|es", &optionsInt, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set border drawing options on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	TableStyle::BorderDrawingOptions options = static_cast<TableStyle::BorderDrawingOptions>(optionsInt);
+	if ((options & TableStyle::HorizontalFirst) && (options & TableStyle::VerticalFirst))
+	{
+		// Both VerticalFirst and HorizontalFirst set, so use HorizontalFirst.
+		options = options & ~TableStyle::VerticalFirst;
+	}
+	table->setBorderDrawingOptions(options);
+	Py_RETURN_NONE;
+}
+
 /*! HACK: this removes "warning: 'blah' defined but not used" compiler warnings
 with header files structure untouched (docstrings are kept near declarations)
 PV */
@@ -763,5 +790,5 @@ void cmdtabledocwarnings()
 	  << scribus_settableleftbordercolor__doc__ << scribus_gettablerightbordercolor__doc__
 	  << scribus_settablerightbordercolor__doc__ << scribus_gettabletopbordercolor__doc__
 	  << scribus_settabletopbordercolor__doc__ << scribus_gettablebottombordercolor__doc__
-	  << scribus_settablebottombordercolor__doc__;
+	  << scribus_settablebottombordercolor__doc__ << scribus_settableborderdrawingoptions__doc__;
 }

@@ -543,6 +543,7 @@ PyMethodDef scribus_methods[] = {
 	{const_cast<char*>("setTableTopBorderColor"), scribus_settabletopbordercolor, METH_VARARGS, tr(scribus_settabletopbordercolor__doc__)},
 	{const_cast<char*>("setTableBottomBorderColor"), scribus_settablebottombordercolor, METH_VARARGS, tr(scribus_settablebottombordercolor__doc__)},
 	{const_cast<char*>("setTableBackgroundColor"), scribus_settablebackgroundcolor, METH_VARARGS, tr(scribus_settablebackgroundcolor__doc__)},
+	{const_cast<char*>("setTableBorderDrawingOptions"), scribus_settableborderdrawingoptions, METH_VARARGS, tr(scribus_settableborderdrawingoptions__doc__)},
 	{const_cast<char*>("setTextAlignment"), scribus_setalign, METH_VARARGS, tr(scribus_setalign__doc__)},
 	{const_cast<char*>("setTextColor"), scribus_settextfill, METH_VARARGS, tr(scribus_settextfill__doc__)},
 	{const_cast<char*>("setText"), scribus_setboxtext, METH_VARARGS, tr(scribus_setboxtext__doc__)},
@@ -740,6 +741,10 @@ void initscribus(ScribusMainWindow *pl)
 	PyDict_SetItemString(d, const_cast<char*>("PAGE_2"), Py_BuildValue(const_cast<char*>("i"), 1));
 	PyDict_SetItemString(d, const_cast<char*>("PAGE_3"), Py_BuildValue(const_cast<char*>("i"), 2));
 	PyDict_SetItemString(d, const_cast<char*>("PAGE_4"), Py_BuildValue(const_cast<char*>("i"), 3));
+	// Table drawing options.
+	PyDict_SetItemString(d, const_cast<char*>("HORIZONTAL_FIRST"), Py_BuildValue(const_cast<char*>("i"), TableStyle::HorizontalFirst));
+	PyDict_SetItemString(d, const_cast<char*>("VERTICAL_FIRST"), Py_BuildValue(const_cast<char*>("i"), TableStyle::VerticalFirst));
+	PyDict_SetItemString(d, const_cast<char*>("JOINED"), Py_BuildValue(const_cast<char*>("i"), TableStyle::Joined));
 
 	// Measurement units understood by Scribus's units.cpp functions are exported as constant conversion
 	// factors to be used from Python.
