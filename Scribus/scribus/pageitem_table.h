@@ -21,7 +21,28 @@ for which a new license (GPL+exception) is in place.
 
 class ScPainter;
 class ScribusDoc;
-class FRect;
+
+/**
+ * The TableBorder class represents a border in a table.
+ * <p>
+ * It is used temporarily during table painting.
+ */
+class TableBorder
+{
+public:
+	TableBorder() {}
+	TableBorder(qreal width, const QString& color) : width(width), color(color) {}
+
+	qreal width; // TODO: Eventually use multiLine.
+	QString color;
+	QPointF start;
+	QPointF end;
+};
+
+inline bool operator==(const TableBorder& lhs, const TableBorder& rhs)
+{
+	return lhs.width == rhs.width && rhs.color == rhs.color;
+};
 
 /**
  * The PageItem_Table class represents a table.
@@ -269,7 +290,7 @@ private:
 	 * If the cell is part of a merged area, the rectangle of the entire area is returned.
 	 * If the cell does not exist, a null rectangle is returned.
 	 */
-	FRect cellRect(int row, int column) const;
+	QRectF cellRect(int row, int column) const;
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.
@@ -282,17 +303,36 @@ private:
 	 */
 	void updateSpans(int index, int number, ChangeType changeType);
 
-	/// Inserts @a numRows new row of cells at @a index.
-	void insertCellRows(int index, int numRows);
-	/// Removes @a numRows row of cells starting with the row at @a index.
-	void removeCellRows(int index, int numRows);
-	/// Inserts @a numColumns new columns of cells at @a index.
-	void insertCellColumns(int index, int numColumns);
-	/// Removes @a numColumns columns of cells starting with the column at @a index.
-	void removeCellColumns(int index, int numColumns);
+	/// Returns the collapsed left border of @a cell.
+	TableBorder collapsedLeftBorder(const TableCell& cell) const;
+	/// Returns the collapsed right border of @a cell.
+	TableBorder collapsedRightBorder(const TableCell& cell) const;
+	/// Returns the collapsed top border of @a cell.
+	TableBorder collapsedTopBorder(const TableCell& cell) const;
+	/// Returns the collapsed bottom border of @a cell.
+	TableBorder collapsedBottomBorder(const TableCell& cell) const;
+
+	/**
+	 * Returns @a firstBorder collapsed with @a secondBorder.
+	 *
+	 * If only one of the borders has a color, the border with a color is returned.
+	 * If none of the borders has a color, a border with no color and width 0.0 is returned.
+	 * If both borders has a color, the wider of the two is returned.
+	 * If both borders has a color and are equally wide, @a firstBorder is returned.
+	 */
+	TableBorder collapseBorders(const TableBorder& firstBorder, const TableBorder& secondBorder) const;
 
 	/// Draws the background of the table.
-	void drawBackground(ScPainter* p);
+	void drawTableBackground(ScPainter* p);
+
+	/// Draws the background of @a cell.
+	void drawCellBackground(const TableCell& cell, ScPainter* p);
+
+	/// Draws the borders in @a borders.
+	void drawBorders(const QList<TableBorder>& borders, ScPainter* p);
+
+	/// Draws the entire table using the collapsed border model.
+	void drawTableCollapsed(ScPainter* p);
 
 	/// Prints internal table information. For internal use.
 	void debug() const;

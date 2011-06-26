@@ -46,55 +46,7 @@ QString TableCell::asString() const
 	return str;
 }
 
-void TableCell::drawBackground(ScPainter* p)
-{
-	QString colorName = d->style.backgroundColor();
-
-	if (colorName == CommonStrings::None)
-		return;
-
-	p->save();
-
-	FRect cellRect = d->table->cellRect(row(), column());
-
-	QColor color;
-	d->table->SetQColor(&color, colorName, 100.0); // Hack!
-	p->setBrush(color);
-	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::None);
-	p->drawRect(cellRect.x(), cellRect.y(), cellRect.width(), cellRect.height());
-
-	p->restore();
-}
-
-void TableCell::drawLeftBorder(ScPainter *p) const
-{
-	// Just draw decorative line for now.
-	FRect cellRect = d->table->cellRect(row(), column());
-	drawDecorativeLine(cellRect.topLeft(), cellRect.bottomLeft(), p);
-}
-
-void TableCell::drawRightBorder(ScPainter *p) const
-{
-	// Just draw decorative line for now.
-	FRect cellRect = d->table->cellRect(row(), column());
-	drawDecorativeLine(cellRect.topRight() + FPoint(1, 0), cellRect.bottomRight() + FPoint(1, 1), p);
-}
-
-void TableCell::drawTopBorder(ScPainter *p) const
-{
-	// Just draw decorative line for now.
-	FRect cellRect = d->table->cellRect(row(), column());
-	drawDecorativeLine(cellRect.topLeft(), cellRect.topRight() + FPoint(1, 0), p);
-}
-
-void TableCell::drawBottomBorder(ScPainter *p) const
-{
-	// Just draw decorative line for now.
-	FRect cellRect = d->table->cellRect(row(), column());
-	drawDecorativeLine(cellRect.bottomLeft() + FPoint(0, 1), cellRect.bottomRight() + FPoint(1, 1), p);
-}
-
+/*
 void TableCell::drawDecorativeLine(const FPoint& start, const FPoint& end, ScPainter *p) const
 {
 	p->save();
@@ -102,7 +54,7 @@ void TableCell::drawDecorativeLine(const FPoint& start, const FPoint& end, ScPai
 	p->setStrokeMode(ScPainter::Solid);
 	p->drawLine(start, end);
 	p->restore();
-}
+}*/
 
 QDebug operator<<(QDebug debug, const TableCell& cell)
 {
