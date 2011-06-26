@@ -13,6 +13,7 @@ for which a new license (GPL+exception) is in place.
 #include <cairo.h>
 
 #include <math.h>
+#include <QPointF>
 
 ScPainter::ScPainter( QImage *target, unsigned int w, unsigned int h, double transparency, int blendmode )
 {
@@ -1725,6 +1726,14 @@ void ScPainter::drawPolyLine()
 }
 
 void ScPainter::drawLine(FPoint start, FPoint end)
+{
+	newPath();
+	moveTo(start.x(), start.y());
+	lineTo(end.x(), end.y());
+	strokePath();
+}
+
+void ScPainter::drawLine(const QPointF& start, const QPointF& end)
 {
 	newPath();
 	moveTo(start.x(), start.y());

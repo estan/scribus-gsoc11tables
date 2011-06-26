@@ -16,6 +16,7 @@ for which a new license (GPL+exception) is in place.
 #include <QTransform>
 #include <QFont>
 #include <QImage>
+#include <QPointF>
 #include "scribusapi.h"
 #include "scconfig.h"
 #include "fpoint.h"
@@ -84,6 +85,7 @@ public:
 	virtual void drawPolygon();
 	virtual void drawPolyLine();
 	virtual void drawLine(FPoint start, FPoint end);
+	virtual void drawLine(const QPointF& start, const QPointF& end);
 	virtual void drawRect(double, double, double, double);
 	virtual void drawText(QRectF area, QString text);
 
