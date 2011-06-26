@@ -722,7 +722,7 @@ void PageItem_Table::drawTableCollapsed(ScPainter* p)
 			TableBorder bottomBorder = collapsedBottomBorder(cell);
 
 			// Adjust border joins.
-			adjustBorderJoins(&leftBorder, &rightBorder, &topBorder, &bottomBorder);
+			adjustBorderJoins(&leftBorder, &rightBorder, &topBorder, &bottomBorder, cell);
 
 			// Collect the borders.
 			verticalBorders.append(rightBorder);
@@ -748,7 +748,7 @@ void PageItem_Table::drawTableCollapsed(ScPainter* p)
 	}
 }
 
-void PageItem_Table::adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom)
+void PageItem_Table::adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom, const TableCell& cell)
 {
 	Q_ASSERT(left);
 	Q_ASSERT(right);
@@ -765,25 +765,49 @@ void PageItem_Table::adjustBorderJoins(TableBorder* left, TableBorder* right, Ta
 	qreal halfBottomWidth = bottom->width / 2;
 	if (options & TableStyle::HorizontalFirst)
 	{
-		left->start.setY(left->start.y() + halfTopWidth);
-		left->end.setY(left->end.y() - halfBottomWidth);
-		right->start.setY(right->start.y() + halfTopWidth);
-		right->end.setY(right->end.y() - halfBottomWidth);
-		bottom->start.setX(bottom->start.x() - halfLeftWidth);
-		bottom->end.setX(bottom->end.x() + halfRightWidth);
-		top->start.setX(top->start.x() - halfLeftWidth);
-		top->end.setX(top->end.x() + halfRightWidth);
+		// Move start points of horizontal borders right.
+		bottom->start.setX(bottom->start.x() + halfLeftWidth);
+		top->start.setX(top->start.x() + halfLeftWidth);
+
+		// Move end points of horizontal borders left.
+		bottom->end.setX(bottom->end.x() - halfRightWidth);
+		top->end.setX(top->end.x() - halfRightWidth);
+
+		if (cell.row() == 0)
+		{
+			// First row, so move start points of vertical borders up.
+			left->start.setY(left->start.y() - halfTopWidth);
+			right->start.setY(right->start.y() - halfTopWidth);
+		}
+		if (cell.row() == rows() - 1)
+		{
+			// Last row, so move end points of horizontal borders down.
+			right->end.setY(right->end.y() + halfBottomWidth);
+			left->end.setY(left->end.y() + halfBottomWidth);
+		}
 	}
 	else if (options & TableStyle::VerticalFirst)
 	{
-		left->start.setY(left->start.y() - halfTopWidth);
-		left->end.setY(left->end.y() + halfBottomWidth);
-		right->start.setY(right->start.y() - halfTopWidth);
-		right->end.setY(right->end.y() + halfBottomWidth);
-		bottom->start.setX(bottom->start.x() + halfLeftWidth);
-		bottom->end.setX(bottom->end.x() - halfRightWidth);
-		top->start.setX(top->start.x() + halfLeftWidth);
-		top->end.setX(top->end.x() - halfRightWidth);
+		// Move start points of vertical borders down.
+		left->start.setY(left->start.y() + halfTopWidth);
+		right->start.setY(right->start.y() + halfTopWidth);
+
+		// Move end points of vertical borders up.
+		left->end.setY(left->end.y() - halfBottomWidth);
+		right->end.setY(right->end.y() - halfBottomWidth);
+
+		if (cell.column() == 0)
+		{
+			// First column, so move start points of horizontal borders left.
+			bottom->start.setX(bottom->start.x() - halfLeftWidth);
+			top->start.setX(top->start.x() - halfLeftWidth);
+		}
+		if (cell.column() == columns() - 1)
+		{
+			// Last column, so move end points of horizontal borders right.
+			bottom->end.setX(bottom->end.x() + halfRightWidth);
+			top->end.setX(top->end.x() + halfRightWidth);
+		}
 	}
 
 	// TODO: Handle multi borders here some day.

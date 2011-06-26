@@ -55,9 +55,9 @@ public:
 	 */
 	enum BorderDrawingOption
 	{
-		HorizontalFirst = 0,  /**< Draw horizontal borders first. */
-		VerticalFirst = 1,    /**< Draw vertical borders first. */
-		Joined = 2            /**< Draw joined at crossings if possible. */
+		HorizontalFirst = 1,  /**< Draw horizontal borders first. */
+		VerticalFirst = 2,    /**< Draw vertical borders first. */
+		Joined = 4            /**< Draw joined at crossings if possible. */
 	};
 	Q_DECLARE_FLAGS(BorderDrawingOptions, BorderDrawingOption)
 
