@@ -715,15 +715,22 @@ void PageItem_Table::drawTableCollapsed(ScPainter* p)
 			// Draw cell background.
 			drawCellBackground(cell, p);
 
-			// Collect borders.
-			// TODO: Border line ends should be adjusted according to
-			//       drawing order before being collected.
-			verticalBorders.append(collapsedRightBorder(cell));
-			horizontalBorders.append(collapsedBottomBorder(cell));
+			// Get the collapsed borders of the cell.
+			TableBorder leftBorder = collapsedLeftBorder(cell);
+			TableBorder rightBorder = collapsedRightBorder(cell);
+			TableBorder topBorder = collapsedTopBorder(cell);
+			TableBorder bottomBorder = collapsedBottomBorder(cell);
+
+			// Adjust border joins.
+			adjustBorderJoins(&leftBorder, &rightBorder, &topBorder, &bottomBorder);
+
+			// Collect the borders.
+			verticalBorders.append(rightBorder);
+			horizontalBorders.append(bottomBorder);
 			if (row == 0)
-				horizontalBorders.append(collapsedTopBorder(cell));
+				horizontalBorders.append(topBorder);
 			if (col == 0)
-				verticalBorders.append(collapsedLeftBorder(cell));
+				verticalBorders.append(leftBorder);
 		}
 	}
 
@@ -739,6 +746,47 @@ void PageItem_Table::drawTableCollapsed(ScPainter* p)
 		drawBorders(verticalBorders, p);
 		drawBorders(horizontalBorders, p);
 	}
+}
+
+void PageItem_Table::adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom)
+{
+	Q_ASSERT(left);
+	Q_ASSERT(right);
+	Q_ASSERT(top);
+	Q_ASSERT(bottom);
+
+	if (!left || !right || !top || !bottom)
+		return;
+
+	TableStyle::BorderDrawingOptions options = borderDrawingOptions();
+	qreal halfLeftWidth = left->width / 2;
+	qreal halfRightWidth = right->width / 2;
+	qreal halfTopWidth = top->width / 2;
+	qreal halfBottomWidth = bottom->width / 2;
+	if (options & TableStyle::HorizontalFirst)
+	{
+		left->start.setY(left->start.y() + halfTopWidth);
+		left->end.setY(left->end.y() - halfBottomWidth);
+		right->start.setY(right->start.y() + halfTopWidth);
+		right->end.setY(right->end.y() - halfBottomWidth);
+		bottom->start.setX(bottom->start.x() - halfLeftWidth);
+		bottom->end.setX(bottom->end.x() + halfRightWidth);
+		top->start.setX(top->start.x() - halfLeftWidth);
+		top->end.setX(top->end.x() + halfRightWidth);
+	}
+	else if (options & TableStyle::VerticalFirst)
+	{
+		left->start.setY(left->start.y() - halfTopWidth);
+		left->end.setY(left->end.y() + halfBottomWidth);
+		right->start.setY(right->start.y() - halfTopWidth);
+		right->end.setY(right->end.y() + halfBottomWidth);
+		bottom->start.setX(bottom->start.x() + halfLeftWidth);
+		bottom->end.setX(bottom->end.x() - halfRightWidth);
+		top->start.setX(top->start.x() + halfLeftWidth);
+		top->end.setX(top->end.x() - halfRightWidth);
+	}
+
+	// TODO: Handle multi borders here some day.
 }
 
 void PageItem_Table::adjustToFrame()

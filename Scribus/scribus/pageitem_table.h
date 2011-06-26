@@ -334,6 +334,15 @@ private:
 	/// Draws the entire table using the collapsed border model.
 	void drawTableCollapsed(ScPainter* p);
 
+	/**
+	 * Adjusts the start and end points of the borders @a left, @a right, @a top and @a bottom
+	 * according to the current border drawing order. If horizontal borders are drawn first, they
+	 * will be extended to the outer edge of the border they will be covering, and vertical
+	 * borders will be retracted to the inner edge of the border they will be covered by, and
+	 * vice versa if vertical borders are drawn first.
+	 */
+	void adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom);
+
 	/// Prints internal table information. For internal use.
 	void debug() const;
 
