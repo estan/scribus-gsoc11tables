@@ -16,7 +16,6 @@ body {
 	padding: 1em;
 	background-color: white;
 }
-
 .scheader {
 	background:url(../images/logo3m.png) repeat-x;
 	margin: 0px;
@@ -51,6 +50,21 @@ div.scfooter {
 }
 div.scfooter a {
 	color: #b9b9b9;
+}
+div.contents {
+	border: 1px solid black;
+	margin: 1em;
+	padding: 1em;
+	background-color: white;
+}
+div.header {
+	border: 1px solid black;
+	margin: 1em;
+	padding: 1em;
+	background-color: white;
+}
+div.headertitle {
+	font-size: 170%;
 }
 a:link, a:visited, a:hover {
 	/* color: #a6823d; std. scribus a */
