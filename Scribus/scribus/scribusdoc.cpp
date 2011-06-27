@@ -479,7 +479,7 @@ void ScribusDoc::init()
 	defaultTableStyle.setName(CommonStrings::DefaultTableStyle);
 	defaultTableStyle.setBorderModel(TableStyle::Collapsed);
 	defaultTableStyle.setBorderDrawingOptions(TableStyle::VerticalFirst);
-	defaultTableStyle.setBackgroundColor(CommonStrings::None);
+	defaultTableStyle.setFillColor(CommonStrings::None);
 	defaultTableStyle.setLeftBorderWidth(1.0);
 	defaultTableStyle.setRightBorderWidth(1.0);
 	defaultTableStyle.setTopBorderWidth(1.0);

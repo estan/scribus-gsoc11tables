@@ -63,7 +63,7 @@ void TableStyle::getNamedResources(ResourceCollection& lists) const
 {
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())
 		lists.collectCellStyle(style->name());
-	lists.collectColor(backgroundColor());
+	lists.collectColor(fillColor());
 	lists.collectColor(leftBorderColor());
 	lists.collectColor(rightBorderColor());
 	lists.collectColor(topBorderColor());
@@ -74,8 +74,8 @@ void TableStyle::replaceNamedResources(ResourceCollection& newNames)
 {
 	QMap<QString, QString>::ConstIterator it;
 
-	if (!isInhBackgroundColor() && (it = newNames.colors().find(backgroundColor())) != newNames.colors().end())
-		setBackgroundColor(it.value());
+	if (!isInhFillColor() && (it = newNames.colors().find(fillColor())) != newNames.colors().end())
+		setFillColor(it.value());
 
 	// TODO: Do we need to do something else? E.g. CharStyle calls its updateFeatures().
 }

@@ -633,9 +633,9 @@ void PageItem_Table::assertValid() const
 	}
 }
 
-void PageItem_Table::drawTableBackground(ScPainter* p)
+void PageItem_Table::drawTableFill(ScPainter* p)
 {
-	QString colorName = m_style.backgroundColor();
+	QString colorName = m_style.fillColor();
 
 	if (colorName == CommonStrings::None)
 		return;
@@ -699,8 +699,8 @@ void PageItem_Table::drawBorders(const QList<TableBorder>& borders, ScPainter* p
 
 void PageItem_Table::drawTableCollapsed(ScPainter* p)
 {
-	// Draw table background.
-	drawTableBackground(p);
+	// Draw table fill.
+	drawTableFill(p);
 
 	// Draw table cell backgrounds and collect borders.
 	TableCell cell;

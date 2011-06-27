@@ -362,7 +362,7 @@ PyObject *scribus_settablestyle(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyObject *scribus_gettablebackgroundcolor(PyObject* /* self */, PyObject* args)
+PyObject *scribus_gettablefillcolor(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	if (!PyArg_ParseTuple(args, "|es", "utf-8", &Name))
@@ -375,13 +375,13 @@ PyObject *scribus_gettablebackgroundcolor(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table background color on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get table fill color on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	return PyString_FromString(table->backgroundColor().toUtf8());
+	return PyString_FromString(table->fillColor().toUtf8());
 }
 
-PyObject *scribus_settablebackgroundcolor(PyObject* /* self */, PyObject* args)
+PyObject *scribus_settablefillcolor(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	char *color;
@@ -395,10 +395,10 @@ PyObject *scribus_settablebackgroundcolor(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table background color on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set table fill color on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	table->setBackgroundColor(QString::fromUtf8(color));
+	table->setFillColor(QString::fromUtf8(color));
 	Py_RETURN_NONE;
 }
 
@@ -781,8 +781,8 @@ void cmdtabledocwarnings()
 	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
 	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
 	  << scribus_mergetablecells__doc__ << scribus_settablestyle__doc__
-	  << scribus_gettablestyle__doc__ << scribus_settablebackgroundcolor__doc__
-	  << scribus_gettablebackgroundcolor__doc__ << scribus_gettableleftborderwidth__doc__
+	  << scribus_gettablestyle__doc__ << scribus_settablefillcolor__doc__
+	  << scribus_gettablefillcolor__doc__ << scribus_gettableleftborderwidth__doc__
 	  << scribus_settableleftborderwidth__doc__ << scribus_gettablerightborderwidth__doc__
 	  << scribus_settablerightborderwidth__doc__ << scribus_gettabletopborderwidth__doc__
 	  << scribus_settabletopborderwidth__doc__ << scribus_gettablebottomborderwidth__doc__

@@ -14,8 +14,8 @@ SMTableStyleWidget::SMTableStyleWidget(QWidget *parent) : QWidget()
 {
 	setupUi(this);
 
-	backgroundColorIcon->setPixmap(loadIcon("16/color-fill.png"));
-	backgroundColor->addItem(CommonStrings::tr_NoneColor);
+	fillColorIcon->setPixmap(loadIcon("16/color-fill.png"));
+	fillColor->addItem(CommonStrings::tr_NoneColor);
 }
 
 SMTableStyleWidget::~SMTableStyleWidget()
@@ -31,7 +31,7 @@ void SMTableStyleWidget::show(TableStyle *tableStyle, QList<TableStyle> &tableSt
 
 	// TODO: Handle parent styles (and language?)
 
-	backgroundColor->setCurrentText(tableStyle->backgroundColor());
+	fillColor->setCurrentText(tableStyle->fillColor());
 }
 
 void SMTableStyleWidget::show(QList<TableStyle*> &tableStyles, QList<TableStyle> &tableStylesAll, const QString &defaultLanguage, int unitIndex)
@@ -45,21 +45,21 @@ void SMTableStyleWidget::show(QList<TableStyle*> &tableStyles, QList<TableStyle>
 
 void SMTableStyleWidget::languageChange()
 {
-	backgroundColor->setToolTip(tr("Background Color"));
+	fillColor->setToolTip(tr("Fill Color"));
 }
 
-void SMTableStyleWidget::fillBackgroundColorCombo(ColorList &colors)
+void SMTableStyleWidget::fillFillColorCombo(ColorList &colors)
 {
-	backgroundColor->clear();
+	fillColor->clear();
 
-	backgroundColor->addItem(CommonStrings::tr_NoneColor);
+	fillColor->addItem(CommonStrings::tr_NoneColor);
 	ColorList::Iterator itEnd = colors.end();
 	ScribusDoc* doc = colors.document();
 	for (ColorList::Iterator it = colors.begin(); it != itEnd; ++it)
 	{
-		backgroundColor->insertFancyItem(it.value(), doc, it.key());
+		fillColor->insertFancyItem(it.value(), doc, it.key());
 	}
-	backgroundColor->view()->setMinimumWidth(backgroundColor->view()->maximumViewportSize().width()+24);
+	fillColor->view()->setMinimumWidth(fillColor->view()->maximumViewportSize().width()+24);
 }
 
 

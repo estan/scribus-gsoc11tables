@@ -63,7 +63,7 @@ void SMTableStyle::setCurrentDoc(ScribusDoc *doc)
 	{
 		if (m_page)
 		{
-			m_page->fillBackgroundColorCombo(m_doc->PageColors);
+			m_page->fillFillColorCombo(m_doc->PageColors);
 		}
 	}
 	else
@@ -411,8 +411,8 @@ void SMTableStyle::setupConnections()
 	if (!m_page)
 		return;
 
-	connect(m_page->backgroundColor, SIGNAL(activated(const QString&)),
-			this, SLOT(slotBackgroundColor()));
+	connect(m_page->fillColor, SIGNAL(activated(const QString&)),
+			this, SLOT(slotFillColor()));
 }
 
 void SMTableStyle::removeConnections()
@@ -420,16 +420,16 @@ void SMTableStyle::removeConnections()
 	if (!m_page)
 		return;
 
-	disconnect(m_page->backgroundColor, SIGNAL(activated(const QString&)),
-			this, SLOT(slotBackgroundColor()));
+	disconnect(m_page->fillColor, SIGNAL(activated(const QString&)),
+			this, SLOT(slotFillColor()));
 }
 
-void SMTableStyle::slotBackgroundColor()
+void SMTableStyle::slotFillColor()
 {
 	// TODO: Handle inheritance as well.
-	QString backgroundColor(m_page->backgroundColor->currentText());
+	QString fillColor(m_page->fillColor->currentText());
 	foreach (TableStyle *tableStyle, m_selection) {
-		tableStyle->setBackgroundColor(backgroundColor);
+		tableStyle->setFillColor(fillColor);
 	}
 
 	if (!m_selectionIsDirty)

@@ -17,7 +17,7 @@
 
 //Syntax: ATTRDEF( datatype, gettername, name, defaultvalue)
 
-ATTRDEF(QString, backgroundColor, BackgroundColor, CommonStrings::None)
+ATTRDEF(QString, fillColor, FillColor, CommonStrings::None)
 ATTRDEF(double, leftBorderWidth, LeftBorderWidth, 0)
 ATTRDEF(double, rightBorderWidth, RightBorderWidth, 0)
 ATTRDEF(double, topBorderWidth, TopBorderWidth, 0)

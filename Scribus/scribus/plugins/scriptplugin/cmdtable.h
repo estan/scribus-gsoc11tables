@@ -161,26 +161,26 @@ If \"name\" is not given the currently selected item is used.\n\
 PyObject *scribus_settablestyle(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_gettablebackgroundcolor__doc__,
-QT_TR_NOOP("getTableBackgroundColor([\"name\"]) -> string\n\
+PyDoc_STRVAR(scribus_gettablefillcolor__doc__,
+QT_TR_NOOP("getTableFillColor([\"name\"]) -> string\n\
 \n\
-Returns the color of the background of the table \"name\".\n\
+Returns the fill color of the table \"name\".\n\
 If \"name\" is not given the currently selected item is used.\n\
 "));
-/*! Get table background color */
-PyObject *scribus_gettablebackgroundcolor(PyObject * /*self*/, PyObject* args);
+/*! Get table fill color */
+PyObject *scribus_gettablefillcolor(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_settablebackgroundcolor__doc__,
-QT_TR_NOOP("setTableBackgroundColor(color, [\"name\"])\n\
+PyDoc_STRVAR(scribus_settablefillcolor__doc__,
+QT_TR_NOOP("setTableFillColor(color, [\"name\"])\n\
 \n\
-Sets the color of the background of the table \"name\" to \"color\".\n\
+Sets the fill color of the table \"name\" to \"color\".\n\
 If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError the table does not exist.\n\
 "));
-/*! Set table background color */
-PyObject *scribus_settablebackgroundcolor(PyObject * /*self*/, PyObject* args);
+/*! Set table fill color */
+PyObject *scribus_settablefillcolor(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
 PyDoc_STRVAR(scribus_gettableleftborderwidth__doc__,

@@ -57,11 +57,11 @@ public:
 	void languageChange();
 
 	/**
-	 * Populates the background color combo with the given color list.
+	 * Populates the fill color combo with the given color list.
 	 *
 	 * @param colors list of colors to populate the combo with.
 	 */
-	void fillBackgroundColorCombo(ColorList &colors);
+	void fillFillColorCombo(ColorList &colors);
 };
 
 #endif // SMTABLESTYLEWIDGET_H

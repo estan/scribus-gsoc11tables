@@ -184,11 +184,11 @@ public:
 
 	// Formatting properties setters/getters.
 
-	/// Sets the background color of this table to @a color.
-	void setBackgroundColor(const QString& color) { m_style.setBackgroundColor(color); }
+	/// Sets the fill color of this table to @a color.
+	void setFillColor(const QString& color) { m_style.setFillColor(color); }
 
-	/// Returns the background color of this table.
-	QString backgroundColor() const { return m_style.backgroundColor(); }
+	/// Returns the fill color of this table.
+	QString fillColor() const { return m_style.fillColor(); }
 
 	/// Sets the width of the left border of this table to @a width.
 	void setLeftBorderWidth(qreal width) { m_style.setLeftBorderWidth(width); }
@@ -322,8 +322,8 @@ private:
 	 */
 	TableBorder collapseBorders(const TableBorder& firstBorder, const TableBorder& secondBorder) const;
 
-	/// Draws the background of the table.
-	void drawTableBackground(ScPainter* p);
+	/// Draws the fill of the table.
+	void drawTableFill(ScPainter* p);
 
 	/// Draws the background of @a cell.
 	void drawCellBackground(const TableCell& cell, ScPainter* p);
