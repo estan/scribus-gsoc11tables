@@ -325,8 +325,8 @@ private:
 	/// Draws the fill of the table.
 	void drawTableFill(ScPainter* p);
 
-	/// Draws the background of @a cell.
-	void drawCellBackground(const TableCell& cell, ScPainter* p);
+	/// Draws the fill of @a cell.
+	void drawCellFill(const TableCell& cell, ScPainter* p);
 
 	/// Draws the borders in @a borders.
 	void drawBorders(const QList<TableBorder>& borders, ScPainter* p);

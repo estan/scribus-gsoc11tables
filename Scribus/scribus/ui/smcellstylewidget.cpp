@@ -14,8 +14,8 @@ SMCellStyleWidget::SMCellStyleWidget(QWidget *parent) : QWidget()
 {
 	setupUi(this);
 
-	backgroundColorIcon->setPixmap(loadIcon("16/color-fill.png"));
-	backgroundColor->addItem(CommonStrings::tr_NoneColor);
+	fillColorIcon->setPixmap(loadIcon("16/color-fill.png"));
+	fillColor->addItem(CommonStrings::tr_NoneColor);
 }
 
 SMCellStyleWidget::~SMCellStyleWidget()
@@ -31,7 +31,7 @@ void SMCellStyleWidget::show(CellStyle *cellStyle, QList<CellStyle> &cellStyles,
 
 	// TODO: Handle parent styles (and language?)
 
-	backgroundColor->setCurrentText(cellStyle->backgroundColor());
+	fillColor->setCurrentText(cellStyle->fillColor());
 }
 
 void SMCellStyleWidget::show(QList<CellStyle*> &cellStyles, QList<CellStyle> &cellStylesAll, const QString &defaultLanguage, int unitIndex)
@@ -45,19 +45,19 @@ void SMCellStyleWidget::show(QList<CellStyle*> &cellStyles, QList<CellStyle> &ce
 
 void SMCellStyleWidget::languageChange()
 {
-	backgroundColor->setToolTip(tr("Background Color"));
+	fillColor->setToolTip(tr("Fill Color"));
 }
 
-void SMCellStyleWidget::fillBackgroundColorCombo(ColorList &colors)
+void SMCellStyleWidget::fillFillColorCombo(ColorList &colors)
 {
-	backgroundColor->clear();
+	fillColor->clear();
 
-	backgroundColor->addItem(CommonStrings::tr_NoneColor);
+	fillColor->addItem(CommonStrings::tr_NoneColor);
 	ColorList::Iterator itEnd = colors.end();
 	ScribusDoc* doc = colors.document();
 	for (ColorList::Iterator it = colors.begin(); it != itEnd; ++it)
 	{
-		backgroundColor->insertFancyItem(it.value(), doc, it.key());
+		fillColor->insertFancyItem(it.value(), doc, it.key());
 	}
-	backgroundColor->view()->setMinimumWidth(backgroundColor->view()->maximumViewportSize().width()+24);
+	fillColor->view()->setMinimumWidth(fillColor->view()->maximumViewportSize().width()+24);
 }

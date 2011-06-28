@@ -103,7 +103,7 @@ PyObject *scribus_getcellcolumnspan(PyObject* /* self */, PyObject* args)
 	return PyInt_FromLong(static_cast<long>(table->cellAt(row, column).columnSpan()));
 }
 
-PyObject *scribus_getcellbackgroundcolor(PyObject* /* self */, PyObject* args)
+PyObject *scribus_getcellfillcolor(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
@@ -117,7 +117,7 @@ PyObject *scribus_getcellbackgroundcolor(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell background color on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell fill color on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -125,10 +125,10 @@ PyObject *scribus_getcellbackgroundcolor(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	return PyString_FromString(table->cellAt(row, column).backgroundColor().toUtf8());
+	return PyString_FromString(table->cellAt(row, column).fillColor().toUtf8());
 }
 
-PyObject *scribus_setcellbackgroundcolor(PyObject* /* self */, PyObject* args)
+PyObject *scribus_setcellfillcolor(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
@@ -143,7 +143,7 @@ PyObject *scribus_setcellbackgroundcolor(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell background color on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell fill color on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -151,7 +151,7 @@ PyObject *scribus_setcellbackgroundcolor(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	table->cellAt(row, column).setBackgroundColor(QString::fromUtf8(color));
+	table->cellAt(row, column).setFillColor(QString::fromUtf8(color));
 	Py_RETURN_NONE;
 }
 
@@ -579,7 +579,7 @@ void cmdcelldocwarnings()
 	QStringList s;
 	s << scribus_getcellstyle__doc__ << scribus_setcellstyle__doc__
 	  << scribus_getcellrowspan__doc__ << scribus_getcellcolumnspan__doc__
-	  << scribus_getcellbackgroundcolor__doc__ << scribus_setcellbackgroundcolor__doc__
+	  << scribus_getcellfillcolor__doc__ << scribus_setcellfillcolor__doc__
 	  << scribus_getcellleftborderwidth__doc__ << scribus_setcellleftborderwidth__doc__
 	  << scribus_getcellrightborderwidth__doc__ << scribus_setcellrightborderwidth__doc__
 	  << scribus_getcelltopborderwidth__doc__ << scribus_setcelltopborderwidth__doc__

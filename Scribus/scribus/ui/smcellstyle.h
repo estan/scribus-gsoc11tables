@@ -91,7 +91,7 @@ private:
 	void removeConnections();
 
 private slots:
-	void slotBackgroundColor();
+	void slotFillColor();
 };
 
 #endif // SMCELLSTYLES_H

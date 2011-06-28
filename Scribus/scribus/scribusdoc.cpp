@@ -495,7 +495,7 @@ void ScribusDoc::init()
 	// TODO: We should have preferences for the default values.
 	CellStyle defaultCellStyle;
 	defaultCellStyle.setName(CommonStrings::DefaultCellStyle);
-	defaultCellStyle.setBackgroundColor(CommonStrings::None);
+	defaultCellStyle.setFillColor(CommonStrings::None);
 	defaultCellStyle.setLeftBorderWidth(1.0);
 	defaultCellStyle.setRightBorderWidth(1.0);
 	defaultCellStyle.setTopBorderWidth(1.0);

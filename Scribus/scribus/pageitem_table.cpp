@@ -657,9 +657,9 @@ void PageItem_Table::drawTableFill(ScPainter* p)
 	p->restore();
 }
 
-void PageItem_Table::drawCellBackground(const TableCell& cell, ScPainter* p)
+void PageItem_Table::drawCellFill(const TableCell& cell, ScPainter* p)
 {
-	QString colorName = cell.backgroundColor();
+	QString colorName = cell.fillColor();
 
 	if (colorName == CommonStrings::None)
 		return;
@@ -713,7 +713,7 @@ void PageItem_Table::drawTableCollapsed(ScPainter* p)
 			cell = cellAt(row, col);
 
 			// Draw cell background.
-			drawCellBackground(cell, p);
+			drawCellFill(cell, p);
 
 			// Get the collapsed borders of the cell.
 			TableBorder leftBorder = collapsedLeftBorder(cell);

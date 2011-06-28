@@ -63,7 +63,7 @@ void SMCellStyle::setCurrentDoc(ScribusDoc *doc)
 	{
 		if (m_page)
 		{
-			m_page->fillBackgroundColorCombo(m_doc->PageColors);
+			m_page->fillFillColorCombo(m_doc->PageColors);
 		}
 	}
 	else
@@ -411,8 +411,8 @@ void SMCellStyle::setupConnections()
 	if (!m_page)
 		return;
 
-	connect(m_page->backgroundColor, SIGNAL(activated(const QString&)),
-			this, SLOT(slotBackgroundColor()));
+	connect(m_page->fillColor, SIGNAL(activated(const QString&)),
+			this, SLOT(slotFillColor()));
 }
 
 void SMCellStyle::removeConnections()
@@ -420,16 +420,16 @@ void SMCellStyle::removeConnections()
 	if (!m_page)
 		return;
 
-	disconnect(m_page->backgroundColor, SIGNAL(activated(const QString&)),
-			this, SLOT(slotBackgroundColor()));
+	disconnect(m_page->fillColor, SIGNAL(activated(const QString&)),
+			this, SLOT(slotFillColor()));
 }
 
-void SMCellStyle::slotBackgroundColor()
+void SMCellStyle::slotFillColor()
 {
 	// TODO: Handle inheritance as well.
-	QString backgroundColor(m_page->backgroundColor->currentText());
+	QString fillColor(m_page->fillColor->currentText());
 	foreach (CellStyle *cellStyle, m_selection) {
-		cellStyle->setBackgroundColor(backgroundColor);
+		cellStyle->setFillColor(fillColor);
 	}
 
 	if (!m_selectionIsDirty)

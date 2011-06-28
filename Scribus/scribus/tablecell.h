@@ -93,11 +93,11 @@ public:
 	/// Returns the number of columns this cell spans.
 	int columnSpan() const { return d->columnSpan; }
 
-	/// Sets the background color of this cell to @a color.
-	void setBackgroundColor(const QString& color) { d->style.setBackgroundColor(color); }
+	/// Sets the fill color of this cell to @a color.
+	void setFillColor(const QString& color) { d->style.setFillColor(color); }
 
-	/// Returns the background color of this cell.
-	QString backgroundColor() const { return d->style.backgroundColor(); }
+	/// Returns the fill color of this cell.
+	QString fillColor() const { return d->style.fillColor(); }
 
 	/// Sets the width of the left border of this cell to @a width.
 	void setLeftBorderWidth(qreal width) { d->style.setLeftBorderWidth(width); }
