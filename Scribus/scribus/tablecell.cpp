@@ -21,6 +21,7 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 {
 	Q_ASSERT(table);
 	d->table = table;
+
 	d->style.setContext(&d->table->m_Doc->cellStyles());
 
 	setValid(true);
@@ -36,25 +37,13 @@ QString TableCell::asString() const
 	QString str("cell(");
 	str += QString("row=%1, column=%2, ").arg(row()).arg(column());
 	str += QString("rowSpan=%1, columnSpan=%2, ").arg(rowSpan()).arg(columnSpan());
-	str += QString("style=%1, ").arg(d->style.name());
-	str += QString("leftBorderWidth=%1, rightBorderWidth=%2, ").arg(leftBorderWidth()).arg(rightBorderWidth());
-	str += QString("topBorderWidth=%1, bottomBorderWidth=%2, ").arg(topBorderWidth()).arg(bottomBorderWidth());
-	str += QString("leftBorderColor=%1, rightBorderColor=%2, ").arg(leftBorderColor()).arg(rightBorderColor());
-	str += QString("topBorderColor=%1, bottomBorderColor=%2").arg(topBorderColor()).arg(bottomBorderColor());
+	str += QString("leftBorder=%1, rightBorder=%2, ").arg(leftBorder().asString()).arg(rightBorder().asString());
+	str += QString("topBorder=%1, bottomBorder=%2, ").arg(topBorder().asString()).arg(bottomBorder().asString());
+	str += QString("style=%1").arg(d->style.asString());
 	str += QString(")");
 
 	return str;
 }
-
-/*
-void TableCell::drawDecorativeLine(const FPoint& start, const FPoint& end, ScPainter *p) const
-{
-	p->save();
-	p->setPen(Qt::red, 0.5 / qMax(p->zoomFactor(), 1.0), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	p->setStrokeMode(ScPainter::Solid);
-	p->drawLine(start, end);
-	p->restore();
-}*/
 
 QDebug operator<<(QDebug debug, const TableCell& cell)
 {

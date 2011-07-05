@@ -11,10 +11,10 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem.h"
 #include "pageitem_table.h"
 #include "styles/tablestyle.h"
+#include "collapsedtablepainter.h"
 #include "cellarea.h"
 #include "scribusdoc.h"
 #include "scpainter.h"
-#include "util_color.h"
 
 #ifdef WANT_DEBUG
 	#define ASSERT_VALID() qt_noop()
@@ -23,7 +23,7 @@ for which a new license (GPL+exception) is in place.
 #endif
 
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
-	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0)
+	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0), m_tablePainter(new CollapsedTablePainter(this))
 {
 	Q_ASSERT(m_Doc);
 	m_style.setContext(&m_Doc->tableStyles());
@@ -34,6 +34,11 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 
 	setStyle("");
 	adjustToFrame();
+}
+
+PageItem_Table::~PageItem_Table()
+{
+	delete m_tablePainter;
 }
 
 void PageItem_Table::insertRows(int index, int numRows)
@@ -133,6 +138,14 @@ qreal PageItem_Table::rowHeight(int row) const
 		return 0.0;
 
 	return m_rowHeights.at(row);
+}
+
+qreal PageItem_Table::rowPosition(int row) const
+{
+	if (!validRow(row))
+		return 0.0;
+
+	return m_rowPositions.at(row);
 }
 
 void PageItem_Table::setRowHeight(int row, qreal height)
@@ -241,6 +254,14 @@ qreal PageItem_Table::columnWidth(int column) const
 		return 0.0;
 
 	return m_columnWidths.at(column);
+}
+
+qreal PageItem_Table::columnPosition(int column) const
+{
+	if (!validColumn(column))
+		return 0.0;
+
+	return m_columnPositions.at(column);
 }
 
 void PageItem_Table::setColumnWidth(int column, qreal width)
@@ -407,163 +428,6 @@ void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 	}
 }
 
-TableBorder PageItem_Table::collapsedLeftBorder(const TableCell& cell) const
-{
-	// Construct the two borders that should be collapsed.
-	TableBorder leftBorder(cell.leftBorderWidth(), cell.leftBorderColor());
-	TableBorder neighborBorder;
-	if (cell.column() == 0)
-	{
-		// Neighboring border is left border of table.
-		neighborBorder.width = leftBorderWidth();
-		neighborBorder.color = leftBorderColor();
-	}
-	else
-	{
-		// Neighboring border is right border of neighboring cell.
-		TableCell neighborCell = cellAt(cell.column() - 1, cell.row());
-		neighborBorder.width = neighborCell.rightBorderWidth();
-		neighborBorder.color = neighborCell.rightBorderColor();
-	}
-
-	// Collapse the borders.
-	TableBorder collapsedBorder = collapseBorders(neighborBorder, leftBorder);
-
-	// Set border coordinates.
-	QRectF rect = cellRect(cell.row(), cell.column());
-	collapsedBorder.start = rect.topLeft();
-	collapsedBorder.end = rect.bottomLeft();
-
-	return collapsedBorder;
-}
-
-TableBorder PageItem_Table::collapsedRightBorder(const TableCell& cell) const
-{
-	// Construct the two borders that should be collapsed.
-	TableBorder rightBorder(cell.rightBorderWidth(), cell.rightBorderColor());
-	TableBorder neighborBorder;
-	if (cell.column() == columns() - 1)
-	{
-		// Neighboring border is right border of table.
-		neighborBorder.width = rightBorderWidth();
-		neighborBorder.color = rightBorderColor();
-	}
-	else
-	{
-		// Neighboring border is left border of neighboring cell.
-		TableCell neighborCell = cellAt(cell.column() + 1, cell.row());
-		neighborBorder.width = neighborCell.leftBorderWidth();
-		neighborBorder.color = neighborCell.leftBorderColor();
-	}
-
-	// Collapse the borders.
-	TableBorder collapsedBorder = collapseBorders(rightBorder, neighborBorder);
-
-	// Set border coordinates.
-	QRectF rect = cellRect(cell.row(), cell.column());
-	collapsedBorder.start = rect.topRight();
-	collapsedBorder.end = rect.bottomRight();
-
-	return collapsedBorder;
-}
-
-TableBorder PageItem_Table::collapsedTopBorder(const TableCell& cell) const
-{
-	// Construct the two borders that should be collapsed.
-	TableBorder topBorder(cell.topBorderWidth(), cell.topBorderColor());
-	TableBorder neighborBorder;
-	if (cell.row() == 0)
-	{
-		// Neighboring border is top border of table.
-		neighborBorder.width = topBorderWidth();
-		neighborBorder.color = topBorderColor();
-	}
-	else
-	{
-		// Neighboring border is bottom border of neighboring cell.
-		TableCell neighborCell = cellAt(cell.column(), cell.row() - 1);
-		neighborBorder.width = neighborCell.bottomBorderWidth();
-		neighborBorder.color = neighborCell.bottomBorderColor();
-	}
-
-	// Collapse the borders.
-	TableBorder collapsedBorder = collapseBorders(topBorder, neighborBorder);
-
-	// Set initial coordinates of the border.
-	QRectF rect = cellRect(cell.row(), cell.column());
-	collapsedBorder.start = rect.topLeft();
-	collapsedBorder.end = rect.topRight();
-
-	return collapsedBorder;
-}
-
-TableBorder PageItem_Table::collapsedBottomBorder(const TableCell& cell) const
-{
-	// Construct the two borders that should be collapsed.
-	TableBorder bottomBorder(cell.bottomBorderWidth(), cell.bottomBorderColor());
-	TableBorder neighborBorder;
-	if (cell.row() == rows() - 1)
-	{
-		// Neighboring border is bottom border of table.
-		neighborBorder.width = bottomBorderWidth();
-		neighborBorder.color = bottomBorderColor();
-	}
-	else
-	{
-		// Neighboring border is top border of neighboring cell.
-		TableCell neighborCell = cellAt(cell.column(), cell.row() + 1);
-		neighborBorder.width = neighborCell.topBorderWidth();
-		neighborBorder.color = neighborCell.topBorderColor();
-	}
-
-	// Collapse the borders.
-	TableBorder collapsedBorder = collapseBorders(neighborBorder, bottomBorder);
-
-	// Set initial coordinates of the border.
-	QRectF rect = cellRect(cell.row(), cell.column());
-	collapsedBorder.start = rect.bottomLeft();
-	collapsedBorder.end = rect.bottomRight();
-
-	return collapsedBorder;
-}
-
-TableBorder PageItem_Table::collapseBorders(const TableBorder& firstBorder, const TableBorder& secondBorder) const
-{
-	/*
-	 * Collapse firstBorder and secondBorder according to the following rules.
-	 *
-	 * (1) If neither firstBorder nor secondBorder has a color, collapsed
-	 *     border has no color and 0 width.
-	 * (2) If just secondBorder has a color, collapsed border is secondBorder.
-	 * (3) If just firstBorder has a color, collapsed border is firstBorder.
-	 * (4) If both firstBorder and secondBorder have a color but secondBorder
-	 *     is wider than firstBorder, collapsed border is secondBorder.
-	 * (5) If both firstBorder and secondBorder have a color but firstBorder
-	 *     is wider than, or equally wide to, secondBorder, collapsed border
-	 *     is firstBorder.
-	 */
-
-	TableBorder collapsedBorder;
-
-	if (firstBorder.color == CommonStrings::None && secondBorder.color == CommonStrings::None)
-	{
-		// (1)
-		collapsedBorder.width = 0.0;
-		collapsedBorder.color = CommonStrings::None;
-	}
-	else if (firstBorder.color == CommonStrings::None)
-		collapsedBorder = secondBorder; // (2)
-	else if (secondBorder.color == CommonStrings::None)
-		collapsedBorder = firstBorder; // (3)
-	else
-		if (secondBorder.width > firstBorder.width)
-			collapsedBorder = secondBorder; // (4)
-		else
-			collapsedBorder = firstBorder; // (5)
-
-	return collapsedBorder;
-}
-
 void PageItem_Table::debug() const
 {
 	qDebug() << "-------------------------------------------------";
@@ -633,186 +497,6 @@ void PageItem_Table::assertValid() const
 	}
 }
 
-void PageItem_Table::drawTableFill(ScPainter* p)
-{
-	QString colorName = m_style.fillColor();
-
-	if (colorName == CommonStrings::None)
-		return;
-
-	p->save();
-
-	qreal x = m_columnPositions.first();
-	qreal y = m_rowPositions.first();
-	qreal width = m_columnPositions.last() + m_columnWidths.last() - x;
-	qreal height = m_rowPositions.last() + m_rowHeights.last() - y;
-
-	QColor color;
-	SetQColor(&color, colorName, 100.0);
-	p->setBrush(color);
-	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::None);
-	p->drawRect(x, y, width, height);
-
-	p->restore();
-}
-
-void PageItem_Table::drawCellFill(const TableCell& cell, ScPainter* p)
-{
-	QString colorName = cell.fillColor();
-
-	if (colorName == CommonStrings::None)
-		return;
-
-	p->save();
-
-	QColor color;
-	SetQColor(&color, colorName, 100.0); // TODO: Support shade.
-	p->setBrush(color);
-	p->setFillMode(ScPainter::Solid);
-	p->setStrokeMode(ScPainter::None);
-	QRectF rect = cellRect(cell.row(), cell.column());
-	p->drawRect(rect.x(), rect.y(), rect.width(), rect.height());
-
-	p->restore();
-}
-
-void PageItem_Table::drawBorders(const QList<TableBorder>& borders, ScPainter* p)
-{
-	p->save();
-
-	p->setStrokeMode(ScPainter::Solid);
-	p->setFillMode(ScPainter::None);
-
-	QColor color;
-	QList<TableBorder>::const_iterator borderIt;
-	for (borderIt = borders.begin(); borderIt != borders.end(); ++borderIt)
-	{
-		TableBorder border = (*borderIt);
-		SetQColor(&color, border.color, 100.0); // TODO: Support shade.
-		p->setPen(color, border.width, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-		p->drawLine(border.start, border.end);
-	}
-
-	p->restore();
-}
-
-void PageItem_Table::drawTableCollapsed(ScPainter* p)
-{
-	// Draw table fill.
-	drawTableFill(p);
-
-	// Draw table cell backgrounds and collect borders.
-	TableCell cell;
-	QList<TableBorder> verticalBorders;
-	QList<TableBorder> horizontalBorders;
-	for (int row = 0; row < rows(); ++row)
-	{
-		for (int col = 0; col < columns(); col += cell.columnSpan())
-		{
-			cell = cellAt(row, col);
-
-			// Draw cell background.
-			drawCellFill(cell, p);
-
-			// Get the collapsed borders of the cell.
-			TableBorder leftBorder = collapsedLeftBorder(cell);
-			TableBorder rightBorder = collapsedRightBorder(cell);
-			TableBorder topBorder = collapsedTopBorder(cell);
-			TableBorder bottomBorder = collapsedBottomBorder(cell);
-
-			// Adjust border joins.
-			adjustBorderJoins(&leftBorder, &rightBorder, &topBorder, &bottomBorder, cell);
-
-			// Collect the borders.
-			verticalBorders.append(rightBorder);
-			horizontalBorders.append(bottomBorder);
-			if (row == 0)
-				horizontalBorders.append(topBorder);
-			if (col == 0)
-				verticalBorders.append(leftBorder);
-		}
-	}
-
-	// Draw borders.
-	TableStyle::BorderDrawingOptions options = borderDrawingOptions();
-	if (options & TableStyle::HorizontalFirst)
-	{
-		drawBorders(horizontalBorders, p);
-		drawBorders(verticalBorders, p);
-	}
-	else if (options & TableStyle::VerticalFirst)
-	{
-		drawBorders(verticalBorders, p);
-		drawBorders(horizontalBorders, p);
-	}
-}
-
-void PageItem_Table::adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom, const TableCell& cell)
-{
-	Q_ASSERT(left);
-	Q_ASSERT(right);
-	Q_ASSERT(top);
-	Q_ASSERT(bottom);
-
-	if (!left || !right || !top || !bottom)
-		return;
-
-	TableStyle::BorderDrawingOptions options = borderDrawingOptions();
-	qreal halfLeftWidth = left->width / 2;
-	qreal halfRightWidth = right->width / 2;
-	qreal halfTopWidth = top->width / 2;
-	qreal halfBottomWidth = bottom->width / 2;
-	if (options & TableStyle::HorizontalFirst)
-	{
-		// Move start points of horizontal borders right.
-		bottom->start.setX(bottom->start.x() + halfLeftWidth);
-		top->start.setX(top->start.x() + halfLeftWidth);
-
-		// Move end points of horizontal borders left.
-		bottom->end.setX(bottom->end.x() - halfRightWidth);
-		top->end.setX(top->end.x() - halfRightWidth);
-
-		if (cell.row() == 0)
-		{
-			// First row, so move start points of vertical borders up.
-			left->start.setY(left->start.y() - halfTopWidth);
-			right->start.setY(right->start.y() - halfTopWidth);
-		}
-		if (cell.row() == rows() - 1)
-		{
-			// Last row, so move end points of horizontal borders down.
-			right->end.setY(right->end.y() + halfBottomWidth);
-			left->end.setY(left->end.y() + halfBottomWidth);
-		}
-	}
-	else if (options & TableStyle::VerticalFirst)
-	{
-		// Move start points of vertical borders down.
-		left->start.setY(left->start.y() + halfTopWidth);
-		right->start.setY(right->start.y() + halfTopWidth);
-
-		// Move end points of vertical borders up.
-		left->end.setY(left->end.y() - halfBottomWidth);
-		right->end.setY(right->end.y() - halfBottomWidth);
-
-		if (cell.column() == 0)
-		{
-			// First column, so move start points of horizontal borders left.
-			bottom->start.setX(bottom->start.x() - halfLeftWidth);
-			top->start.setX(top->start.x() - halfLeftWidth);
-		}
-		if (cell.column() == columns() - 1)
-		{
-			// Last column, so move end points of horizontal borders right.
-			bottom->end.setX(bottom->end.x() + halfRightWidth);
-			top->end.setX(top->end.x() + halfRightWidth);
-		}
-	}
-
-	// TODO: Handle multi borders here some day.
-}
-
 void PageItem_Table::adjustToFrame()
 {
 	// Distribute width equally across columns.
@@ -841,8 +525,5 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->RePos)
 		return;
 
-	if (borderModel() == TableStyle::Collapsed)
-		drawTableCollapsed(p);
-
-	// TODO: Implement TableStyle::Separated.
+	m_tablePainter->paintTable(p);
 }

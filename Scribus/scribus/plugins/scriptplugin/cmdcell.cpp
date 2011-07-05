@@ -10,6 +10,7 @@
 #include "cmdcell.h"
 #include "cmdutil.h"
 #include "pageitem_table.h"
+#include "tableborder.h"
 
 PyObject *scribus_getcellstyle(PyObject* /* self */, PyObject* args)
 {
@@ -155,11 +156,12 @@ PyObject *scribus_setcellfillcolor(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyObject *scribus_getcellleftborderwidth(PyObject* /* self */, PyObject* args)
+PyObject *scribus_setcellleftborder(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+	PyObject* borderLines;
+	if (!PyArg_ParseTuple(args, "iiO|es", &row, &column, &borderLines, "utf-8", &Name))
 		return NULL;
 	if(!checkHaveDocument())
 		return NULL;
@@ -169,28 +171,7 @@ PyObject *scribus_getcellleftborderwidth(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell left border width from non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyFloat_FromDouble(static_cast<double>(table->cellAt(row, column).leftBorderWidth()));
-}
-
-PyObject *scribus_setcellleftborderwidth(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	double width;
-	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &width, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell left border width on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell left border on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -198,20 +179,23 @@ PyObject *scribus_setcellleftborderwidth(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (width < 0.0)
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell left border width must be >= 0.0", "python error").toLocal8Bit().constData());
+
+	bool ok = false;
+	TableBorder border = parseBorder(borderLines, &ok);
+	if (ok)
+		table->cellAt(row, column).setLeftBorder(border);
+	else
 		return NULL;
-	}
-	table->cellAt(row, column).setLeftBorderWidth(width);
+
 	Py_RETURN_NONE;
 }
 
-PyObject *scribus_getcellrightborderwidth(PyObject* /* self */, PyObject* args)
+PyObject *scribus_setcellrightborder(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+	PyObject* borderLines;
+	if (!PyArg_ParseTuple(args, "iiO|es", &row, &column, &borderLines, "utf-8", &Name))
 		return NULL;
 	if(!checkHaveDocument())
 		return NULL;
@@ -221,28 +205,7 @@ PyObject *scribus_getcellrightborderwidth(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell right border width from non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyFloat_FromDouble(static_cast<double>(table->cellAt(row, column).rightBorderWidth()));
-}
-
-PyObject *scribus_setcellrightborderwidth(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	double width;
-	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &width, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell right border width on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell right border on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -250,20 +213,23 @@ PyObject *scribus_setcellrightborderwidth(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (width < 0.0)
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell right border width must be >= 0.0", "python error").toLocal8Bit().constData());
+
+	bool ok = false;
+	TableBorder border = parseBorder(borderLines, &ok);
+	if (ok)
+		table->cellAt(row, column).setRightBorder(border);
+	else
 		return NULL;
-	}
-	table->cellAt(row, column).setRightBorderWidth(width);
+
 	Py_RETURN_NONE;
 }
 
-PyObject *scribus_getcelltopborderwidth(PyObject* /* self */, PyObject* args)
+PyObject *scribus_setcelltopborder(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+	PyObject* borderLines;
+	if (!PyArg_ParseTuple(args, "iiO|es", &row, &column, &borderLines, "utf-8", &Name))
 		return NULL;
 	if(!checkHaveDocument())
 		return NULL;
@@ -273,28 +239,7 @@ PyObject *scribus_getcelltopborderwidth(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell top border width from non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyFloat_FromDouble(static_cast<double>(table->cellAt(row, column).topBorderWidth()));
-}
-
-PyObject *scribus_setcelltopborderwidth(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	double width;
-	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &width, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell top border width on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell top border on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -302,20 +247,23 @@ PyObject *scribus_setcelltopborderwidth(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (width < 0.0)
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell top border width must be >= 0.0", "python error").toLocal8Bit().constData());
+
+	bool ok = false;
+	TableBorder border = parseBorder(borderLines, &ok);
+	if (ok)
+		table->cellAt(row, column).setTopBorder(border);
+	else
 		return NULL;
-	}
-	table->cellAt(row, column).setTopBorderWidth(width);
+
 	Py_RETURN_NONE;
 }
 
-PyObject *scribus_getcellbottomborderwidth(PyObject* /* self */, PyObject* args)
+PyObject *scribus_setcellbottomborder(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+	PyObject* borderLines;
+	if (!PyArg_ParseTuple(args, "iiO|es", &row, &column, &borderLines, "utf-8", &Name))
 		return NULL;
 	if(!checkHaveDocument())
 		return NULL;
@@ -325,28 +273,7 @@ PyObject *scribus_getcellbottomborderwidth(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell bottom border width from non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyFloat_FromDouble(static_cast<double>(table->cellAt(row, column).bottomBorderWidth()));
-}
-
-PyObject *scribus_setcellbottomborderwidth(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	double width;
-	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &width, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell bottom border width on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell bottom border on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
@@ -354,220 +281,14 @@ PyObject *scribus_setcellbottomborderwidth(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
 		return NULL;
 	}
-	if (width < 0.0)
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell bottom border width must be >= 0.0", "python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	table->cellAt(row, column).setBottomBorderWidth(width);
-	Py_RETURN_NONE;
-}
 
-PyObject *scribus_getcellleftbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
+	bool ok = false;
+	TableBorder border = parseBorder(borderLines, &ok);
+	if (ok)
+		table->cellAt(row, column).setBottomBorder(border);
+	else
 		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell left border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyString_FromString(table->cellAt(row, column).leftBorderColor().toUtf8());
-}
 
-PyObject *scribus_setcellleftbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	char *color;
-	if (!PyArg_ParseTuple(args, "iies|es", &row, &column, "utf-8", &color, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell left border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	table->cellAt(row, column).setLeftBorderColor(QString::fromUtf8(color));
-	Py_RETURN_NONE;
-}
-
-PyObject *scribus_getcellrightbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell right border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyString_FromString(table->cellAt(row, column).rightBorderColor().toUtf8());
-}
-
-PyObject *scribus_setcellrightbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	char *color;
-	if (!PyArg_ParseTuple(args, "iies|es", &row, &column, "utf-8", &color, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell right border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	table->cellAt(row, column).setRightBorderColor(QString::fromUtf8(color));
-	Py_RETURN_NONE;
-}
-
-PyObject *scribus_getcelltopbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell top border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyString_FromString(table->cellAt(row, column).topBorderColor().toUtf8());
-}
-
-PyObject *scribus_setcelltopbordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	char *color;
-	if (!PyArg_ParseTuple(args, "iies|es", &row, &column, "utf-8", &color, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell top border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	table->cellAt(row, column).setTopBorderColor(QString::fromUtf8(color));
-	Py_RETURN_NONE;
-}
-
-PyObject *scribus_getcellbottombordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	if (!PyArg_ParseTuple(args, "ii|es", &row, &column, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot get cell bottom border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	return PyString_FromString(table->cellAt(row, column).bottomBorderColor().toUtf8());
-}
-
-PyObject *scribus_setcellbottombordercolor(PyObject* /* self */, PyObject* args)
-{
-	char *Name = const_cast<char*>("");
-	int row, column;
-	char *color;
-	if (!PyArg_ParseTuple(args, "iies|es", &row, &column, "utf-8", &color, "utf-8", &Name))
-		return NULL;
-	if(!checkHaveDocument())
-		return NULL;
-	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
-	if (i == NULL)
-		return NULL;
-	PageItem_Table *table = i->asTable();
-	if (!table)
-	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell bottom border color on a non-table item.","python error").toLocal8Bit().constData());
-		return NULL;
-	}
-	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
-	{
-		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
-		return NULL;
-	}
-	table->cellAt(row, column).setBottomBorderColor(QString::fromUtf8(color));
 	Py_RETURN_NONE;
 }
 
@@ -580,12 +301,6 @@ void cmdcelldocwarnings()
 	s << scribus_getcellstyle__doc__ << scribus_setcellstyle__doc__
 	  << scribus_getcellrowspan__doc__ << scribus_getcellcolumnspan__doc__
 	  << scribus_getcellfillcolor__doc__ << scribus_setcellfillcolor__doc__
-	  << scribus_getcellleftborderwidth__doc__ << scribus_setcellleftborderwidth__doc__
-	  << scribus_getcellrightborderwidth__doc__ << scribus_setcellrightborderwidth__doc__
-	  << scribus_getcelltopborderwidth__doc__ << scribus_setcelltopborderwidth__doc__
-	  << scribus_getcellbottomborderwidth__doc__ << scribus_setcellbottomborderwidth__doc__
-	  << scribus_getcellleftbordercolor__doc__ << scribus_setcellleftbordercolor__doc__
-	  << scribus_getcellrightbordercolor__doc__ << scribus_setcellrightbordercolor__doc__
-	  << scribus_getcelltopbordercolor__doc__ << scribus_setcelltopbordercolor__doc__
-	  << scribus_getcellbottombordercolor__doc__ << scribus_setcellbottombordercolor__doc__;
+	  << scribus_setcellleftborder__doc__ << scribus_setcellrightborder__doc__
+	  << scribus_setcelltopborder__doc__ << scribus_setcellbottomborder__doc__;
 }

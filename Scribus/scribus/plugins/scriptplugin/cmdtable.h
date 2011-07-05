@@ -183,191 +183,59 @@ May throw ValueError the table does not exist.\n\
 PyObject *scribus_settablefillcolor(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_gettableleftborderwidth__doc__,
-QT_TR_NOOP("getTableLeftBorderWidth([\"name\"]) -> float\n\
+PyDoc_STRVAR(scribus_settableleftborder__doc__,
+QT_TR_NOOP("setTableLeftBorder(borderLines, [\"name\"])\n\
 \n\
-Returns the width of the left border of the table \"name\" expressed in points.\n\
-If \"name\" is not given the currently selected item is used.\n\
+Sets the left border of the table \"name\".\n\
+The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
+order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+the currently selected item is used.\n\
+\n\
+May throw ValueError if \"borderLines\" is of the wrong format.\n\
 "));
-/*! Get table left border width */
-PyObject *scribus_gettableleftborderwidth(PyObject * /*self*/, PyObject* args);
+/*! Set table left border */
+PyObject *scribus_settableleftborder(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_settableleftborderwidth__doc__,
-QT_TR_NOOP("setTableLeftBorderWidth(width, [\"name\"])\n\
+PyDoc_STRVAR(scribus_settablerightborder__doc__,
+QT_TR_NOOP("setTableRightBorder(borderLines, [\"name\"])\n\
 \n\
-Sets the width of the left border of the table \"name\" to \"width\".\n\
-If \"name\" is not given the currently selected item is used.\n\
+Sets the right border of the table \"name\".\n\
+The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
+order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+the currently selected item is used.\n\
 \n\
-May throw ValueError if the width is less than 0.\n\
+May throw ValueError if \"borderLines\" is of the wrong format.\n\
 "));
-/*! Set table left border width */
-PyObject *scribus_settableleftborderwidth(PyObject * /*self*/, PyObject* args);
+/*! Set table right border */
+PyObject *scribus_settablerightborder(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_gettablerightborderwidth__doc__,
-QT_TR_NOOP("getTableRightBorderWidth([\"name\"]) -> float\n\
+PyDoc_STRVAR(scribus_settabletopborder__doc__,
+QT_TR_NOOP("setTableTopBorder(borderLines, [\"name\"])\n\
 \n\
-Returns the width of the right border of the table \"name\" expressed in points.\n\
-If \"name\" is not given the currently selected item is used.\n\
+Sets the top border of the table \"name\".\n\
+The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
+order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+the currently selected item is used.\n\
+\n\
+May throw ValueError if \"borderLines\" is of the wrong format.\n\
 "));
-/*! Get table right border width */
-PyObject *scribus_gettablerightborderwidth(PyObject * /*self*/, PyObject* args);
+/*! Set table top border */
+PyObject *scribus_settabletopborder(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_settablerightborderwidth__doc__,
-QT_TR_NOOP("setTableRightBorderWidth(width, [\"name\"])\n\
+PyDoc_STRVAR(scribus_settablebottomborder__doc__,
+QT_TR_NOOP("setTableBottomBorder(borderLines, [\"name\"])\n\
 \n\
-Sets the width of the right border of the table \"name\" to \"width\".\n\
-If \"name\" is not given the currently selected item is used.\n\
+Sets the bottom border of the table \"name\".\n\
+The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
+order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+the currently selected item is used.\n\
 \n\
-May throw ValueError if the width is less than 0.\n\
+May throw ValueError if \"borderLines\" is of the wrong format.\n\
 "));
-/*! Set table right border width */
-PyObject *scribus_settablerightborderwidth(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettabletopborderwidth__doc__,
-QT_TR_NOOP("getTableTopBorderWidth([\"name\"]) -> float\n\
-\n\
-Returns the width of the top border of the table \"name\" expressed in points\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table top border width */
-PyObject *scribus_gettabletopborderwidth(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settabletopborderwidth__doc__,
-QT_TR_NOOP("setTableTopBorderWidth(width, [\"name\"])\n\
-\n\
-Sets the width of the top border of the table \"name\" to \"width\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError if the width is less than 0.\n\
-"));
-/*! Set table top border width */
-PyObject *scribus_settabletopborderwidth(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettablebottomborderwidth__doc__,
-QT_TR_NOOP("getTableBottomBorderWidth([\"name\"]) -> float\n\
-\n\
-Returns the width of the bottom border of the table \"name\" expressed in points\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table bottom border width */
-PyObject *scribus_gettablebottomborderwidth(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settablebottomborderwidth__doc__,
-QT_TR_NOOP("setTableBottomBorderWidth(width, [\"name\"])\n\
-\n\
-Sets the width of the bottom border of the table \"name\" to \"width\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError if the width is less than 0.\n\
-"));
-/*! Set table bottom border width */
-PyObject *scribus_settablebottomborderwidth(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettableleftbordercolor__doc__,
-QT_TR_NOOP("getTableLeftBorderColor([\"name\"]) -> string\n\
-\n\
-Returns the color of the left border of the table \"name\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table left border color */
-PyObject *scribus_gettableleftbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settableleftbordercolor__doc__,
-QT_TR_NOOP("setTableLeftBorderColor(color, [\"name\"])\n\
-\n\
-Sets the color of the left border of the table \"name\". to \"color\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError the table does not exist.\n\
-"));
-/*! Set table left border color */
-PyObject *scribus_settableleftbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettablerightbordercolor__doc__,
-QT_TR_NOOP("getTableRightBorderColor([\"name\"]) -> string\n\
-\n\
-Returns the color of the right border of the table \"name\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table right border color */
-PyObject *scribus_gettablerightbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settablerightbordercolor__doc__,
-QT_TR_NOOP("setTableRightBorderColor(color, [\"name\"])\n\
-\n\
-Sets the color of the right border of the table \"name\" to \"color\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError the table does not exist.\n\
-"));
-/*! Set table right border color */
-PyObject *scribus_settablerightbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettabletopbordercolor__doc__,
-QT_TR_NOOP("getTableTopBorderColor([\"name\"]) -> string\n\
-\n\
-Returns the color of the top border of the table \"name\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table top border color */
-PyObject *scribus_gettabletopbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settabletopbordercolor__doc__,
-QT_TR_NOOP("setTableTopBorderColor(color, [\"name\"])\n\
-\n\
-Sets the color of the top border of the table \"name\" to \"color\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError the table does not exist.\n\
-"));
-/*! Set table top border color */
-PyObject *scribus_settabletopbordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_gettablebottombordercolor__doc__,
-QT_TR_NOOP("getTableBottomBorderColor([\"name\"]) -> string\n\
-\n\
-Returns the color of the bottom border of the table \"name\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-"));
-/*! Get table bottom border color */
-PyObject *scribus_gettablebottombordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settablebottombordercolor__doc__,
-QT_TR_NOOP("setTableBottomBorderColor(color, [\"name\"])\n\
-\n\
-Sets the color of the bottom border of the table \"name\" to \"color\".\n\
-If \"name\" is not given the currently selected item is used.\n\
-\n\
-May throw ValueError the table does not exist.\n\
-"));
-/*! Set table bottom border color */
-PyObject *scribus_settablebottombordercolor(PyObject * /*self*/, PyObject* args);
-
-/*! docstring */
-PyDoc_STRVAR(scribus_settableborderdrawingoptions__doc__,
-QT_TR_NOOP("setTableBorderDrawingOptions(options, [\"name\"])\n\
-\n\
-Sets the border drawing options of the table \"name\" to \"options\".\n\
-\"options\" can be either HORIZONTAL_FIRST or VERTICAL_FIRST, optionally\n\
-combined with JOINED. If \"name\" is not given the currently selected item\n\
-is used.\n\
-"));
-/*! Set table border drawing options */
-PyObject *scribus_settableborderdrawingoptions(PyObject * /*self*/, PyObject* args);
+/*! Set table bottom border */
+PyObject *scribus_settablebottomborder(PyObject * /*self*/, PyObject* args);
 
 #endif // CMDTABLE_H

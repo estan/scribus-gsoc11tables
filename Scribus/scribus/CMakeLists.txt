@@ -476,6 +476,7 @@ SET(SCRIBUS_SOURCES
   chartableview.cpp
   cmserrorhandling.cpp
   cmsettings.cpp
+  collapsedtablepainter.cpp
   collect4output.cpp
   colorblind.cpp
   colorsetmanager.cpp
@@ -614,6 +615,7 @@ SET(SCRIBUS_SOURCES
   serializer.cpp
   styleitem.cpp
   tablecell.cpp
+  tableutils.cpp
   textwriter.cpp
   tocgenerator.cpp
   transaction.cpp

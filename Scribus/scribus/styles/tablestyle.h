@@ -22,45 +22,13 @@
 #include "commonstrings.h"
 #include "resourcecollection.h"
 #include "styles/stylecontextproxy.h"
+#include "tableborder.h"
 
 /**
  * The TableStyle class represents a style for a table.
  */
 class SCRIBUS_API TableStyle : public Style {
 public:
-	/**
-	 * This enum describes border models for tables.
-	 * <p>
-	 * In the collapsed border model, adjacent borders are collapsed into one border
-	 * according to certain rules and the resulting border is drawn centered on the
-	 * table grid.
-	 * <p>
-	 * TODO: Document the rules.
-	 * <p>
-	 * In the separated border model, adjacent borders are drawn separately and cells
-	 * may be separated by cell spacing. The cell borders are drawn completely inside
-	 * the cell grid rectangle and the table borders completely outside the table grid.
-	 */
-	enum BorderModel
-	{
-		Collapsed,  /**< Adjacent borders are collapsed. */
-		Separated   /**< Adjacent borders are drawn separated. */
-	};
-
-	/**
-	 * This enum type describes drawing options for table and cell borders.
-	 *
-	 * HorizontalFirst and VerticalFirst may not be combined, though they may each be
-	 * combined with Joined.
-	 */
-	enum BorderDrawingOption
-	{
-		HorizontalFirst = 1,  /**< Draw horizontal borders first. */
-		VerticalFirst = 2,    /**< Draw vertical borders first. */
-		Joined = 4            /**< Draw joined at crossings if possible. */
-	};
-	Q_DECLARE_FLAGS(BorderDrawingOptions, BorderDrawingOption)
-
 	/**
 	 * Constructs a new table style with all attributes inherited.
 	 */
@@ -194,8 +162,6 @@ private:
 #include "tablestyle.attrdefs.cxx"
 #undef ATTRDEF
 };
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(TableStyle::BorderDrawingOptions)
 
 inline TableStyle& TableStyle::operator=(const TableStyle& other)
 {

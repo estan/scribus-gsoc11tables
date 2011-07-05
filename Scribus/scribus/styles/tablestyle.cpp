@@ -9,6 +9,7 @@
 
 #include "commonstrings.h"
 #include "util_math.h"
+#include "tableborder.h"
 #include "tablestyle.h"
 
 QString TableStyle::displayName() const
@@ -64,10 +65,7 @@ void TableStyle::getNamedResources(ResourceCollection& lists) const
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())
 		lists.collectCellStyle(style->name());
 	lists.collectColor(fillColor());
-	lists.collectColor(leftBorderColor());
-	lists.collectColor(rightBorderColor());
-	lists.collectColor(topBorderColor());
-	lists.collectColor(bottomBorderColor());
+	// TODO: Collect colors of borders.
 }
 
 void TableStyle::replaceNamedResources(ResourceCollection& newNames)

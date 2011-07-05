@@ -7,9 +7,12 @@
  for which a new license (GPL+exception) is in place.
  */
 
+#include <QString>
+
 #include "commonstrings.h"
 #include "util_math.h"
 #include "cellstyle.h"
+#include "tableborder.h"
 
 QString CellStyle::displayName() const
 {
@@ -64,10 +67,7 @@ void CellStyle::getNamedResources(ResourceCollection& lists) const
 	for (const Style* style = parentStyle(); style != NULL; style = style->parentStyle())
 		lists.collectCellStyle(style->name());
 	lists.collectColor(fillColor());
-	lists.collectColor(leftBorderColor());
-	lists.collectColor(rightBorderColor());
-	lists.collectColor(topBorderColor());
-	lists.collectColor(bottomBorderColor());
+	// TODO: Collect border colors.
 }
 
 void CellStyle::replaceNamedResources(ResourceCollection& newNames)
@@ -78,4 +78,18 @@ void CellStyle::replaceNamedResources(ResourceCollection& newNames)
 		setFillColor(it.value());
 
 	// TODO: Do we need to do something else? E.g. CharStyle calls its updateFeatures().
+}
+
+QString CellStyle::asString() const
+{
+	QString str("cellstyle(");
+	str += QString("displayName=%1,").arg(displayName());
+	str += QString("fillColor=%1%2,").arg(fillColor()).arg(inh_FillColor ? "(inh)" : "");
+	str += QString("leftBorder=%1%2,").arg(leftBorder().asString()).arg(inh_LeftBorder ? "(inh)" : "");
+	str += QString("rightBorder=%1%2,").arg(rightBorder().asString()).arg(inh_RightBorder ? "(inh)" : "");
+	str += QString("topBorder=%1%2,").arg(topBorder().asString()).arg(inh_TopBorder ? "(inh)" : "");
+	str += QString("bottomBorder=%1%2,").arg(bottomBorder().asString()).arg(inh_BottomBorder ? "(inh)" : "");
+	str += QString(hasParent() ? QString("parent=%1").arg(parent()) : "");
+	str += QString(")");
+	return str;
 }

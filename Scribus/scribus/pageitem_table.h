@@ -21,28 +21,7 @@ for which a new license (GPL+exception) is in place.
 
 class ScPainter;
 class ScribusDoc;
-
-/**
- * The TableBorder class represents a border in a table.
- * <p>
- * It is used temporarily during table painting.
- */
-class TableBorder
-{
-public:
-	TableBorder() {}
-	TableBorder(qreal width, const QString& color) : width(width), color(color) {}
-
-	qreal width; // TODO: Eventually use multiLine.
-	QString color;
-	QPointF start;
-	QPointF end;
-};
-
-inline bool operator==(const TableBorder& lhs, const TableBorder& rhs)
-{
-	return lhs.width == rhs.width && rhs.color == rhs.color;
-};
+class TablePainter;
 
 /**
  * The PageItem_Table class represents a table.
@@ -73,7 +52,7 @@ public:
 	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
 
 	/// Destructor.
-	~PageItem_Table() {};
+	~PageItem_Table();
 
 	/// Returns the number of rows in the table.
 	int rows() const { return m_rows; }
@@ -112,6 +91,11 @@ public:
 	void setRowHeight(int row, qreal height);
 
 	/**
+	 * Returns the position of @a row, or 0 if @a row does not exist.
+	 */
+	qreal rowPosition(int row) const;
+
+	/**
 	 * Inserts @a numColumns columns before the column at @a index.
 	 *
 	 * If @a index is columns(), a column is appended to the table.
@@ -133,6 +117,11 @@ public:
 	 * Returns the width of @a column, or 0 if @a column does not exist.
 	 */
 	qreal columnWidth(int column) const;
+
+	/**
+	 * Returns the position of @a column, or 0 if @a column does not exist.
+	 */
+	qreal columnPosition(int column) const;
 
 	/**
 	 * Sets the width of @a column to @a width.
@@ -190,65 +179,29 @@ public:
 	/// Returns the fill color of this table.
 	QString fillColor() const { return m_style.fillColor(); }
 
-	/// Sets the width of the left border of this table to @a width.
-	void setLeftBorderWidth(qreal width) { m_style.setLeftBorderWidth(width); }
+	/// Sets the left border of this table to @a border.
+	void setLeftBorder(const TableBorder& border) { m_style.setLeftBorder(border); }
 
-	/// Returns the width of the left border of this table.
-	qreal leftBorderWidth() const { return m_style.leftBorderWidth(); }
+	/// Returns the left border of this table.
+	TableBorder leftBorder() const { return m_style.leftBorder(); }
 
-	/// Sets the width of the right border of this table to @a width.
-	void setRightBorderWidth(qreal width) { m_style.setRightBorderWidth(width); }
+	/// Sets the right border of this table to @a border.
+	void setRightBorder(const TableBorder& border) { m_style.setRightBorder(border); }
 
-	/// Returns the width of the right border of this table.
-	qreal rightBorderWidth() const { return m_style.rightBorderWidth(); }
+	/// Returns the right border of this table.
+	TableBorder rightBorder() const { return m_style.rightBorder(); }
 
-	/// Sets the width of the top border of this table to @a width.
-	void setTopBorderWidth(qreal width) { m_style.setTopBorderWidth(width); }
+	/// Sets the top border of this table to @a border.
+	void setTopBorder(const TableBorder& border) { m_style.setTopBorder(border); }
 
-	/// Returns the width of the top border of this table.
-	qreal topBorderWidth() const { return m_style.topBorderWidth(); }
+	/// Returns the top border of this table.
+	TableBorder topBorder() const { return m_style.topBorder(); }
 
-	/// Sets the width of the bottom border of this table to @a width.
-	void setBottomBorderWidth(qreal width) { m_style.setBottomBorderWidth(width); }
+	/// Sets the bottom border of this table to @a border.
+	void setBottomBorder(const TableBorder& border) { m_style.setBottomBorder(border); }
 
-	/// Returns the width of the bottom border of this table.
-	qreal bottomBorderWidth() const { return m_style.bottomBorderWidth(); }
-
-	/// Sets the color of the left border of this table to @a color.
-	void setLeftBorderColor(const QString& color) { m_style.setLeftBorderColor(color); }
-
-	/// Returns the color of the left border of this table.
-	QString leftBorderColor() const { return m_style.leftBorderColor(); }
-
-	/// Sets the color of the right border of this table to @a color.
-	void setRightBorderColor(const QString& color) { m_style.setRightBorderColor(color); }
-
-	/// Returns the color of the right border of this table.
-	QString rightBorderColor() const { return m_style.rightBorderColor(); }
-
-	/// Sets the color of the top border of this table to @a color.
-	void setTopBorderColor(const QString& color) { m_style.setTopBorderColor(color); }
-
-	/// Returns the color of the top border of this table.
-	QString topBorderColor() const { return m_style.topBorderColor(); }
-
-	/// Sets the color of the bottom border of this table to @a color.
-	void setBottomBorderColor(const QString& color) { m_style.setBottomBorderColor(color); }
-
-	/// Returns the color of the bottom border of this table.
-	QString bottomBorderColor() const { return m_style.bottomBorderColor(); }
-
-	/// Sets the border model of this table to @a model.
-	void setBorderModel(TableStyle::BorderModel model) { m_style.setBorderModel(model); }
-
-	/// Returns the border model of this table.
-	TableStyle::BorderModel borderModel() const { return m_style.borderModel(); }
-
-	/// Sets the border drawing options of this table to @a options.
-	void setBorderDrawingOptions(TableStyle::BorderDrawingOptions options) { m_style.setBorderDrawingOptions(options); }
-
-	/// Returns the border drawing options of this table.
-	TableStyle::BorderDrawingOptions borderDrawingOptions() const { return m_style.borderDrawingOptions(); }
+	/// Returns the bottom border of this table.
+	TableBorder bottomBorder() const { return m_style.bottomBorder(); }
 
 	/// Sets the table style for this table to @a style.
 	void setStyle(const QString& style) { m_style.setParent(style); }
@@ -303,43 +256,6 @@ private:
 	 */
 	void updateSpans(int index, int number, ChangeType changeType);
 
-	/// Returns the collapsed left border of @a cell.
-	TableBorder collapsedLeftBorder(const TableCell& cell) const;
-	/// Returns the collapsed right border of @a cell.
-	TableBorder collapsedRightBorder(const TableCell& cell) const;
-	/// Returns the collapsed top border of @a cell.
-	TableBorder collapsedTopBorder(const TableCell& cell) const;
-	/// Returns the collapsed bottom border of @a cell.
-	TableBorder collapsedBottomBorder(const TableCell& cell) const;
-
-	/**
-	 * Returns @a firstBorder collapsed with @a secondBorder.
-	 *
-	 * If only one of the borders has a color, the border with a color is returned.
-	 * If none of the borders has a color, a border with no color and width 0.0 is returned.
-	 * If both borders has a color, the wider of the two is returned.
-	 * If both borders has a color and are equally wide, @a firstBorder is returned.
-	 */
-	TableBorder collapseBorders(const TableBorder& firstBorder, const TableBorder& secondBorder) const;
-
-	/// Draws the fill of the table.
-	void drawTableFill(ScPainter* p);
-
-	/// Draws the fill of @a cell.
-	void drawCellFill(const TableCell& cell, ScPainter* p);
-
-	/// Draws the borders in @a borders.
-	void drawBorders(const QList<TableBorder>& borders, ScPainter* p);
-
-	/// Draws the entire table using the collapsed border model.
-	void drawTableCollapsed(ScPainter* p);
-
-	/**
-	 * Adjusts the start and end points of the borders @a left, @a right, @a top and @a bottom
-	 * surrounding @a cell according to the current border drawing order.
-	 */
-	void adjustBorderJoins(TableBorder* left, TableBorder* right, TableBorder* top, TableBorder* bottom, const TableCell& cell);
-
 	/// Prints internal table information. For internal use.
 	void debug() const;
 
@@ -372,6 +288,9 @@ private:
 
 	/// Style of the table.
 	TableStyle m_style;
+
+	/// The table painter to paint the table with.
+	TablePainter* m_tablePainter;
 };
 
 #endif // PAGEITEM_TABLE_H

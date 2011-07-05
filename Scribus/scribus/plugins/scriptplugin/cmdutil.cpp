@@ -10,6 +10,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribuscore.h"
 #include "scribusdoc.h"
 #include "selection.h"
+#include "tableborder.h"
 
 ScribusMainWindow* Carrier;
 ScribusDoc* doc;
@@ -229,4 +230,59 @@ bool setSelectedItemsByName(QStringList& itemNames)
 		ScCore->primaryMainWindow()->view->SelectItemNr(item->ItemNr);
 	}
 	return true;
+}
+
+TableBorder parseBorder(PyObject* borderLines, bool* ok)
+{
+	TableBorder border;
+
+	if (!PyList_Check(borderLines))
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Expected a list of border lines", "python error").toLocal8Bit().constData());
+		*ok = false;
+		return border;
+	}
+
+	// Get the sequence of border lines.
+	PyObject* borderLinesList = PySequence_List(borderLines);
+	if (borderLinesList == NULL)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Expected a list of border lines", "python error").toLocal8Bit().constData());
+		*ok = false;
+		return border;
+	}
+
+	// Parse each tuple decribing a border line and append it to the border.
+	int nBorderLines = PyList_Size(borderLinesList);
+	double lastWidth = 0.0;
+	for (int i = 0; i < nBorderLines; i++) {
+		double width = 0.0;
+		int style;
+		char* color;
+		PyObject* props = PyList_GET_ITEM(borderLinesList, i);
+		if (!PyArg_ParseTuple(props, "dies", &width, &style, "utf-8", &color))
+		{
+			PyErr_SetString(PyExc_ValueError, QObject::tr("Border lines are specified as (width,style,color) tuples", "python error").toLocal8Bit().constData());
+			*ok = false;
+			return border;
+		}
+		if (width <= 0.0)
+		{
+			PyErr_SetString(PyExc_ValueError, QObject::tr("Border line width must be > 0.0", "python error").toLocal8Bit().constData());
+			*ok = false;
+			return border;
+		}
+		if (i > 0 && width > lastWidth)
+		{
+			PyErr_SetString(PyExc_ValueError, QObject::tr("Border lines must be specified in decreasing order by width.", "python error").toLocal8Bit().constData());
+			*ok = false;
+			return border;
+		}
+		lastWidth = width;
+		border.appendLine(TableBorderLine(width, static_cast<Qt::PenStyle>(style), QString::fromUtf8(color)));
+	}
+	Py_DECREF(borderLinesList);
+
+	*ok = true;
+	return border;
 }

@@ -18,7 +18,10 @@
 #ifndef CELLSTYLE_H
 #define CELLSTYLE_H
 
+#include <QString>
+
 #include "style.h"
+#include "tableborder.h"
 #include "commonstrings.h"
 #include "resourcecollection.h"
 #include "styles/stylecontextproxy.h"
@@ -150,7 +153,10 @@ public:
 	}
 #include "cellstyle.attrdefs.cxx"
 #undef ATTRDEF
-	
+
+	/// Returns a string representation of this style.
+	QString asString() const;
+
 private:
 	StyleContextProxy cellStyleProxy;
 
