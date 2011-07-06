@@ -1,4 +1,5 @@
 #include <QLineF>
+#include <QColor>
 
 #include "scpainter.h"
 #include "tablecell.h"
@@ -10,14 +11,12 @@
 
 void CollapsedTablePainter::paintTable(ScPainter* p)
 {
-
 	// Paint table fill.
 	paintTableFill(p);
 
 	/*
-	 * We paint the cells in three passes, first the cell fills, then the vertical
-	 * borders and finally the horizontal borders. This is partly due to a limitation
-	 * in the border joining algorithm. It might be fixed in the future.
+	 * We paint the table in four passes, first the cell fills, then the vertical
+	 * borders, then the horizontal borders and finally the decorative grid lines.
 	 */
 
 	// Pass 1: Paint cell fills.
@@ -67,7 +66,32 @@ void CollapsedTablePainter::paintTable(ScPainter* p)
 		}
 	}
 
-	// TODO: We should actually have a fourth pass where we paint the decorative grid lines.
+	// Pass 4: Paint grid lines.
+	// TODO: This should be configurable.
+	for (int row = 0; row < table()->rows(); ++row)
+	{
+		int colSpan = 0;
+		for (int col = 0; col < table()->columns(); col += colSpan)
+		{
+			TableCell cell = table()->cellAt(row, col);
+			if (row == cell.row())
+			{
+				qreal left = table()->columnPosition(col);
+				qreal right = left + table()->columnWidth(col);
+				qreal top = table()->rowPosition(row);
+				qreal bottom = top + table()->rowHeight(row);
+				// Paint right and bottom grid line.
+				paintGridLine(QPointF(right, top), QPointF(right, bottom), p);
+				paintGridLine(QPointF(left, bottom), QPointF(right, bottom), p);
+				// Paint left and top grid line.
+				if (col == 0)
+					paintGridLine(QPointF(left, top), QPointF(left, bottom), p);
+				if (row == 0)
+					paintGridLine(QPointF(left, top), QPointF(right, top), p);
+			}
+			colSpan = cell.columnSpan();
+		}
+	}
 }
 
 void CollapsedTablePainter::paintTableFill(ScPainter* p) const
@@ -169,15 +193,12 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 			endRow = qMin(lastRow, leftCell.row() + leftCell.rowSpan());
 		}
 
+		if (border.isNull())
+			continue; // Quit early if the border is null.
+
 		// Determine initial coordinates.
 		start.setY(table()->rowPosition(startRow));
 		end.setY(table()->rowPosition(endRow) + table()->rowHeight(endRow));
-
-		// Paint grid line.
-		paintGridLine(start, end, p);
-
-		if (border.isNull())
-			continue; // Quit early if the border is null.
 
 		// Determine neighboring borders and adjust coordinates for joining.
 		TableBorder topLeft, top, topRight, bottomLeft, bottom, bottomRight;
@@ -275,15 +296,12 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 			endRow = qMin(lastRow, rightCell.row() + rightCell.rowSpan());
 		}
 
+		if (border.isNull())
+			continue; // Quit early if the border is null.
+
 		// Determine initial coordinates.
 		start.setY(table()->rowPosition(startRow));
 		end.setY(table()->rowPosition(endRow) + table()->rowHeight(endRow));
-
-		// Paint grid line.
-		paintGridLine(start, end, p);
-
-		if (border.isNull())
-			continue; // Quit early if the border is null.
 
 		// Determine neighboring borders and adjust coordinates for joining.
 		TableBorder topLeft, top, topRight, bottomLeft, bottom, bottomRight;
@@ -374,16 +392,12 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 			endCol = qMin(lastCol, topCell.column() + topCell.columnSpan());
 		}
 
+		if (border.isNull())
+			continue; // Quit early if the border is null.
+
 		// Determine initial coordinates.
 		start.setX(table()->columnPosition(startCol));
 		end.setX(table()->columnPosition(endCol) + table()->columnWidth(endCol));
-
-		// Paint grid line.
-		paintGridLine(start, end, p);
-
-		// Quit early if the border is null.
-		if (border.isNull())
-			continue;
 
 		// Determine neighboring borders and adjust coordinates for joining.
 		TableBorder topLeft, left, bottomLeft, topRight, right, bottomRight;
@@ -473,16 +487,12 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 			endCol = qMin(lastCol, bottomCell.column() + bottomCell.columnSpan());
 		}
 
+		if (border.isNull())
+			continue; // Quit early if the border is null.
+
 		// Determine initial coordinates.
 		start.setX(table()->columnPosition(startCol));
 		end.setX(table()->columnPosition(endCol) + table()->columnWidth(endCol));
-
-		// Paint grid line.
-		paintGridLine(start, end, p);
-
-		// Quit early if the border is null.
-		if (border.isNull())
-			continue;
 
 		// Determine neighboring borders and adjust coordinates for joining.
 		TableBorder topLeft, left, bottomLeft, topRight, right, bottomRight;
@@ -557,7 +567,7 @@ void CollapsedTablePainter::paintBorder(const TableBorder& border, const QPointF
 void CollapsedTablePainter::paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const
 {
 	p->save();
-	p->setPen(Qt::red, 0.5 / qMax(p->zoomFactor(), 1.0), Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
+	p->setPen(QColor(100, 200, 255), 1.0 / qMax(p->zoomFactor(), 1.0), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->setStrokeMode(ScPainter::Solid);
 	p->drawLine(start, end);
 	p->restore();

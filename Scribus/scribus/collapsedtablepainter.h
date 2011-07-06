@@ -47,7 +47,7 @@ private:
 					 const QPointF& startOffsetFactors, const QPointF& endOffsetFactors,
 					 ScPainter *p) const;
 
-	/// Paints a decorative red dotted line from @a start to @a end.
+	/// Paints a decorative thin blue line from @a start to @a end.
 	void paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const;
 };
 
