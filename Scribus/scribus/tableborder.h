@@ -99,9 +99,9 @@ public:
 
 	/**
 	 * Returns <code>true</code> if this border can be joined with @a other.
-	 * Two borders can be joined if their list of border lines are equal.
+	 * Two borders can be joined if they are both not null and their list of border lines are equal.
 	 */
-	bool joinsWith(const TableBorder& other) const { return borderLines() == other.borderLines(); }
+	bool joinsWith(const TableBorder& other) const { return !isNull() && !other.isNull() && borderLines() == other.borderLines(); }
 
 	/// Returns <code>true</code> if this border has no border lines.
 	bool isNull() const { return m_borderLines.size() == 0; }
