@@ -29,7 +29,7 @@ for i in range(43):
     table_name = "tbl" + str(i)
     createTable(x, y, table_width, table_height, 2, 2, table_name)
 
-# Define the three borders to use.
+# Define the four borders to use.
 defineColorRGB("Red", 255, 128, 128)
 defineColorRGB("Green", 128, 255, 136)
 defineColorRGB("Yellow", 255, 253, 128)
