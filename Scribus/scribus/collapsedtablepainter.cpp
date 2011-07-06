@@ -76,10 +76,12 @@ void CollapsedTablePainter::paintTable(ScPainter* p)
 			TableCell cell = table()->cellAt(row, col);
 			if (row == cell.row())
 			{
+				int endCol = col + cell.columnSpan() - 1;
+				int endRow = row + cell.rowSpan() - 1;
 				qreal left = table()->columnPosition(col);
-				qreal right = left + table()->columnWidth(col);
+				qreal right = table()->columnPosition(endCol) + table()->columnWidth(endCol);
 				qreal top = table()->rowPosition(row);
-				qreal bottom = top + table()->rowHeight(row);
+				qreal bottom = table()->rowPosition(endRow) + table()->rowHeight(endRow);
 				// Paint right and bottom grid line.
 				paintGridLine(QPointF(right, top), QPointF(right, bottom), p);
 				paintGridLine(QPointF(left, bottom), QPointF(right, bottom), p);
