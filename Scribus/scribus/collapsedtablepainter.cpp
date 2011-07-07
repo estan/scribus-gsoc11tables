@@ -192,7 +192,7 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 			// Collapse with right border of cell to the left.
 			border = TableUtils::collapseBorders(cell.leftBorder(), leftCell.rightBorder());
 			startRow = qMax(cell.row(), leftCell.row());
-			endRow = qMin(lastRow, leftCell.row() + leftCell.rowSpan());
+			endRow = qMin(lastRow, leftCell.row() + leftCell.rowSpan() - 1);
 		}
 
 		if (border.isNull())
@@ -295,7 +295,7 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 			// Collapse with left border of cell to the right.
 			border = TableUtils::collapseBorders(rightCell.leftBorder(), cell.rightBorder());
 			startRow = qMax(cell.row(), rightCell.row());
-			endRow = qMin(lastRow, rightCell.row() + rightCell.rowSpan());
+			endRow = qMin(lastRow, rightCell.row() + rightCell.rowSpan() - 1);
 		}
 
 		if (border.isNull())
@@ -325,7 +325,6 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 
 		// Paint the border.
 		paintBorder(border, start, end, startOffsetFactors, endOffsetFactors, p);
-
 	}
 }
 
@@ -391,7 +390,7 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 			// Collapse with bottom border of cell above.
 			border = TableUtils::collapseBorders(cell.topBorder(), topCell.bottomBorder());
 			startCol = qMax(cell.column(), topCell.column());
-			endCol = qMin(lastCol, topCell.column() + topCell.columnSpan());
+			endCol = qMin(lastCol, topCell.column() + topCell.columnSpan() - 1);
 		}
 
 		if (border.isNull())
@@ -486,7 +485,7 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 			// Collapse with bottom border of cell above.
 			border = TableUtils::collapseBorders(bottomCell.topBorder(), cell.bottomBorder());
 			startCol = qMax(cell.column(), bottomCell.column());
-			endCol = qMin(lastCol, bottomCell.column() + bottomCell.columnSpan());
+			endCol = qMin(lastCol, bottomCell.column() + bottomCell.columnSpan() - 1);
 		}
 
 		if (border.isNull())
