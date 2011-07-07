@@ -721,7 +721,7 @@ void CollapsedTablePainter::paintBorder(const TableBorder& border, const QPointF
 void CollapsedTablePainter::paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const
 {
 	p->save();
-	p->setPen(QColor(100, 200, 255), 1.0 / qMax(p->zoomFactor(), 1.0), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+	p->setPen(QColor(100, 200, 255), 1.0 / qMax(p->zoomFactor(), 1.0), Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
 	p->setStrokeMode(ScPainter::Solid);
 	p->drawLine(start, end);
 	p->restore();
