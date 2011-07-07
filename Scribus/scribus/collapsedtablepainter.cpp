@@ -676,8 +676,17 @@ void CollapsedTablePainter::paintCellFill(const TableCell& cell, ScPainter* p) c
 	p->setBrush(color);
 	p->setFillMode(ScPainter::Solid);
 	p->setStrokeMode(ScPainter::None);
-	p->drawRect(table()->columnPosition(cell.column()), table()->rowPosition(cell.row()),
-				table()->columnWidth(cell.column()), table()->rowHeight(cell.row()));
+
+	int row = cell.row();
+	int col = cell.column();
+	int lastRow = row + cell.rowSpan() - 1;
+	int lastCol = col + cell.columnSpan() - 1;
+
+	qreal x = table()->columnPosition(col);
+	qreal y = table()->rowPosition(row);
+	qreal width = table()->columnPosition(lastCol) + table()->columnWidth(lastCol) - x;
+	qreal height = table()->rowPosition(lastRow) + table()->rowHeight(lastRow) - y;
+	p->drawRect(x, y, width, height);
 
 	p->restore();
 }
