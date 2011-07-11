@@ -423,6 +423,7 @@ SET(SCRIBUS_MOC_CLASSES
   ui/styleview.h
   ui/swatchcombo.h
   ui/symbolpalette.h
+  ui/tablesideselector.h
   ui/tabmanager.h
   ui/tabpdfoptions.h
   ui/tabruler.h
@@ -614,6 +615,7 @@ SET(SCRIBUS_SOURCES
   selection.cpp
   serializer.cpp
   styleitem.cpp
+  tableborder.cpp
   tablecell.cpp
   tableutils.cpp
   textwriter.cpp
@@ -833,6 +835,7 @@ SET(SCRIBUS_SOURCES
   ui/styleview.cpp
   ui/swatchcombo.cpp
   ui/symbolpalette.cpp
+  ui/tablesideselector.cpp
   ui/tabmanager.cpp
   ui/tabpdfoptions.cpp
   ui/tabruler.cpp

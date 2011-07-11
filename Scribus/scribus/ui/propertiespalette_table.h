@@ -1,10 +1,21 @@
+/*
+Copyright (C) 2011 Elvis Stansvik <elvstone@gmail.com>
+
+For general Scribus (>=1.3.2) copyright and licensing information please refer
+to the COPYING file provided with the program. Following this notice may exist
+a copyright and/or license notice that predates the release of Scribus 1.3.2
+for which a new license (GPL+exception) is in place.
+*/
 #ifndef PROPERTIESPALETTE_TABLE_H
 #define PROPERTIESPALETTE_TABLE_H
 
+#include <QColor>
+#include <QString>
 #include <QWidget>
 
 #include "scribusapi.h"
 #include "scguardedptr.h"
+#include "tableborder.h"
 
 #include "ui_propertiespalette_tablebase.h"
 
@@ -38,17 +49,68 @@ public slots:
 	/// Unset the current item.
 	void unsetItem();
 
-	/// Called when the selection changes.
+	/// Handles item selection changes.
 	void handleSelectionChanged();
-	/// Called when a language change occured.
+	/// Handles update requests from the main window.
+	void handleUpdateRequest(int updateFlags);
+	/// Handles language changes.
 	void languageChange();
-	/// Called when a unit change occurred.
+	/// Handles unit changes.
 	void unitChange();
 
+private slots:
+	/// Handles selection changes in the side selector.
+	void on_sideSelector_selectionChanged();
+	/// Handles selection changes in the list of border lines.
+	void on_borderLineList_currentRowChanged(int row);
+	/// Handles adding of a new border line.
+	void on_addBorderLineButton_clicked();
+	/// Handles removing of a border line.
+	void on_removeBorderLineButton_clicked();
+	/// Handles border line width changes.
+	/// Handles border line width changes.
+	void on_borderLineWidth_valueChanged(double width);
+	/// Handles border line color changes.
+	void on_borderLineColor_activated(const QString& colorName);
+	/// Handles border line style changes.
+	void on_borderLineStyle_activated(int style);
+
+	/// Handles table fill color changes.
+	void on_fillColor_activated(const QString& colorName);
+
 private:
+	/// This enum represents three states. Used for three-state logic.
+	enum State
+	{
+		Unset,
+		Set,
+		TriState
+	};
+
+private:
+	/// Updates the list of border lines from the current border.
+	void updateBorderLineList();
+	/// Updates the current item in the list of border lines.
+	void updateBorderLineListItem();
+	/// Updates the fill controls.
+	void updateFillControls();
+	/// Updates the selected table with the current border.
+	void updateBorders();
+	/// Returns the color with name @a colorName and shade @a shade as a QColor.
+	QColor getColor(const QString& colorName, int shade) const;
+
+private:
+	/// The current main window.
 	ScribusMainWindow* m_mainWindow;
+	/// The current document.
 	ScGuardedPtr<ScribusDoc> m_doc;
-	PageItem *m_item;
+	/// The currently edited item.
+	PageItem* m_item;
+	/// The previous edited selected items.
+	PageItem* m_previousItem;
+
+	/// The currently edited border.
+	TableBorder m_currentBorder;
 };
 
 #endif // PROPERTIESPALETTE_TABLE_H

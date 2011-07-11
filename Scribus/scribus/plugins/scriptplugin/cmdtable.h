@@ -187,8 +187,8 @@ PyDoc_STRVAR(scribus_settableleftborder__doc__,
 QT_TR_NOOP("setTableLeftBorder(borderLines, [\"name\"])\n\
 \n\
 Sets the left border of the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError if \"borderLines\" is of the wrong format.\n\
@@ -201,8 +201,8 @@ PyDoc_STRVAR(scribus_settablerightborder__doc__,
 QT_TR_NOOP("setTableRightBorder(borderLines, [\"name\"])\n\
 \n\
 Sets the right border of the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError if \"borderLines\" is of the wrong format.\n\
@@ -215,8 +215,8 @@ PyDoc_STRVAR(scribus_settabletopborder__doc__,
 QT_TR_NOOP("setTableTopBorder(borderLines, [\"name\"])\n\
 \n\
 Sets the top border of the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError if \"borderLines\" is of the wrong format.\n\
@@ -229,8 +229,8 @@ PyDoc_STRVAR(scribus_settablebottomborder__doc__,
 QT_TR_NOOP("setTableBottomBorder(borderLines, [\"name\"])\n\
 \n\
 Sets the bottom border of the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError if \"borderLines\" is of the wrong format.\n\

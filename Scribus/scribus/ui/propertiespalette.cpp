@@ -241,6 +241,7 @@ void PropertiesPalette::setMainWindow(ScribusMainWindow* mw)
 	this->imagePal->setMainWindow(mw);
 	this->linePal->setMainWindow(mw);
 	this->textPal->setMainWindow(mw);
+	this->tablePal->setMainWindow(mw);
 
 	connect(this, SIGNAL(DocChanged()), m_ScMW, SLOT(slotDocCh()));
 	//connect(this->Cpal, SIGNAL(gradientChanged()), m_ScMW, SLOT(updtGradFill()));
@@ -890,6 +891,7 @@ void PropertiesPalette::updateColorList()
 
 	groupPal->updateColorList();
 	textPal->updateColorList();
+	tablePal->updateColorList();
 
 	Cpal->updateColorList();
 	Tpal->updateColorList();

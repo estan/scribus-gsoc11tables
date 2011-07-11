@@ -9,12 +9,9 @@ for which a new license (GPL+exception) is in place.
 #ifndef TABLEBORDER_H
 #define TABLEBORDER_H
 
-#include <QPointF>
-#include <QString>
-#include <QStringList>
 #include <QList>
-
-#include "commonstrings.h"
+#include <QPen>
+#include <QString>
 
 /**
  * The TableBorderLine class represents a single line in a table border.
@@ -22,21 +19,11 @@ for which a new license (GPL+exception) is in place.
 class TableBorderLine
 {
 public:
-	/// Creates a new solid table border line with 0 width and no color.
-	TableBorderLine()
-	{
-		setWidth(0.0);
-		setStyle(Qt::SolidLine);
-		setColor(CommonStrings::None);
-	}
+	/// Creates a new solid black 0 width table border line.
+	TableBorderLine();
 
 	/// Creates a new table border line with @a width, @a style and @a color.
-	TableBorderLine(qreal width, Qt::PenStyle style, const QString& color)
-	{
-		setWidth(width);
-		setStyle(style);
-		setColor(color);
-	}
+	TableBorderLine(qreal width, Qt::PenStyle style, const QString& color);
 
 	/// Returns the width of this table border line.
 	qreal width() const { return m_width; }
@@ -57,13 +44,19 @@ public:
 	void setColor(const QString& color) { m_color = color; }
 
 	/// Returns a string representation of the border line.
-	QString asString() const { return QString("(%1,%2,%3)").arg(width()).arg(style()).arg(color()); }
+	QString asString() const;
 
 	/// Returns <code>true</code> if this table border line is equal to @a other.
 	bool operator==(const TableBorderLine& other) const
 	{
 		return width() == other.width() && color() == other.color() && style() == other.style();
 	}
+
+	/// Returns <code>true</code> if this table border line is not equal to @a other.
+	bool operator!=(const TableBorderLine& other) const { return !(*this == other); }
+
+	/// Returns <code>true</code> if this table border line is thinner than @a other.
+	bool operator<(const TableBorderLine& other) const { return width() < other.width(); }
 
 private:
 	/// The width of the table border line.
@@ -77,7 +70,7 @@ private:
 /**
  * The TableBorder class represents a border on a table or table cell.
  *
- * It consists of a list of table border lines.
+ * It consists of a list of table border lines kept in descending order by width.
  */
 class TableBorder
 {
@@ -86,16 +79,34 @@ public:
 	TableBorder() {}
 
 	/// Creates a new table border with a single border line with @a width, @a style and @a color.
-	TableBorder(qreal width, Qt::PenStyle style, const QString& color) { appendLine(TableBorderLine(width, style, color)); }
+	TableBorder(qreal width, Qt::PenStyle style, const QString& color);
 
 	/// Returns the width of the first table border line, or 0.0 if this is a null border.
-	qreal width() const { return isNull() ? 0.0 : m_borderLines.first().width(); }
+	qreal width() const;
 
 	/// Returns the list of border lines for this border in the order they should be painted.
 	QList<TableBorderLine> borderLines() const { return m_borderLines; }
 
-	/// Appends @a line to the list of border lines for this border.
-	void appendLine(const TableBorderLine& borderLine) { m_borderLines.append(borderLine); }
+	/**
+	 * Returns the border line at @a index from the list of border lines for this border, or
+	 * a default constructed border line if there is no border line at @a index.
+	 */
+	TableBorderLine borderLine(int index) const;
+
+	/// Adds @a borderLine to the list of border lines for this border.
+	void addBorderLine(const TableBorderLine& borderLine);
+
+	/**
+	 * Removes the border line at @a index from the list of border lines for this border.
+	 * If there is no border line at @a index, this method does nothing.
+	 */
+	void removeBorderLine(int index);
+
+	/**
+	 * Replaces the border line at @a index in the list of border lines for this border.
+	 * If there is no border line at @a index, this method does nothing.
+	 */
+	void replaceBorderLine(int index, const TableBorderLine& borderLine);
 
 	/**
 	 * Returns <code>true</code> if this border can be joined with @a other.
@@ -107,20 +118,23 @@ public:
 	bool isNull() const { return m_borderLines.size() == 0; }
 
 	/// Returns a string representation of the border.
-	QString asString() const {
-		QStringList lines;
-		foreach (TableBorderLine line, m_borderLines)
-			lines << line.asString();
-		return QString("TableBorder(%1)").arg(lines.join(","));
-	}
+	QString asString() const;
+
 private:
 	/// List of border lines in the order they should be painted.
 	QList<TableBorderLine> m_borderLines;
 };
 
+/// Returns <code>true</code> if @a lfs is equal to @a rhs.
 inline bool operator==(const TableBorder& lhs, const TableBorder& rhs)
 {
-	return lhs.borderLines() == rhs.borderLines();
+	return !lhs.isNull() && !rhs.isNull() && (lhs.borderLines() == rhs.borderLines());
+}
+
+/// Returns <code>true</code> if @a lfs is not equal to @a rhs.
+inline bool operator!=(const TableBorder& lhs, const TableBorder& rhs)
+{
+	return !(lhs == rhs);
 }
 
 #endif // TABLEBORDER_H

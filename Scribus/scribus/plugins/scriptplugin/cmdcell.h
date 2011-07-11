@@ -88,8 +88,8 @@ PyDoc_STRVAR(scribus_setcellleftborder__doc__,
 QT_TR_NOOP("setCellLeftBorder(row, column, borderLines, [\"name\"])\n\
 \n\
 Sets the left border of the cell at \"row\", \"column\" in the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist or if \"borderLines\" is of the wrong format.\n\
@@ -102,8 +102,8 @@ PyDoc_STRVAR(scribus_setcellrightborder__doc__,
 QT_TR_NOOP("setCellRightBorder(row, column, borderLines, [\"name\"])\n\
 \n\
 Sets the right border of the cell at \"row\", \"column\" in the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist or if \"borderLines\" is of the wrong format.\n\
@@ -116,8 +116,8 @@ PyDoc_STRVAR(scribus_setcelltopborder__doc__,
 QT_TR_NOOP("setCellTopBorder(row, column, borderLines, [\"name\"])\n\
 \n\
 Sets the top border of the cell at \"row\", \"column\" in the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist or if \"borderLines\" is of the wrong format.\n\
@@ -130,8 +130,8 @@ PyDoc_STRVAR(scribus_setcellbottomborder__doc__,
 QT_TR_NOOP("setCellBottomBorder(row, column, borderLines, [\"name\"])\n\
 \n\
 Sets the bottom border of the cell at \"row\", \"column\" in the table \"name\".\n\
-The border is specified as a list of \"(width, style, color)\" tuples in decreasing\n\
-order by width. \"style\" is one of the LINE_* constants. If \"name\" is not given\n\
+The border is specified as a list of \"(width, style, color)\" tuples.\n\
+\"style\" is one of the LINE_* constants. If \"name\" is not given\n\
 the currently selected item is used.\n\
 \n\
 May throw ValueError the cell does not exist or if \"borderLines\" is of the wrong format.\n\

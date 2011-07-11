@@ -83,6 +83,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribuswin.h"
 #include "selection.h"
 #include "serializer.h"
+#include "tableborder.h"
 #include "ui/hruler.h"
 #include "ui/layers.h"
 #include "ui/storyeditor.h"
@@ -478,6 +479,10 @@ void ScribusDoc::init()
 	TableStyle defaultTableStyle;
 	defaultTableStyle.setName(CommonStrings::DefaultTableStyle);
 	defaultTableStyle.setFillColor(CommonStrings::None);
+	defaultTableStyle.setLeftBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultTableStyle.setRightBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultTableStyle.setTopBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultTableStyle.setBottomBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
 	docTableStyles.create(defaultTableStyle);
 	docTableStyles.makeDefault(&(docTableStyles[0]));
 
@@ -486,6 +491,10 @@ void ScribusDoc::init()
 	CellStyle defaultCellStyle;
 	defaultCellStyle.setName(CommonStrings::DefaultCellStyle);
 	defaultCellStyle.setFillColor(CommonStrings::None);
+	defaultCellStyle.setLeftBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultCellStyle.setRightBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultCellStyle.setTopBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultCellStyle.setBottomBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
 	docCellStyles.create(defaultCellStyle);
 	docCellStyles.makeDefault(&(docCellStyles[0]));
 	

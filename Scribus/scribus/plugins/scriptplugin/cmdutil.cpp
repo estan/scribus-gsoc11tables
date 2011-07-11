@@ -254,7 +254,6 @@ TableBorder parseBorder(PyObject* borderLines, bool* ok)
 
 	// Parse each tuple decribing a border line and append it to the border.
 	int nBorderLines = PyList_Size(borderLinesList);
-	double lastWidth = 0.0;
 	for (int i = 0; i < nBorderLines; i++) {
 		double width = 0.0;
 		int style;
@@ -272,14 +271,7 @@ TableBorder parseBorder(PyObject* borderLines, bool* ok)
 			*ok = false;
 			return border;
 		}
-		if (i > 0 && width > lastWidth)
-		{
-			PyErr_SetString(PyExc_ValueError, QObject::tr("Border lines must be specified in decreasing order by width.", "python error").toLocal8Bit().constData());
-			*ok = false;
-			return border;
-		}
-		lastWidth = width;
-		border.appendLine(TableBorderLine(width, static_cast<Qt::PenStyle>(style), QString::fromUtf8(color)));
+		border.addBorderLine(TableBorderLine(width, static_cast<Qt::PenStyle>(style), QString::fromUtf8(color)));
 	}
 	Py_DECREF(borderLinesList);
 
