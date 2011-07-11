@@ -17,7 +17,7 @@ http://wiki.scribus.net/canvas/File:Table_border_join_cases.png.
 from scribus import *
 
 
-# Fill the page with 43 tables.
+# Fill the page with 43 tables with null borders.
 page_size = getPageSize()                                                               
 table_width = (page_size[0] / 6) - 10                                                   
 table_height = (page_size[1] / 8) - 10
@@ -28,6 +28,26 @@ for i in range(43):
     y = 5 + ((table_height + 10) * row)
     table_name = "tbl" + str(i)
     createTable(x, y, table_width, table_height, 2, 2, table_name)
+    setTableLeftBorder([], table_name)
+    setTableRightBorder([], table_name)
+    setTableTopBorder([], table_name)
+    setTableBottomBorder([], table_name)
+    setCellLeftBorder(0, 0, [], table_name)
+    setCellLeftBorder(0, 1, [], table_name)
+    setCellLeftBorder(1, 0, [], table_name)
+    setCellLeftBorder(1, 1, [], table_name)
+    setCellRightBorder(0, 0, [], table_name)
+    setCellRightBorder(0, 1, [], table_name)
+    setCellRightBorder(1, 0, [], table_name)
+    setCellRightBorder(1, 1, [], table_name)
+    setCellTopBorder(0, 0, [], table_name)
+    setCellTopBorder(0, 1, [], table_name)
+    setCellTopBorder(1, 0, [], table_name)
+    setCellTopBorder(1, 1, [], table_name)
+    setCellBottomBorder(0, 0, [], table_name)
+    setCellBottomBorder(0, 1, [], table_name)
+    setCellBottomBorder(1, 0, [], table_name)
+    setCellBottomBorder(1, 1, [], table_name)
 
 # Define the four borders to use.
 defineColorRGB("Red", 255, 128, 128)
