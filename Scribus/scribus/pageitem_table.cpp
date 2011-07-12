@@ -8,13 +8,14 @@ for which a new license (GPL+exception) is in place.
 */
 #include <QRectF>
 
-#include "pageitem.h"
-#include "pageitem_table.h"
-#include "styles/tablestyle.h"
-#include "collapsedtablepainter.h"
 #include "cellarea.h"
-#include "scribusdoc.h"
+#include "collapsedtablepainter.h"
+#include "pageitem.h"
 #include "scpainter.h"
+#include "scribusdoc.h"
+#include "styles/tablestyle.h"
+
+#include "pageitem_table.h"
 
 #ifdef WANT_DEBUG
 	#define ASSERT_VALID() qt_noop()
@@ -22,8 +23,10 @@ for which a new license (GPL+exception) is in place.
 	#define ASSERT_VALID() assertValid(); qt_noop()
 #endif
 
-PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows, int numColumns)
-	: PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline), m_rows(0), m_columns(0), m_tablePainter(new CollapsedTablePainter(this))
+PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h,
+	double w2, QString fill, QString outline, int numRows, int numColumns) :
+	PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline),
+	m_rows(0), m_columns(0), m_tablePainter(new CollapsedTablePainter(this))
 {
 	Q_ASSERT(m_Doc);
 	m_style.setContext(&m_Doc->tableStyles());
@@ -135,38 +138,6 @@ void PageItem_Table::removeRows(int index, int numRows)
 	ASSERT_VALID();
 }
 
-qreal PageItem_Table::rowHeight(int row) const
-{
-	if (!validRow(row))
-		return 0.0;
-
-	return m_rowHeights.at(row);
-}
-
-qreal PageItem_Table::rowPosition(int row) const
-{
-	if (!validRow(row))
-		return 0.0;
-
-	return m_rowPositions.at(row);
-}
-
-void PageItem_Table::setRowHeight(int row, qreal height)
-{
-	if (!validRow(row) || height <= 0.0)
-		return;
-
-	// Set the height and save the change.
-	qreal deltaHeight = height - m_rowHeights.at(row);
-	m_rowHeights[row] = height;
-
-	// Adjust positions of following rows.
-	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
-		m_rowPositions[nextRow] += deltaHeight;
-
-	emit changed();
-}
-
 void PageItem_Table::insertColumns(int index, int numColumns)
 {
 	ASSERT_VALID();
@@ -255,6 +226,38 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	emit changed();
 
 	ASSERT_VALID();
+}
+
+qreal PageItem_Table::rowHeight(int row) const
+{
+	if (!validRow(row))
+		return 0.0;
+
+	return m_rowHeights.at(row);
+}
+
+void PageItem_Table::setRowHeight(int row, qreal height)
+{
+	if (!validRow(row) || height <= 0.0)
+		return;
+
+	// Set the height and save the change.
+	qreal deltaHeight = height - m_rowHeights.at(row);
+	m_rowHeights[row] = height;
+
+	// Adjust positions of following rows.
+	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
+		m_rowPositions[nextRow] += deltaHeight;
+
+	emit changed();
+}
+
+qreal PageItem_Table::rowPosition(int row) const
+{
+	if (!validRow(row))
+		return 0.0;
+
+	return m_rowPositions.at(row);
 }
 
 qreal PageItem_Table::columnWidth(int column) const
@@ -353,162 +356,6 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 	}
 
 	return cell;
-}
-
-bool PageItem_Table::isCovered(int row, int column) const
-{
-	if (!validCell(row, column))
-		return false;
-
-	TableCell cell = cellAt(row, column);
-
-	return row != cell.row() || column != cell.column();
-}
-
-QRectF PageItem_Table::cellRect(int row, int column) const
-{
-	if (!validCell(row, column))
-		return QRectF();
-
-	TableCell cell = cellAt(row, column);
-
-	// Determine where the cell starts and ends.
-	int startRow = cell.row();
-	int startColumn = cell.column();
-	int endRow = startRow + cell.rowSpan() - 1;
-	int endColumn = startColumn + cell.columnSpan() - 1;
-
-	// Calculate cell geometry.
-	qreal left = m_columnPositions[startColumn];
-	qreal top = m_rowPositions[startRow];
-	qreal width = m_columnPositions[endColumn] + m_columnWidths[endColumn] - left;
-	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - top;
-
-	return QRectF(left, top, width, height);
-}
-
-void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
-{
-	// Loop through areas of merged cells.
-	QMutableListIterator<CellArea> areaIt(m_cellAreas);
-	while (areaIt.hasNext())
-	{
-		CellArea oldArea = areaIt.next();
-
-		// Get a copy of the area adjusted to the change.
-		CellArea newArea;
-		switch (changeType)
-		{
-			case RowsInserted:
-				newArea = oldArea.adjustedForRowInsertion(index, number);
-				break;
-			case RowsRemoved:
-				newArea = oldArea.adjustedForRowRemoval(index, number);
-				break;
-			case ColumnsInserted:
-				newArea = oldArea.adjustedForColumnInsertion(index, number);
-				break;
-			case ColumnsRemoved:
-				newArea = oldArea.adjustedForColumnRemoval(index, number);
-				break;
-			default:
-				break;
-		}
-
-		// Check if the area was affected by the change.
-		if (newArea != oldArea)
-		{
-			if (newArea.height() < 2 && newArea.width() < 2)
-			{
-				// Adjusted area is 1x1 or less, so remove it.
-				areaIt.remove();
-
-				// And reset row/column span of spanning cell to 1.
-				TableCell oldSpanningCell = cellAt(oldArea.row(), oldArea.column());
-				oldSpanningCell.setRowSpan(1);
-				oldSpanningCell.setColumnSpan(1);
-			}
-			else
-			{
-				// Replace the area with the adjusted copy.
-				areaIt.setValue(newArea);
-
-				// And set row/column spanning of spanning cell.
-				TableCell newSpanningCell = cellAt(newArea.row(), newArea.column());
-				newSpanningCell.setRowSpan(newArea.height());
-				newSpanningCell.setColumnSpan(newArea.width());
-			}
-		}
-	}
-}
-
-void PageItem_Table::debug() const
-{
-	qDebug() << "-------------------------------------------------";
-	qDebug() << "Table Debug";
-	qDebug() << "-------------------------------------------------";
-	qDebug() << "m_rows: " <<  m_rows;
-	qDebug() << "m_columns: " <<  m_columns;
-	qDebug() << "m_columnPositions: " <<  m_columnPositions;
-	qDebug() << "m_columnWidths: " <<  m_columnWidths;
-	qDebug() << "m_rowPositions: " <<  m_rowPositions;
-	qDebug() << "m_rowHeights: " <<  m_rowHeights;
-	qDebug() << "m_cellSpans: " <<  m_cellAreas;
-	qDebug() << "m_cellRows contains: ";
-	foreach(QList<TableCell> cellRow, m_cellRows)
-		foreach(TableCell cell, cellRow)
-			qDebug() << cell.asString();
-	qDebug() << "-------------------------------------------------";
-}
-
-void PageItem_Table::assertValid() const
-{
-	// Check list sizes.
-	Q_ASSERT_X(rows() == m_rowPositions.size(), "isValid", "rows() != m_rowPositions.size()");
-	Q_ASSERT_X(rows() == m_rowHeights.size(), "isValid", "rows() != m_rowHeights.size()");
-	Q_ASSERT_X(columns() == m_columnPositions.size(), "isValid", "columns() != m_columnPositions.size()");
-	Q_ASSERT_X(columns() == m_columnWidths.size(), "isValid", "columns() != m_columnWidths.size()");
-	Q_ASSERT_X(rows() == m_cellRows.size(), "isValid", "rows() != m_cellRows.size()");
-	foreach (QList<TableCell> cellRow, m_cellRows)
-		Q_ASSERT_X(columns() == cellRow.size(), "isValid", "columns() != cellRow.size()");
-
-	// Check that cells report correct row, column, row span and column span.
-	for (int row = 0; row < rows(); ++row)
-	{
-		for (int col = 0; col < columns(); ++col)
-		{
-			TableCell cell = m_cellRows[row][col];
-			Q_ASSERT_X(cell.row() == row, "isValid", "cell.row() != row");
-			Q_ASSERT_X(cell.column() == col, "isValid", "cell.column() != col");
-			if (cell.rowSpan() > 1 || cell.columnSpan() > 1)
-			{
-				// Cell has row or column span, so check that there's exactly one matching area.
-				CellArea expectedArea(cell.row(), cell.column(), cell.columnSpan(), cell.rowSpan());
-				Q_ASSERT_X(m_cellAreas.count(expectedArea) == 1, "isValid", "Unexpected number of cell areas");
-			}
-		}
-	}
-
-	// Check that cellAt(int, int) has correct behavior on covered cells.
-	for (int row = 0; row < rows(); ++row)
-	{
-		for (int col = 0; col < columns(); ++col)
-		{
-			TableCell cell = cellAt(row, col);
-			foreach (CellArea area, m_cellAreas)
-			{
-				if (area.contains(row, col))
-				{
-					// Area contains the requested row and column, so cellAt should report spanning cell.
-					Q_ASSERT_X(area.width() > 0 && area.height() > 0 && (area.width() > 1 || area.height() > 1),
-							   "isValid", "Invalid cell area size");
-					Q_ASSERT_X(cell.row() == area.row() && cell.column() == area.column() &&
-							   cell.rowSpan() == area.height() && cell.columnSpan() == area.width(),
-							   "isValid", "cellAt(int, int) reports wrong cell");
-				}
-			}
-		}
-	}
 }
 
 void PageItem_Table::adjustToFrame()
@@ -641,5 +488,130 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->RePos)
 		return;
 
+	// Simply paint the table using the currently set table painter.
 	m_tablePainter->paintTable(p);
+}
+
+void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
+{
+	// Loop through areas of merged cells.
+	QMutableListIterator<CellArea> areaIt(m_cellAreas);
+	while (areaIt.hasNext())
+	{
+		CellArea oldArea = areaIt.next();
+
+		// Get a copy of the area adjusted to the change.
+		CellArea newArea;
+		switch (changeType)
+		{
+			case RowsInserted:
+				newArea = oldArea.adjustedForRowInsertion(index, number);
+				break;
+			case RowsRemoved:
+				newArea = oldArea.adjustedForRowRemoval(index, number);
+				break;
+			case ColumnsInserted:
+				newArea = oldArea.adjustedForColumnInsertion(index, number);
+				break;
+			case ColumnsRemoved:
+				newArea = oldArea.adjustedForColumnRemoval(index, number);
+				break;
+			default:
+				break;
+		}
+
+		// Check if the area was affected by the change.
+		if (newArea != oldArea)
+		{
+			if (newArea.height() < 2 && newArea.width() < 2)
+			{
+				// Adjusted area is 1x1 or less, so remove it.
+				areaIt.remove();
+
+				// And reset row/column span of spanning cell to 1.
+				TableCell oldSpanningCell = cellAt(oldArea.row(), oldArea.column());
+				oldSpanningCell.setRowSpan(1);
+				oldSpanningCell.setColumnSpan(1);
+			}
+			else
+			{
+				// Replace the area with the adjusted copy.
+				areaIt.setValue(newArea);
+
+				// And set row/column spanning of spanning cell.
+				TableCell newSpanningCell = cellAt(newArea.row(), newArea.column());
+				newSpanningCell.setRowSpan(newArea.height());
+				newSpanningCell.setColumnSpan(newArea.width());
+			}
+		}
+	}
+}
+
+void PageItem_Table::debug() const
+{
+	qDebug() << "-------------------------------------------------";
+	qDebug() << "Table Debug";
+	qDebug() << "-------------------------------------------------";
+	qDebug() << "m_rows: " <<  m_rows;
+	qDebug() << "m_columns: " <<  m_columns;
+	qDebug() << "m_columnPositions: " <<  m_columnPositions;
+	qDebug() << "m_columnWidths: " <<  m_columnWidths;
+	qDebug() << "m_rowPositions: " <<  m_rowPositions;
+	qDebug() << "m_rowHeights: " <<  m_rowHeights;
+	qDebug() << "m_cellSpans: " <<  m_cellAreas;
+	qDebug() << "m_cellRows contains: ";
+	foreach(QList<TableCell> cellRow, m_cellRows)
+		foreach(TableCell cell, cellRow)
+			qDebug() << cell.asString();
+	qDebug() << "-------------------------------------------------";
+}
+
+void PageItem_Table::assertValid() const
+{
+	// Check list sizes.
+	Q_ASSERT_X(rows() == m_rowPositions.size(), "isValid", "rows() != m_rowPositions.size()");
+	Q_ASSERT_X(rows() == m_rowHeights.size(), "isValid", "rows() != m_rowHeights.size()");
+	Q_ASSERT_X(columns() == m_columnPositions.size(), "isValid", "columns() != m_columnPositions.size()");
+	Q_ASSERT_X(columns() == m_columnWidths.size(), "isValid", "columns() != m_columnWidths.size()");
+	Q_ASSERT_X(rows() == m_cellRows.size(), "isValid", "rows() != m_cellRows.size()");
+	foreach (QList<TableCell> cellRow, m_cellRows)
+		Q_ASSERT_X(columns() == cellRow.size(), "isValid", "columns() != cellRow.size()");
+
+	// Check that cells report correct row, column, row span and column span.
+	for (int row = 0; row < rows(); ++row)
+	{
+		for (int col = 0; col < columns(); ++col)
+		{
+			TableCell cell = m_cellRows[row][col];
+			Q_ASSERT_X(cell.row() == row, "isValid", "cell.row() != row");
+			Q_ASSERT_X(cell.column() == col, "isValid", "cell.column() != col");
+			if (cell.rowSpan() > 1 || cell.columnSpan() > 1)
+			{
+				// Cell has row or column span, so check that there's exactly one matching area.
+				CellArea expectedArea(cell.row(), cell.column(), cell.columnSpan(), cell.rowSpan());
+				Q_ASSERT_X(m_cellAreas.count(expectedArea) == 1, "isValid", "Unexpected number of cell areas");
+			}
+		}
+	}
+
+	// Check that cellAt(int, int) has correct behavior on covered cells.
+	for (int row = 0; row < rows(); ++row)
+	{
+		for (int col = 0; col < columns(); ++col)
+		{
+			TableCell cell = cellAt(row, col);
+			foreach (CellArea area, m_cellAreas)
+			{
+				if (area.contains(row, col))
+				{
+					// Area contains the requested row and column, so cellAt should report spanning cell.
+					Q_ASSERT_X(area.width() > 0 && area.height() > 0 && (area.width() > 1 || area.height() > 1),
+							   "isValid", "Invalid cell area size");
+					Q_ASSERT_X(cell.row() == area.row() && cell.column() == area.column() &&
+							   cell.rowSpan() == area.height() && cell.columnSpan() == area.width(),
+							   "isValid", "cellAt(int, int) reports wrong cell");
+				}
+			}
+		}
+	}
 }

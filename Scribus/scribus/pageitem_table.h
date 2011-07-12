@@ -9,15 +9,15 @@ for which a new license (GPL+exception) is in place.
 #ifndef PAGEITEM_TABLE_H
 #define PAGEITEM_TABLE_H
 
-#include <QString>
 #include <QList>
 #include <QRectF>
+#include <QString>
 
-#include "scribusapi.h"
+#include "cellarea.h"
 #include "pageitem.h"
+#include "scribusapi.h"
 #include "styles/tablestyle.h"
 #include "tablecell.h"
-#include "cellarea.h"
 
 class ScPainter;
 class ScribusDoc;
@@ -58,7 +58,8 @@ class SCRIBUS_API PageItem_Table : public PageItem
 
 public:
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
-	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
+	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2,
+		QString fill, QString outline, int numRows = 1, int numColumns = 1);
 
 	/// Destructor.
 	~PageItem_Table();
@@ -168,11 +169,6 @@ public:
 	TableCell cellAt(int row, int column) const;
 
 	/**
-	 * Returns <code>true</code> if the cell at @a row, @a column is covered by a span.
-	 */
-	bool isCovered(int row, int column) const;
-
-	/**
 	 * Adjusts the rows and columns of the table to fit the frame. Currently this method gives
 	 * all rows equal height and all columns equal width.
 	 *
@@ -234,11 +230,19 @@ public:
 	/// Returns the style of this table.
 	QString style() const;
 
-	// Reimplemented from PageItem.
+	/// Returns this item as a PageItem_Table.
 	virtual PageItem_Table* asTable() { return this; }
+
+	/// Returns <code>true</code>.
 	virtual bool isTable() const { return true; }
-	PageItem::ItemType realItemType() const { return PageItem::Table; }
-	virtual void applicableActions(QStringList &actionList) {};
+
+	/// Returns PageItem::Table.
+	virtual ItemType realItemType() const { return PageItem::Table; }
+
+	/// Adds the applicable actions for this table to @a actionList.
+	virtual void applicableActions(QStringList& actionList) {};
+
+	/// Returns a textual description of this item.
 	virtual QString infoDescription() { return QString(); }
 
 signals:
@@ -246,7 +250,7 @@ signals:
 	void changed();
 
 protected:
-	// Reimplemented from PageItem.
+	/// Paints this item.
 	virtual void DrawObj_Item(ScPainter *p, QRectF clipRect);
 
 private:
@@ -267,14 +271,6 @@ private:
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
 
 	/**
-	 * Returns the rectangle of the cell in the given @a row and @a column.
-	 *
-	 * If the cell is part of a merged area, the rectangle of the entire area is returned.
-	 * If the cell does not exist, a null rectangle is returned.
-	 */
-	QRectF cellRect(int row, int column) const;
-
-	/**
 	 * Updates row and column spans following a change in rows or columns.
 	 *
 	 * If @a changeType is <code>RowsInserted</code> or <code>ColumnsInserted</code>, @a index
@@ -292,8 +288,6 @@ private:
 	void assertValid() const;
 
 private:
-	friend class TableCell;
-
 	/// List of rows of cells in the table.
 	QList<QList<TableCell> > m_cellRows;
 

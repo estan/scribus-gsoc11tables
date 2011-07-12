@@ -10,10 +10,10 @@ for which a new license (GPL+exception) is in place.
 #ifndef TABLECELL_H
 #define TABLECELL_H
 
-#include <QString>
 #include <QDebug>
 #include <QExplicitlySharedDataPointer>
 #include <QSharedData>
+#include <QString>
 
 #include "commonstrings.h"
 #include "styles/cellstyle.h"
