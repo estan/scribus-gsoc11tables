@@ -86,8 +86,6 @@ void PageItem_Table::insertRows(int index, int numRows)
 	// Increase number of rows.
 	m_rows += numRows;
 
-	emit rowsInserted(index, numRows);
-	emit rowsChanged();
 	emit changed();
 
 	ASSERT_VALID();
@@ -133,8 +131,6 @@ void PageItem_Table::removeRows(int index, int numRows)
 	// Decrease number of rows.
 	m_rows -= numRows;
 
-	emit rowsRemoved(index, numRows);
-	emit rowsChanged();
 	emit changed();
 
 	ASSERT_VALID();
@@ -169,7 +165,6 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
 		m_rowPositions[nextRow] += deltaHeight;
 
-	emit rowHeightChanged(row, height);
 	emit changed();
 }
 
@@ -215,8 +210,6 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	// Increase number of columns.
 	m_columns += numColumns;
 
-	emit columnsInserted(index, numColumns);
-	emit columnsChanged();
 	emit changed();
 
 	ASSERT_VALID();
@@ -260,8 +253,6 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	// Decrease number of columns.
 	m_columns -= numColumns;
 
-	emit columnsRemoved(index, numColumns);
-	emit columnsChanged();
 	emit changed();
 
 	ASSERT_VALID();
@@ -288,7 +279,6 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 	for (int nextColumn = column + 1; nextColumn < columns(); ++nextColumn)
 		m_columnPositions[nextColumn] += deltaWidth;
 
-	emit columnWidthChanged(column, width);
 	emit changed();
 }
 
@@ -333,7 +323,6 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 	newSpanningCell.setColumnSpan(newArea.width());
 	m_cellAreas.append(newArea);
 
-	emit cellsMerged(row, column, numRows, numCols);
 	emit changed();
 
 	ASSERT_VALID();
@@ -342,8 +331,6 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 {
 	// Not implemented.
-
-	emit cellSplit(row, column, numRows, numCols);
 	emit changed();
 }
 
@@ -551,14 +538,12 @@ void PageItem_Table::adjustToFrame()
 void PageItem_Table::setFillColor(const QString& color)
 {
 	m_style.setFillColor(color);
-	emit fillColorChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetFillColor()
 {
 	m_style.resetFillColor();
-	emit fillColorChanged();
 	emit changed();
 }
 
@@ -570,14 +555,12 @@ QString PageItem_Table::fillColor() const
 void PageItem_Table::setLeftBorder(const TableBorder& border)
 {
 	m_style.setLeftBorder(border);
-	emit leftBorderChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetLeftBorder()
 {
 	m_style.resetLeftBorder();
-	emit leftBorderChanged();
 	emit changed();
 }
 
@@ -589,14 +572,12 @@ TableBorder PageItem_Table::leftBorder() const
 void PageItem_Table::setRightBorder(const TableBorder& border)
 {
 	m_style.setRightBorder(border);
-	emit rightBorderChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetRightBorder()
 {
 	m_style.resetRightBorder();
-	emit rightBorderChanged();
 	emit changed();
 }
 
@@ -608,14 +589,12 @@ TableBorder PageItem_Table::rightBorder() const
 void PageItem_Table::setTopBorder(const TableBorder& border)
 {
 	m_style.setTopBorder(border);
-	emit topBorderChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetTopBorder()
 {
 	m_style.resetTopBorder();
-	emit topBorderChanged();
 	emit changed();
 }
 
@@ -627,14 +606,12 @@ TableBorder PageItem_Table::topBorder() const
 void PageItem_Table::setBottomBorder(const TableBorder& border)
 {
 	m_style.setBottomBorder(border);
-	emit bottomBorderChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetBottomBorder()
 {
 	m_style.resetBottomBorder();
-	emit bottomBorderChanged();
 	emit changed();
 }
 
@@ -646,14 +623,12 @@ TableBorder PageItem_Table::bottomBorder() const
 void PageItem_Table::setStyle(const QString& style)
 {
 	m_style.setParent(style);
-	emit styleChanged();
 	emit changed();
 }
 
 void PageItem_Table::unsetStyle()
 {
 	m_style.setParent("");
-	emit styleChanged();
 	emit changed();
 }
 

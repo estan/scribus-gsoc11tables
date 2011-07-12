@@ -47,14 +47,14 @@ class SCRIBUS_API PageItem_Table : public PageItem
 {
 	Q_OBJECT
 
-	Q_PROPERTY(int rows READ rows NOTIFY rowsChanged)
-	Q_PROPERTY(int columns READ columns NOTIFY columnsChanged)
-	Q_PROPERTY(QString fillColor READ fillColor WRITE setFillColor RESET unsetFillColor NOTIFY fillColorChanged)
-	Q_PROPERTY(TableBorder leftBorder READ leftBorder WRITE setLeftBorder RESET unsetLeftBorder NOTIFY leftBorderChanged)
-	Q_PROPERTY(TableBorder rightBorder READ rightBorder WRITE setRightBorder RESET unsetRightBorder NOTIFY rightBorderChanged)
-	Q_PROPERTY(TableBorder topBorder READ topBorder WRITE setTopBorder RESET unsetTopBorder NOTIFY topBorderChanged)
-	Q_PROPERTY(TableBorder bottomBorder READ bottomBorder WRITE setBottomBorder RESET unsetBottomBorder NOTIFY bottomBorderChanged)
-	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY styleChanged)
+	Q_PROPERTY(int rows READ rows NOTIFY changed)
+	Q_PROPERTY(int columns READ columns NOTIFY changed)
+	Q_PROPERTY(QString fillColor READ fillColor WRITE setFillColor RESET unsetFillColor NOTIFY changed)
+	Q_PROPERTY(TableBorder leftBorder READ leftBorder WRITE setLeftBorder RESET unsetLeftBorder NOTIFY changed)
+	Q_PROPERTY(TableBorder rightBorder READ rightBorder WRITE setRightBorder RESET unsetRightBorder NOTIFY changed)
+	Q_PROPERTY(TableBorder topBorder READ topBorder WRITE setTopBorder RESET unsetTopBorder NOTIFY changed)
+	Q_PROPERTY(TableBorder bottomBorder READ bottomBorder WRITE setBottomBorder RESET unsetBottomBorder NOTIFY changed)
+	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY changed)
 
 public:
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
@@ -242,80 +242,6 @@ public:
 	virtual QString infoDescription() { return QString(); }
 
 signals:
-	/// This signal is emitted whenever the number of rows changes.
-	void rowsChanged();
-
-	/// This signal is emitted whenever the number of columns changes.
-	void columnsChanged();
-
-	/**
-	 * This signal is emitted whenever rows are inserted. The parameters specify that
-	 * @a numRows rows were inserted before the row at @a index.
-	 */
-	void rowsInserted(int index, int numRows);
-
-	/**
-	 * This signal is emitted whenever rows are removed. The parameters specify that
-	 * @a numRows rows were removed, starting with the row at @a index.
-	 */
-	void rowsRemoved(int index, int numRows);
-
-	/**
-	 * This signal is emitted whenever a row height changes. The parameters specify that
-	 * the row at @a index had its height changed to @a height.
-	 */
-	void rowHeightChanged(int index, qreal height);
-
-	/**
-	 * This signal is emitted whenever columns are inserted. The parameters specify that
-	 * @a numColumns columns were inserted before the column at @a index.
-	 */
-	void columnsInserted(int index, int numColumns);
-
-	/**
-	 * This signal is emitted whenever columns are removed. The parameters specify that
-	 * @a numColumns columns were removed, starting with the column at @a index.
-	 */
-	void columnsRemoved(int index, int numColumns);
-
-	/**
-	 * This signal is emitted whenever a column width changes. The parameters specify that
-	 * the column at @a index had its width changed to @a width.
-	 */
-	void columnWidthChanged(int index, qreal width);
-
-	/**
-	 * This signal is emitted whenever cells are merged. The parameters specify that the cell
-	 * at @a row, @a column was merged with adjacent cells into a cell that spans @a numRows
-	 * rows and @a numColumns columns.
-	 */
-	void cellsMerged(int row, int column, int numRows, int numColumns);
-
-	/**
-	 * This signal is emitted whenever a cell is split. The parameters specify that the cell
-	 * at @a row, @a column was split into an array of cells with dimensions @a numRows,
-	 * @a numColumns.
-	 */
-	void cellSplit(int row, int column, int numRows, int numColumns);
-
-	/// This signal is emitted whenever the fill color is set/unset.
-	void fillColorChanged();
-
-	/// This signal is emitted whenever the left border is set/unset.
-	void leftBorderChanged();
-
-	/// This signal is emitted whenever the right border is set/unset.
-	void rightBorderChanged();
-
-	/// This signal is emitted whenever the top border is set/unset.
-	void topBorderChanged();
-
-	/// This signal is emitted whenever the bottom border is set/unset.
-	void bottomBorderChanged();
-
-	/// This signal is emitted whenever the table style is set/unset.
-	void styleChanged();
-
 	/// This signal is emitted whenever something in the table changes.
 	void changed();
 
