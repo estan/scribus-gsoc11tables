@@ -40,7 +40,7 @@ QString TableBorderLine::asString() const
 }
 
 /*
- * TableBorderLine definitions.
+ * TableBorder definitions.
  */
 
 TableBorder::TableBorder(qreal width, Qt::PenStyle style, const QString& color)
