@@ -539,7 +539,11 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	if (m_Doc->RePos)
 		return;
 
-	// Simply paint the table using the currently set table painter.
+	// Set the clip path.
+	p->setupPolygon(&PoLine);
+	p->setClipPath();
+
+	// Paint the table.
 	m_tablePainter->paintTable(p);
 }
 
