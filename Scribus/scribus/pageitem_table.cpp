@@ -14,6 +14,7 @@ for which a new license (GPL+exception) is in place.
 #include "scpainter.h"
 #include "scribusdoc.h"
 #include "styles/tablestyle.h"
+#include "tableutils.h"
 
 #include "pageitem_table.h"
 
@@ -481,6 +482,54 @@ void PageItem_Table::unsetStyle()
 QString PageItem_Table::style() const
 {
 	return m_style.parent();
+}
+
+qreal PageItem_Table::maxLeftBorderWidth() const
+{
+	qreal maxWidth = 0.0;
+	TableCell cell;
+	for (int row = 0; row < rows(); row += cell.rowSpan())
+	{
+		cell = cellAt(row, 0);
+		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(cell.leftBorder(), leftBorder()).width());
+	}
+	return maxWidth;
+}
+
+qreal PageItem_Table::maxRightBorderWidth() const
+{
+	qreal maxWidth = 0.0;
+	TableCell cell;
+	for (int row = 0; row < rows(); row += cell.rowSpan())
+	{
+		cell = cellAt(row, columns() - 1);
+		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(leftBorder(), cell.rightBorder()).width());
+	}
+	return maxWidth;
+}
+
+qreal PageItem_Table::maxTopBorderWidth() const
+{
+	qreal maxWidth = 0.0;
+	TableCell cell;
+	for (int col = 0; col < columns(); col += cell.columnSpan())
+	{
+		cell = cellAt(0, col);
+		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(cell.topBorder(), topBorder()).width());
+	}
+	return maxWidth;
+}
+
+qreal PageItem_Table::maxBottomBorderWidth() const
+{
+	qreal maxWidth = 0.0;
+	TableCell cell;
+	for (int col = 0; col < columns(); col += cell.columnSpan())
+	{
+		cell = cellAt(rows() - 1, col);
+		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(bottomBorder(), cell.bottomBorder()).width());
+	}
+	return maxWidth;
 }
 
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)

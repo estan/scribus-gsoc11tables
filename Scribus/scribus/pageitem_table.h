@@ -230,6 +230,18 @@ public:
 	/// Returns the style of this table.
 	QString style() const;
 
+	/// Returns the width of the widest border long the left side of this table.
+	qreal maxLeftBorderWidth() const;
+
+	/// Returns the width of the widest border long the right side of this table.
+	qreal maxRightBorderWidth() const;
+
+	/// Returns the width of the widest border long the top side of this table.
+	qreal maxTopBorderWidth() const;
+
+	/// Returns the width of the widest border long the bottom side of this table.
+	qreal maxBottomBorderWidth() const;
+
 	/// Returns this item as a PageItem_Table.
 	virtual PageItem_Table* asTable() { return this; }
 
