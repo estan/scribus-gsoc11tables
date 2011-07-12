@@ -362,7 +362,8 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 void PageItem_Table::adjustToFrame()
 {
 	// Distribute width equally across columns.
-	qreal columnWidth = width() / columns();
+	qreal availableWidth = width() - (maxLeftBorderWidth() + maxRightBorderWidth()) / 2;
+	qreal columnWidth = availableWidth / columns();
 	qreal columnPosition = 0.0;
 	for (int col = 0; col < columns(); ++col)
 	{
@@ -372,7 +373,8 @@ void PageItem_Table::adjustToFrame()
 	}
 
 	// Distribute height equally across rows.
-	qreal rowHeight = height() / rows();
+	qreal availableHeight = height() - (maxTopBorderWidth() + maxBottomBorderWidth()) / 2;
+	qreal rowHeight = availableHeight / rows();
 	qreal rowPosition = 0.0;
 	for (int row = 0; row < rows(); ++row)
 	{

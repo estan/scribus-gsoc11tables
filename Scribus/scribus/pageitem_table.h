@@ -71,6 +71,22 @@ public:
 	int columns() const { return m_columns; }
 
 	/**
+	 * Returns the width of the table.
+	 *
+	 * The table width includes the width of the table grid plus half the width of the widest borders
+	 * found along its left and right side.
+	 */
+	qreal tableWidth() const { return gridWidth() + (maxLeftBorderWidth() + maxRightBorderWidth()) / 2; }
+
+	/**
+	 * Returns the height of the table.
+	 *
+	 * The table height includes the height of the table grid plus half the width of the widest borders
+	 * found along its top and bottom side.
+	 */
+	qreal tableHeight() const { return gridHeight() + (maxTopBorderWidth() + maxBottomBorderWidth()) / 2; }
+
+	/**
 	 * Inserts @a numRows rows before the row at @a index.
 	 *
 	 * If @a index is rows(), a row is appended to the table.
@@ -281,6 +297,12 @@ private:
 	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
 	/// Returns true if there is a cell at @a row, @a column in this table.
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+
+	/// Returns the width of the table grid.
+	qreal gridWidth() const { return m_columnPositions.last() + m_columnWidths.last(); }
+
+	/// Returns the height of the table grid.
+	qreal gridHeight() const { return m_rowPositions.last() + m_rowHeights.last(); }
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.
