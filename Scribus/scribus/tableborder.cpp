@@ -64,7 +64,7 @@ TableBorderLine TableBorder::borderLine(int index) const
 void TableBorder::addBorderLine(const TableBorderLine& borderLine)
 {
 	m_borderLines.append(borderLine);
-	qStableSort(m_borderLines.end(), m_borderLines.begin());
+	qStableSort(m_borderLines.begin(), m_borderLines.end(), qGreater<TableBorderLine>());
 }
 
 void TableBorder::removeBorderLine(int index)
@@ -81,6 +81,7 @@ void TableBorder::replaceBorderLine(int index, const TableBorderLine& borderLine
 		return;
 
 	m_borderLines.replace(index, borderLine);
+	qStableSort(m_borderLines.begin(), m_borderLines.end(), qGreater<TableBorderLine>());
 }
 
 QString TableBorder::asString() const
