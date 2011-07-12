@@ -32,7 +32,6 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 	insertColumns(0, qMax(1, numColumns));
 	insertRows(0, qMax(1, numRows));
 
-	setStyle("");
 	adjustToFrame();
 }
 
