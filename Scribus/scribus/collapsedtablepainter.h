@@ -25,10 +25,10 @@ class CollapsedTablePainter : public TablePainter
 {
 public:
 	/// Creates a new collapsed table painter configured to paint @a table.
-	CollapsedTablePainter(PageItem_Table* table) : TablePainter(table) {}
+	explicit CollapsedTablePainter(PageItem_Table* table) : TablePainter(table) {}
 
-	/// Paints the table using @a p.
-	void paintTable(ScPainter* p);
+	/// Paints the table using @a p and returns the table offset.
+	virtual void paintTable(ScPainter* p);
 
 private:
 	/// Paints the fill of the table.
