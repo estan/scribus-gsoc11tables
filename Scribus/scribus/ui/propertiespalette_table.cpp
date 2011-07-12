@@ -286,7 +286,6 @@ void PropertiesPalette_Table::on_borderLineList_currentRowChanged(int row)
 	}
 }
 
-
 /// Handles adding of a new border line.
 void PropertiesPalette_Table::on_addBorderLineButton_clicked()
 {
