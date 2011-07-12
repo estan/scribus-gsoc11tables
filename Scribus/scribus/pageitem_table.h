@@ -47,6 +47,15 @@ class SCRIBUS_API PageItem_Table : public PageItem
 {
 	Q_OBJECT
 
+	Q_PROPERTY(int rows READ rows NOTIFY rowsChanged)
+	Q_PROPERTY(int columns READ columns NOTIFY columnsChanged)
+	Q_PROPERTY(QString fillColor READ fillColor WRITE setFillColor RESET unsetFillColor NOTIFY fillColorChanged)
+	Q_PROPERTY(TableBorder leftBorder READ leftBorder WRITE setLeftBorder RESET unsetLeftBorder NOTIFY leftBorderChanged)
+	Q_PROPERTY(TableBorder rightBorder READ rightBorder WRITE setRightBorder RESET unsetRightBorder NOTIFY rightBorderChanged)
+	Q_PROPERTY(TableBorder topBorder READ topBorder WRITE setTopBorder RESET unsetTopBorder NOTIFY topBorderChanged)
+	Q_PROPERTY(TableBorder bottomBorder READ bottomBorder WRITE setBottomBorder RESET unsetBottomBorder NOTIFY bottomBorderChanged)
+	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY styleChanged)
+
 public:
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
 	PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h, double w2, QString fill, QString outline, int numRows = 1, int numColumns = 1);
@@ -119,16 +128,16 @@ public:
 	qreal columnWidth(int column) const;
 
 	/**
-	 * Returns the position of @a column, or 0 if @a column does not exist.
-	 */
-	qreal columnPosition(int column) const;
-
-	/**
 	 * Sets the width of @a column to @a width.
 	 *
 	 * If @a column does not exists or @a width is less than or equal to 0, this method does nothing.
 	 */
 	void setColumnWidth(int column, qreal width);
+
+	/**
+	 * Returns the position of @a column, or 0 if @a column does not exist.
+	 */
+	qreal columnPosition(int column) const;
 
 	/**
 	 * Merges the cell at the specified @a row and @a column with the adjacent cells into
@@ -171,43 +180,59 @@ public:
 	 */
 	void adjustToFrame();
 
-	// Formatting properties setters/getters.
-
 	/// Sets the fill color of this table to @a color.
-	void setFillColor(const QString& color) { m_style.setFillColor(color); }
+	void setFillColor(const QString& color);
+
+	/// Unsets the fill color of this table.
+	void unsetFillColor();
 
 	/// Returns the fill color of this table.
-	QString fillColor() const { return m_style.fillColor(); }
+	QString fillColor() const;
 
 	/// Sets the left border of this table to @a border.
-	void setLeftBorder(const TableBorder& border) { m_style.setLeftBorder(border); }
+	void setLeftBorder(const TableBorder& border);
+
+	/// Unsets the left border of this table.
+	void unsetLeftBorder();
 
 	/// Returns the left border of this table.
-	TableBorder leftBorder() const { return m_style.leftBorder(); }
+	TableBorder leftBorder() const;
 
 	/// Sets the right border of this table to @a border.
-	void setRightBorder(const TableBorder& border) { m_style.setRightBorder(border); }
+	void setRightBorder(const TableBorder& border);
+
+	/// Unsets the right border of this table.
+	void unsetRightBorder();
 
 	/// Returns the right border of this table.
-	TableBorder rightBorder() const { return m_style.rightBorder(); }
+	TableBorder rightBorder() const;
 
 	/// Sets the top border of this table to @a border.
-	void setTopBorder(const TableBorder& border) { m_style.setTopBorder(border); }
+	void setTopBorder(const TableBorder& border);
+
+	/// Unsets the top border of this table.
+	void unsetTopBorder();
 
 	/// Returns the top border of this table.
-	TableBorder topBorder() const { return m_style.topBorder(); }
+	TableBorder topBorder() const;
 
 	/// Sets the bottom border of this table to @a border.
-	void setBottomBorder(const TableBorder& border) { m_style.setBottomBorder(border); }
+	void setBottomBorder(const TableBorder& border);
+
+	/// Unsets the bottom border of this table.
+	void unsetBottomBorder();
 
 	/// Returns the bottom border of this table.
-	TableBorder bottomBorder() const { return m_style.bottomBorder(); }
+	TableBorder bottomBorder() const;
 
-	/// Sets the table style for this table to @a style.
-	void setStyle(const QString& style) { m_style.setParent(style); }
+	/// Sets the table style of this table to @a style.
+	void setStyle(const QString& style);
 
-	/// Returns the named table style for this table.
-	QString style() const { return m_style.parent(); }
+	/// Unsets the style of this table.
+	void unsetStyle();
+
+	/// Returns the style of this table.
+	QString style() const;
 
 	// Reimplemented from PageItem.
 	virtual PageItem_Table* asTable() { return this; }
@@ -215,6 +240,84 @@ public:
 	PageItem::ItemType realItemType() const { return PageItem::Table; }
 	virtual void applicableActions(QStringList &actionList) {};
 	virtual QString infoDescription() { return QString(); }
+
+signals:
+	/// This signal is emitted whenever the number of rows changes.
+	void rowsChanged();
+
+	/// This signal is emitted whenever the number of columns changes.
+	void columnsChanged();
+
+	/**
+	 * This signal is emitted whenever rows are inserted. The parameters specify that
+	 * @a numRows rows were inserted before the row at @a index.
+	 */
+	void rowsInserted(int index, int numRows);
+
+	/**
+	 * This signal is emitted whenever rows are removed. The parameters specify that
+	 * @a numRows rows were removed, starting with the row at @a index.
+	 */
+	void rowsRemoved(int index, int numRows);
+
+	/**
+	 * This signal is emitted whenever a row height changes. The parameters specify that
+	 * the row at @a index had its height changed to @a height.
+	 */
+	void rowHeightChanged(int index, qreal height);
+
+	/**
+	 * This signal is emitted whenever columns are inserted. The parameters specify that
+	 * @a numColumns columns were inserted before the column at @a index.
+	 */
+	void columnsInserted(int index, int numColumns);
+
+	/**
+	 * This signal is emitted whenever columns are removed. The parameters specify that
+	 * @a numColumns columns were removed, starting with the column at @a index.
+	 */
+	void columnsRemoved(int index, int numColumns);
+
+	/**
+	 * This signal is emitted whenever a column width changes. The parameters specify that
+	 * the column at @a index had its width changed to @a width.
+	 */
+	void columnWidthChanged(int index, qreal width);
+
+	/**
+	 * This signal is emitted whenever cells are merged. The parameters specify that the cell
+	 * at @a row, @a column was merged with adjacent cells into a cell that spans @a numRows
+	 * rows and @a numColumns columns.
+	 */
+	void cellsMerged(int row, int column, int numRows, int numColumns);
+
+	/**
+	 * This signal is emitted whenever a cell is split. The parameters specify that the cell
+	 * at @a row, @a column was split into an array of cells with dimensions @a numRows,
+	 * @a numColumns.
+	 */
+	void cellSplit(int row, int column, int numRows, int numColumns);
+
+	/// This signal is emitted whenever the fill color is set/unset.
+	void fillColorChanged();
+
+	/// This signal is emitted whenever the left border is set/unset.
+	void leftBorderChanged();
+
+	/// This signal is emitted whenever the right border is set/unset.
+	void rightBorderChanged();
+
+	/// This signal is emitted whenever the top border is set/unset.
+	void topBorderChanged();
+
+	/// This signal is emitted whenever the bottom border is set/unset.
+	void bottomBorderChanged();
+
+	/// This signal is emitted whenever the table style is set/unset.
+	void styleChanged();
+
+	/// This signal is emitted whenever something in the table changes.
+	void changed();
 
 protected:
 	// Reimplemented from PageItem.
