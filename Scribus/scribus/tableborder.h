@@ -125,13 +125,21 @@ private:
 	QList<TableBorderLine> m_borderLines;
 };
 
-/// Returns <code>true</code> if @a lfs is equal to @a rhs.
+/**
+ * Returns <code>true</code> if the two borders @a lfs and @a rhs are equal.
+ *
+ * Two borders are equal if they are both not null and they have their lists of border lines are equal.
+ */
 inline bool operator==(const TableBorder& lhs, const TableBorder& rhs)
 {
 	return !lhs.isNull() && !rhs.isNull() && (lhs.borderLines() == rhs.borderLines());
 }
 
-/// Returns <code>true</code> if @a lfs is not equal to @a rhs.
+/**
+ * Returns <code>true</code> if the two borders @a lfs and @a rhs are not equal.
+ *
+ * Two borders are equal if either of them are null, or if their lists of border lines are not equal.
+ */
 inline bool operator!=(const TableBorder& lhs, const TableBorder& rhs)
 {
 	return !(lhs == rhs);
