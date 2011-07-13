@@ -29,7 +29,6 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 	setColumn(column);
 	setRowSpan(1);
 	setColumnSpan(1);
-	setStyle("");
 }
 
 QString TableCell::asString() const
