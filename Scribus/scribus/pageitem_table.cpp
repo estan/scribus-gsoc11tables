@@ -628,48 +628,32 @@ void PageItem_Table::debug() const
 void PageItem_Table::assertValid() const
 {
 	// Check list sizes.
-	Q_ASSERT_X(rows() == m_rowPositions.size(), "isValid", "rows() != m_rowPositions.size()");
-	Q_ASSERT_X(rows() == m_rowHeights.size(), "isValid", "rows() != m_rowHeights.size()");
-	Q_ASSERT_X(columns() == m_columnPositions.size(), "isValid", "columns() != m_columnPositions.size()");
-	Q_ASSERT_X(columns() == m_columnWidths.size(), "isValid", "columns() != m_columnWidths.size()");
-	Q_ASSERT_X(rows() == m_cellRows.size(), "isValid", "rows() != m_cellRows.size()");
+	Q_ASSERT(rows() == m_rowPositions.size());
+	Q_ASSERT(rows() == m_rowHeights.size());
+	Q_ASSERT(columns() == m_columnPositions.size());
+	Q_ASSERT(columns() == m_columnWidths.size());
+	Q_ASSERT(rows() == m_cellRows.size());
 	foreach (QList<TableCell> cellRow, m_cellRows)
-		Q_ASSERT_X(columns() == cellRow.size(), "isValid", "columns() != cellRow.size()");
+		Q_ASSERT(columns() == cellRow.size());
 
-	// Check that cells report correct row, column, row span and column span.
 	for (int row = 0; row < rows(); ++row)
 	{
 		for (int col = 0; col < columns(); ++col)
 		{
 			TableCell cell = m_cellRows[row][col];
-			Q_ASSERT_X(cell.row() == row, "isValid", "cell.row() != row");
-			Q_ASSERT_X(cell.column() == col, "isValid", "cell.column() != col");
+
+			// Check that the cell reports correct row and column.
+			Q_ASSERT(cell.row() == row);
+			Q_ASSERT(cell.column() == col);
+
+			// Check that the row and column span is sane.
+			Q_ASSERT(cell.rowSpan() >= 1 && cell.columnSpan() >= 1);
+
 			if (cell.rowSpan() > 1 || cell.columnSpan() > 1)
 			{
-				// Cell has row or column span, so check that there's exactly one matching area.
+				// Check that there's exactly one matching cell area.
 				CellArea expectedArea(cell.row(), cell.column(), cell.columnSpan(), cell.rowSpan());
-				Q_ASSERT_X(m_cellAreas.count(expectedArea) == 1, "isValid", "Unexpected number of cell areas");
-			}
-		}
-	}
-
-	// Check that cellAt(int, int) has correct behavior on covered cells.
-	for (int row = 0; row < rows(); ++row)
-	{
-		for (int col = 0; col < columns(); ++col)
-		{
-			TableCell cell = cellAt(row, col);
-			foreach (CellArea area, m_cellAreas)
-			{
-				if (area.contains(row, col))
-				{
-					// Area contains the requested row and column, so cellAt should report spanning cell.
-					Q_ASSERT_X(area.width() > 0 && area.height() > 0 && (area.width() > 1 || area.height() > 1),
-							   "isValid", "Invalid cell area size");
-					Q_ASSERT_X(cell.row() == area.row() && cell.column() == area.column() &&
-							   cell.rowSpan() == area.height() && cell.columnSpan() == area.width(),
-							   "isValid", "cellAt(int, int) reports wrong cell");
-				}
+				Q_ASSERT(m_cellAreas.count(expectedArea) == 1);
 			}
 		}
 	}
