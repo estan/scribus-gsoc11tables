@@ -617,7 +617,7 @@ void PageItem_Table::debug() const
 	qDebug() << "m_columnWidths: " <<  m_columnWidths;
 	qDebug() << "m_rowPositions: " <<  m_rowPositions;
 	qDebug() << "m_rowHeights: " <<  m_rowHeights;
-	qDebug() << "m_cellSpans: " <<  m_cellAreas;
+	qDebug() << "m_cellAreas: " <<  m_cellAreas;
 	qDebug() << "m_cellRows contains: ";
 	foreach(QList<TableCell> cellRow, m_cellRows)
 		foreach(TableCell cell, cellRow)
