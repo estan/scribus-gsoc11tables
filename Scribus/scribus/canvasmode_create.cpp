@@ -883,9 +883,9 @@ PageItem* CreateMode::doCreateNewObject(void)
 						   tableRect.y(),
 						   tableRect.width(),
 						   tableRect.height(),
-						   0, // TODO: Pass something sensical here later.
-						   CommonStrings::None,
-						   m_doc->itemToolPrefs().textColor,
+						   0,                   // Unused.
+						   CommonStrings::None, // Unused.
+						   CommonStrings::None, // Unused.
 						   true);
 			PageItem_Table *table = m_doc->Items->at(z)->asTable();
 			table->insertRows(0, numRows - 1);

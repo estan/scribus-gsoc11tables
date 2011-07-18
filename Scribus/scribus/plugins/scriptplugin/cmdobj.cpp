@@ -138,8 +138,10 @@ PyObject *scribus_newtable(PyObject* /* self */, PyObject* args)
 								pageUnitYToDocY(y),
 								ValueToPoint(w),
 								ValueToPoint(h),
-								ScCore->primaryMainWindow()->doc->itemToolPrefs().shapeLineWidth, CommonStrings::None,
-								ScCore->primaryMainWindow()->doc->itemToolPrefs().textColor, true);
+								0,                    // Unused.
+								CommonStrings::None,  // Unused.
+								CommonStrings::None,  // Unused.
+								true);
 	PageItem_Table *table = ScCore->primaryMainWindow()->doc->Items->at(i)->asTable();
 	table->insertRows(0, numRows - 1);
 	table->insertColumns(0, numColumns - 1);
