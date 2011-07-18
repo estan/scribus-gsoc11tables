@@ -29,9 +29,11 @@ class TablePainter;
  * A table is a group of cells ordered into rows and columns. Each table contains at least
  * one row and one column.
  * <p>
- * A table's size can be changed by using <code>insertRows()</code>,
+ * A table's dimensions can be changed by using <code>insertRows()</code>,
  * <code>insertColumns()</code>, <code>removeRows()</code>, or <code>removeColumns()</code>.
  * Use <code>cellAt()</code> to retrieve table cells.
+ * <p>
+ * The width and height of the table may be set using the <code>resize()</code> function.
  * <p>
  * Heights and widths of rows and columns can be set by using <code>setRowHeight()</code>
  * and <code>setColumnWidth()</code>.
@@ -46,6 +48,7 @@ class TablePainter;
 class SCRIBUS_API PageItem_Table : public PageItem
 {
 	Q_OBJECT
+	Q_ENUMS(ResizeStrategy)
 
 	Q_PROPERTY(int rows READ rows NOTIFY changed)
 	Q_PROPERTY(int columns READ columns NOTIFY changed)
@@ -55,6 +58,28 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_PROPERTY(TableBorder topBorder READ topBorder WRITE setTopBorder RESET unsetTopBorder NOTIFY changed)
 	Q_PROPERTY(TableBorder bottomBorder READ bottomBorder WRITE setBottomBorder RESET unsetBottomBorder NOTIFY changed)
 	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY changed)
+
+public:
+	/**
+	 * This enum specifies resize strategies for a table.
+	 *
+	 * With the Equal resize strategy, any width or height that is added to or removed
+	 * from the table during resize is distributed equally to the columns and rows. With
+	 * the Proportional resize strategy, the space distributed to a row or column is
+	 * proportional to how high or wide the row or column is compared to the table width
+	 * or height.
+	 */
+	enum ResizeStrategy
+	{
+		Equal,        /**< Distribute width/height equally to columns/rows. */
+		Proportional  /**< Distribute width/height proportionally to columns/rows. */
+	};
+
+	/// The minimum row height.
+	static const qreal MinimumRowHeight;
+
+	/// The minimum column width.
+	static const qreal MinimumColumnWidth;
 
 public:
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
@@ -73,18 +98,45 @@ public:
 	/**
 	 * Returns the width of the table.
 	 *
-	 * The table width includes the width of the table grid plus half the width of the widest borders
-	 * found along its left and right side.
+	 * This is the width of the table grid, not including any borders along the left and right side.
 	 */
-	qreal tableWidth() const { return gridWidth() + (maxLeftBorderWidth() + maxRightBorderWidth()) / 2; }
+	qreal tableWidth() const { return m_columnPositions.last() + m_columnWidths.last(); }
 
 	/**
 	 * Returns the height of the table.
 	 *
-	 * The table height includes the height of the table grid plus half the width of the widest borders
-	 * found along its top and bottom side.
+	 * This is the height of the table grid, not including any borders along the top and left side.
 	 */
-	qreal tableHeight() const { return gridHeight() + (maxTopBorderWidth() + maxBottomBorderWidth()) / 2; }
+	qreal tableHeight() const { return m_rowPositions.last() + m_rowHeights.last(); }
+
+	/**
+	 * Returns the effective width of the table.
+	 *
+	 * The effective table width includes the width of the table grid plus half the width of the widest
+	 * borders found along its left and right side.
+	 */
+	qreal effectiveWidth() const { return tableWidth() + (maxLeftBorderWidth() + maxRightBorderWidth()) / 2; }
+
+	/**
+	 * Returns the effective height of the table.
+	 *
+	 * The effective table height includes the height of the table grid plus half the width of the widest
+	 * borders found along its top and bottom side.
+	 */
+	qreal effectiveHeight() const { return tableHeight() + (maxTopBorderWidth() + maxBottomBorderWidth()) / 2; }
+
+	/**
+	 * Resizes the table grid to @a width, @a height.
+	 *
+	 * The change in width and height will be distributed to each column and row in the table
+	 * according to the resize strategy specified by @a strategy.
+	 *
+	 * When shrinking the table grid, rows and columns will never shrink below below
+	 * <code>MinumumRowHeight</code> and <code>MinimumColumnWidth</code>, respectively. This
+	 * means the table grid will never shrink below <code>columns() * MinimumColumnWidth</code>
+	 * in width and <code>rows() * MinimumRowHeight</code> in height.
+	 */
+	void resize(qreal width, qreal height, ResizeStrategy strategy = Proportional);
 
 	/**
 	 * Inserts @a numRows rows before the row at @a index.
@@ -110,7 +162,7 @@ public:
 	qreal rowHeight(int row) const;
 
 	/**
-	 * Sets the height of @a row to @a height.
+	 * Sets the height of @a row to <code>qMax(MinimumRowHeight, height)</code>.
 	 *
 	 * If @a row does not exists or @a height is less than or equal to 0, this method does nothing.
 	 */
@@ -145,7 +197,7 @@ public:
 	qreal columnWidth(int column) const;
 
 	/**
-	 * Sets the width of @a column to @a width.
+	 * Sets the width of @a column to <code>qMax(MinimumColumnWidth, width)</code>.
 	 *
 	 * If @a column does not exists or @a width is less than or equal to 0, this method does nothing.
 	 */
@@ -246,16 +298,16 @@ public:
 	/// Returns the style of this table.
 	QString style() const;
 
-	/// Returns the width of the widest border long the left side of this table.
+	/// Returns the width of the widest border along the left side of this table.
 	qreal maxLeftBorderWidth() const;
 
-	/// Returns the width of the widest border long the right side of this table.
+	/// Returns the width of the widest border along the right side of this table.
 	qreal maxRightBorderWidth() const;
 
-	/// Returns the width of the widest border long the top side of this table.
+	/// Returns the width of the widest border along the top side of this table.
 	qreal maxTopBorderWidth() const;
 
-	/// Returns the width of the widest border long the bottom side of this table.
+	/// Returns the width of the widest border along the bottom side of this table.
 	qreal maxBottomBorderWidth() const;
 
 	/// Returns this item as a PageItem_Table.
@@ -298,11 +350,11 @@ private:
 	/// Returns true if there is a cell at @a row, @a column in this table.
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
 
-	/// Returns the width of the table grid.
-	qreal gridWidth() const { return m_columnPositions.last() + m_columnWidths.last(); }
+	/// Resizes the table to @a width, @a height, affecting rows and columns equally.
+	void resizeEqual(qreal width, qreal height);
 
-	/// Returns the height of the table grid.
-	qreal gridHeight() const { return m_rowPositions.last() + m_rowHeights.last(); }
+	/// Resizes the table to @a width, @a height, affecting rows and columns proportionally.
+	void resizeProportional(qreal width, qreal height);
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.

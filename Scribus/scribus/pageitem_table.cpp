@@ -26,6 +26,12 @@ for which a new license (GPL+exception) is in place.
 	#define ASSERT_VALID() assertValid(); qt_noop()
 #endif
 
+// The minimum row height.
+const qreal PageItem_Table::MinimumRowHeight = 3.0;
+
+// The minimum column width.
+const qreal PageItem_Table::MinimumColumnWidth = 3.0;
+
 PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, double h,
 	double w2, QString fill, QString outline, int numRows, int numColumns) :
 	PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline),
@@ -245,8 +251,9 @@ void PageItem_Table::setRowHeight(int row, qreal height)
 		return;
 
 	// Set the height and save the change.
-	qreal deltaHeight = height - m_rowHeights.at(row);
-	m_rowHeights[row] = height;
+	qreal newRowHeight = qMax(height, MinimumRowHeight);
+	qreal deltaHeight = newRowHeight - m_rowHeights.at(row);
+	m_rowHeights[row] = newRowHeight;
 
 	// Adjust positions of following rows.
 	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
@@ -277,8 +284,9 @@ void PageItem_Table::setColumnWidth(int column, qreal width)
 		return;
 
 	// Set the width and save the change.
-	qreal deltaWidth = width - m_columnWidths.at(column);
-	m_columnWidths[column] = width;
+	qreal newColumnWidth = qMax(width, MinimumColumnWidth);
+	qreal deltaWidth = newColumnWidth - m_columnWidths.at(column);
+	m_columnWidths[column] = newColumnWidth;
 
 	// Adjust positions of following columns.
 	for (int nextColumn = column + 1; nextColumn < columns(); ++nextColumn)
@@ -361,29 +369,23 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 	return cell;
 }
 
+void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
+{
+	if (width < 0 || height < 0)
+		return;
+
+	if (strategy == Equal)
+		resizeEqual(width, height);
+	else if (strategy == Proportional)
+		resizeProportional(width, height);
+	else
+		qWarning("Unknown table resize strategy");
+}
+
 void PageItem_Table::adjustToFrame()
 {
-	// Distribute width equally across columns.
-	qreal availableWidth = width() - (maxLeftBorderWidth() + maxRightBorderWidth()) / 2;
-	qreal columnWidth = availableWidth / columns();
-	qreal columnPosition = 0.0;
-	for (int col = 0; col < columns(); ++col)
-	{
-		m_columnWidths[col] = columnWidth;
-		m_columnPositions[col] = columnPosition;
-		columnPosition += columnWidth;
-	}
-
-	// Distribute height equally across rows.
-	qreal availableHeight = height() - (maxTopBorderWidth() + maxBottomBorderWidth()) / 2;
-	qreal rowHeight = availableHeight / rows();
-	qreal rowPosition = 0.0;
-	for (int row = 0; row < rows(); ++row)
-	{
-		m_rowHeights[row] = rowHeight;
-		m_rowPositions[row] = rowPosition;
-		rowPosition += rowHeight;
-	}
+	resize(width() - (maxLeftBorderWidth() + maxRightBorderWidth()) / 2,
+		height() - (maxTopBorderWidth() + maxBottomBorderWidth()) / 2, Equal);
 }
 
 void PageItem_Table::setFillColor(const QString& color)
@@ -551,6 +553,44 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	m_tablePainter->paintTable(p);
 
 	p->restore();
+}
+
+void PageItem_Table::resizeEqual(qreal width, qreal height)
+{
+	// Distribute width equally across columns.
+	qreal widthPool = width - tableWidth();
+	qreal currentWidth = 0.0;
+	qreal newWidth = 0.0;
+	qreal newPos = 0.0;
+	for (int col = 0; col < columns(); ++col)
+	{
+		currentWidth = m_columnWidths[col];
+		newWidth = qMax(MinimumColumnWidth, currentWidth + (widthPool / (columns() - col)));
+		m_columnWidths[col] = newWidth;
+		m_columnPositions[col] = newPos;
+		widthPool -= newWidth - currentWidth;
+		newPos += newWidth;
+	}
+
+	// Distribute height equally across rows.
+	qreal heightPool = height - tableHeight();
+	qreal currentHeight = 0.0;
+	qreal newHeight = 0.0;
+	newPos = 0.0;
+	for (int row = 0; row < rows(); ++row)
+	{
+		currentHeight = m_rowHeights[row];
+		newHeight = qMax(MinimumRowHeight, currentHeight + (heightPool / (rows() - row)));
+		m_rowHeights[row] = newHeight;
+		m_rowPositions[row] = newPos;
+		heightPool -= newHeight - currentHeight;
+		newPos += newHeight;
+	}
+}
+
+void PageItem_Table::resizeProportional(qreal width, qreal height)
+{
+	// Not implemented.
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
