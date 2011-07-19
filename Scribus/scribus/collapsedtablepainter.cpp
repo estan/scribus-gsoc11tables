@@ -378,26 +378,30 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 	const int lastRow = cell.row() + cell.rowSpan() - 1;
 	// The cell starts in this column.
 	const int firstCol = cell.column();
-	// The X position of the borders to paint.
+	// The X position of the border segments to paint.
 	const qreal borderX = table()->columnPosition(firstCol);
 
-	// The start point of the border currently being painted.
+	// The start point of the border segment currently being painted.
 	QPointF start(borderX, 0.0);
-	// The end point of the border currently being painted.
+	// The end point of the border segment currently being painted.
 	QPointF end(borderX, 0.0);
-	// The start and end offset factors for the border currently being painted.
+	// The start and end offset factors for the border segment currently being painted.
 	QPointF startOffsetFactors, endOffsetFactors;
-	// Start and end row of border currently being painted.
+	// Start and end row of border segment currently being painted.
 	int startRow, endRow;
 
 	for (int row = cell.row(); row <= lastRow; row += endRow - startRow + 1)
 	{
-		// Get the neighboring cells.
-		TableCell topLeftCell = table()->cellAt(row - 1, firstCol - 1);
-		TableCell topRightCell = table()->cellAt(row - 1, firstCol);
+		// Get the neighboring cell to the left and determine border segment row interval.
 		TableCell leftCell = table()->cellAt(row, firstCol - 1);
-		TableCell bottomRightCell = table()->cellAt(row + 1, firstCol);
-		TableCell bottomLeftCell = table()->cellAt(row + 1, firstCol - 1);
+		startRow = qMax(cell.row(), leftCell.row());
+		endRow = qMin(lastRow, leftCell.isValid() ? leftCell.row() + leftCell.rowSpan() - 1 : lastRow);
+
+		// Get the remaining neighboring cells.
+		TableCell topLeftCell = table()->cellAt(startRow - 1, firstCol - 1);
+		TableCell topRightCell = table()->cellAt(startRow - 1, firstCol);
+		TableCell bottomRightCell = table()->cellAt(lastRow + 1, firstCol);
+		TableCell bottomLeftCell = table()->cellAt(lastRow + 1, firstCol - 1);
 
 		// Resolve borders between neighboring cells.
 		TableBorder topLeft, top, topRight, border, bottomLeft, bottom, bottomRight;
@@ -407,19 +411,6 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 		if (border.isNull())
 			continue; // Quit early if the border to paint is null.
 
-		if (firstCol == 0)
-		{
-			// In first column, so border stretch along entire left side.
-			startRow = cell.row();
-			endRow = lastRow;
-		}
-		else
-		{
-			// Paint the smallest possible shared border segment.
-			startRow = qMax(cell.row(), leftCell.row());
-			endRow = qMin(lastRow, leftCell.row() + leftCell.rowSpan() - 1);
-		}
-
 		// Set initial coordinates.
 		start.setY(table()->rowPosition(startRow));
 		end.setY(table()->rowPosition(endRow) + table()->rowHeight(endRow));
@@ -428,7 +419,7 @@ void CollapsedTablePainter::paintCellLeftBorders(const TableCell& cell, ScPainte
 		joinVertical(border, topLeft, top, topRight, bottomLeft, bottom, bottomRight,
 			 &start, &end, &startOffsetFactors, &endOffsetFactors);
 
-		// Paint the border.
+		// Paint the border segment.
 		paintBorder(border, start, end, startOffsetFactors, endOffsetFactors, p);
 	}
 }
@@ -463,26 +454,30 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 	const int lastRow = cell.row() + cell.rowSpan() - 1;
 	// The cell ends in this column.
 	const int lastCol = cell.column() + cell.columnSpan() - 1;
-	// The X position of the borders to paint.
+	// The X position of the border segments to paint.
 	const qreal borderX = table()->columnPosition(lastCol) + table()->columnWidth(lastCol);
 
-	// The start point of the border currently being painted.
+	// The start point of the border segment currently being painted.
 	QPointF start(borderX, 0.0);
-	// The end point of the border currently being painted.
+	// The end point of the border segment currently being painted.
 	QPointF end(borderX, 0.0);
-	// The start and end offset factors for the border currently being painted.
+	// The start and end offset factors for the border segment currently being painted.
 	QPointF startOffsetFactors, endOffsetFactors;
-	// The start and end row of border currently being painted.
+	// The start and end row of border segment currently being painted.
 	int startRow, endRow;
 
 	for (int row = cell.row(); row <= lastRow; row += endRow - startRow + 1)
 	{
-		// Get the neighboring cells.
-		TableCell topLeftCell = table()->cellAt(row - 1, lastCol);
-		TableCell topRightCell = table()->cellAt(row - 1, lastCol + 1);
+		// Get the neighboring cell to the right and determine border segment row interval.
 		TableCell rightCell = table()->cellAt(row, lastCol + 1);
-		TableCell bottomRightCell = table()->cellAt(row + 1, lastCol + 1);
-		TableCell bottomLeftCell = table()->cellAt(row + 1, lastCol);
+		startRow = qMax(cell.row(), rightCell.row());
+		endRow = qMin(lastRow, rightCell.isValid() ? rightCell.row() + rightCell.rowSpan() - 1 : lastRow);
+
+		// Get the remaining neighboring cells surrounding the segment.
+		TableCell topLeftCell = table()->cellAt(startRow - 1, lastCol);
+		TableCell topRightCell = table()->cellAt(startRow - 1, lastCol + 1);
+		TableCell bottomRightCell = table()->cellAt(endRow + 1, lastCol + 1);
+		TableCell bottomLeftCell = table()->cellAt(endRow + 1, lastCol);
 
 		// Resolve borders between neighboring cells.
 		TableBorder topLeft, top, topRight, border, bottomLeft, bottom, bottomRight;
@@ -491,22 +486,6 @@ void CollapsedTablePainter::paintCellRightBorders(const TableCell& cell, ScPaint
 
 		if (border.isNull())
 			continue; // Quit early if the border to paint is null.
-
-		if (lastCol == table()->columns() - 1)
-		{
-			// In last column, so border stretch along entire right side.
-			startRow = cell.row();
-			endRow = lastRow;
-		}
-		else
-		{
-			// Paint the smallest possible shared border segment.
-			startRow = qMax(cell.row(), rightCell.row());
-			endRow = qMin(lastRow, rightCell.row() + rightCell.rowSpan() - 1);
-		}
-
-		if (border.isNull())
-			continue; // Quit early if the border is null.
 
 		// Set initial coordinates.
 		start.setY(table()->rowPosition(startRow));
@@ -544,26 +523,30 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 	const int firstRow = cell.row();
 	// The cell ends in this column.
 	const int lastCol = cell.column() + cell.columnSpan() - 1;
-	// The Y position of the borders to paint.
+	// The Y position of the border segments to paint.
 	const qreal borderY = table()->rowPosition(firstRow);
 
-	// The start point of the border currently being painted.
+	// The start point of the border segment currently being painted.
 	QPointF start(0.0, borderY);
-	// The end point of the border currently being painted.
+	// The end point of the border segment currently being painted.
 	QPointF end(0.0, borderY);
-	// The start and end offset factors for the border currently being painted.
+	// The start and end offset factors for the border segment currently being painted.
 	QPointF startOffsetFactors, endOffsetFactors;
-	// Start column of border currently being painted.
+	// Start and end column of border segment currently being painted.
 	int startCol, endCol;
 
 	for (int col = cell.column(); col <= lastCol; col += endCol - startCol + 1)
 	{
-		// Get the neighboring cells.
-		TableCell topLeftCell = table()->cellAt(firstRow - 1, col - 1);
+		// Get the neighboring cell above and determine border segment column interval.
 		TableCell topCell = table()->cellAt(firstRow - 1, col);
-		TableCell topRightCell = table()->cellAt(firstRow - 1, col + 1);
-		TableCell bottomRightCell = table()->cellAt(firstRow, col + 1);
-		TableCell bottomLeftCell = table()->cellAt(firstRow, col - 1);
+		startCol = qMax(cell.column(), topCell.column());
+		endCol = qMin(lastCol, topCell.isValid() ? topCell.column() + topCell.columnSpan() - 1 : lastCol);
+
+		// Get the remaining neighboring cells.
+		TableCell topLeftCell = table()->cellAt(firstRow - 1, startCol - 1);
+		TableCell topRightCell = table()->cellAt(firstRow - 1, endCol + 1);
+		TableCell bottomRightCell = table()->cellAt(firstRow, endCol + 1);
+		TableCell bottomLeftCell = table()->cellAt(firstRow, startCol - 1);
 
 		// Resolve borders between neighboring cells.
 		TableBorder topLeft, left, bottomLeft, border, topRight, right, bottomRight;
@@ -573,19 +556,6 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 		if (border.isNull())
 			continue; // Quit early if the border is null.
 
-		if (firstRow == 0)
-		{
-			// In first row, so border stretch along entire top side.
-			startCol = cell.column();
-			endCol = lastCol;
-		}
-		else
-		{
-			// Paint the smallest possible shared border segment.
-			startCol = qMax(cell.column(), topCell.column());
-			endCol = qMin(lastCol, topCell.column() + topCell.columnSpan() - 1);
-		}
-
 		// Set initial coordinates.
 		start.setX(table()->columnPosition(startCol));
 		end.setX(table()->columnPosition(endCol) + table()->columnWidth(endCol));
@@ -594,7 +564,7 @@ void CollapsedTablePainter::paintCellTopBorders(const TableCell& cell, ScPainter
 		joinHorizontal(border, topLeft, left, bottomLeft, topRight, right, bottomRight,
 			 &start, &end, &startOffsetFactors, &endOffsetFactors);
 
-		// Paint the border.
+		// Paint the border segment.
 		paintBorder(border, start, end, startOffsetFactors, endOffsetFactors, p);
 	}
 }
@@ -622,26 +592,30 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 	const int lastRow = cell.row() + cell.rowSpan() - 1;
 	// The cell ends in this column.
 	const int lastCol = cell.column() + cell.columnSpan() - 1;
-	// The Y position of the borders to paint.
+	// The Y position of the border segments to paint.
 	const qreal borderY = table()->rowPosition(lastRow) + table()->rowHeight(lastRow);
 
-	// The start point of the border currently being painted.
+	// The start point of the border segment currently being painted.
 	QPointF start(0.0, borderY);
-	// The end point of the border currently being painted.
+	// The end point of the border segment currently being painted.
 	QPointF end(0.0, borderY);
-	// The start and end offset factors for the border currently being painted.
+	// The start and end offset factors for the border segment currently being painted.
 	QPointF startOffsetFactors, endOffsetFactors;
-	// Start column of border currently being painted.
+	// Start and end column of border segment currently being painted.
 	int startCol, endCol;
 
 	for (int col = cell.column(); col <= lastCol; col += endCol - startCol + 1)
 	{
-		// Get the neighboring cells.
-		TableCell topLeftCell = table()->cellAt(lastRow, col - 1);
+		// Get the neighboring cell below and determine border segment column interval.
 		TableCell bottomCell = table()->cellAt(lastRow + 1, col);
-		TableCell topRightCell = table()->cellAt(lastRow, col + 1);
-		TableCell bottomRightCell = table()->cellAt(lastRow + 1, col + 1);
-		TableCell bottomLeftCell = table()->cellAt(lastRow + 1, col - 1);
+		startCol = qMax(cell.column(), bottomCell.column());
+		endCol = qMin(lastCol, bottomCell.isValid() ? bottomCell.column() + bottomCell.columnSpan() - 1 : lastCol);
+
+		// Get the remaining neighboring cells.
+		TableCell topLeftCell = table()->cellAt(lastRow, startCol - 1);
+		TableCell topRightCell = table()->cellAt(lastRow, endCol + 1);
+		TableCell bottomRightCell = table()->cellAt(lastRow + 1, endCol + 1);
+		TableCell bottomLeftCell = table()->cellAt(lastRow + 1, startCol - 1);
 
 		// Resolve borders between neighboring cells.
 		TableBorder topLeft, left, bottomLeft, border, topRight, right, bottomRight;
@@ -651,19 +625,6 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 		if (border.isNull())
 			continue; // Quit early if the border is null.
 
-		if (lastRow == table()->rows() - 1)
-		{
-			// In last row, so border stretch along entire top side.
-			startCol = cell.column();
-			endCol = lastCol;
-		}
-		else
-		{
-			// Paint the smallest possible shared border segment.
-			startCol = qMax(cell.column(), bottomCell.column());
-			endCol = qMin(lastCol, bottomCell.column() + bottomCell.columnSpan() - 1);
-		}
-
 		// Set initial coordinates.
 		start.setX(table()->columnPosition(startCol));
 		end.setX(table()->columnPosition(endCol) + table()->columnWidth(endCol));
@@ -672,7 +633,7 @@ void CollapsedTablePainter::paintCellBottomBorders(const TableCell& cell, ScPain
 		joinHorizontal(border, topLeft, left, bottomLeft, topRight, right, bottomRight,
 			 &start, &end, &startOffsetFactors, &endOffsetFactors);
 
-		// Paint the border.
+		// Paint the border segment.
 		paintBorder(border, start, end, startOffsetFactors, endOffsetFactors, p);
 	}
 }
