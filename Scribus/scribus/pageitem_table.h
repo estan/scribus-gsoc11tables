@@ -131,10 +131,8 @@ public:
 	 * The change in width and height will be distributed to each column and row in the table
 	 * according to the resize strategy specified by @a strategy.
 	 *
-	 * When shrinking the table grid, rows and columns will never shrink below below
-	 * <code>MinumumRowHeight</code> and <code>MinimumColumnWidth</code>, respectively. This
-	 * means the table grid will never shrink below <code>columns() * MinimumColumnWidth</code>
-	 * in width and <code>rows() * MinimumRowHeight</code> in height.
+	 * If any row or column hits the limit MinimumRowHeight or MinimumColumnWidth, respectively,
+	 * then resizing in that direction will stop for the entire table.
 	 */
 	void resize(qreal width, qreal height, ResizeStrategy strategy = Proportional);
 
@@ -236,13 +234,11 @@ public:
 	 */
 	TableCell cellAt(int row, int column) const;
 
-	/**
-	 * Adjusts the rows and columns of the table to fit the frame. Currently this method gives
-	 * all rows equal height and all columns equal width.
-	 *
-	 * TODO: We need much more sophistication/flexibility here, but that will come.
-	 */
-	void adjustToFrame();
+	/// Resizes the table to fit the frame, using a Proportional resize strategy.
+	void adjustTableToFrame();
+
+	/// Resizes the frame to fit the table.
+	void adjustFrameToTable();
 
 	/// Sets the fill color of this table to @a color.
 	void setFillColor(const QString& color);

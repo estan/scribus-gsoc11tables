@@ -890,7 +890,8 @@ PageItem* CreateMode::doCreateNewObject(void)
 			PageItem_Table *table = m_doc->Items->at(z)->asTable();
 			table->insertRows(0, numRows - 1);
 			table->insertColumns(0, numColumns - 1);
-			table->adjustToFrame();
+			table->adjustTableToFrame();
+			table->adjustFrameToTable();
 		}
 		break;
 	case modeInsertPDF3DAnnotation:

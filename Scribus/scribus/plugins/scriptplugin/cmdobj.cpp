@@ -145,7 +145,8 @@ PyObject *scribus_newtable(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = ScCore->primaryMainWindow()->doc->Items->at(i)->asTable();
 	table->insertRows(0, numRows - 1);
 	table->insertColumns(0, numColumns - 1);
-	table->adjustToFrame();
+	table->adjustTableToFrame();
+	table->adjustFrameToTable();
 	if (Name != EMPTY_STRING)
 	{
 		QString objName = QString::fromUtf8(Name);
