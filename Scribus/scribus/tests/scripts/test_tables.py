@@ -24,6 +24,10 @@ from sys import stdout
 from inspect import getmembers, ismethod
 
 class TableTests:
+    def __init__(self):
+        # The default border width of tables.
+        self.defaultBorderWidth = 1.0
+
     """ Tests for tables """
     def test_construction(self):
         """ Test for createTable(...) """
@@ -32,12 +36,12 @@ class TableTests:
         check(objectExists(table))
         check(getTableColumns(table) == 3)
         check(getTableRows(table) == 3)
-        check(getTableColumnWidth(0, table) == 30)
-        check(getTableColumnWidth(1, table) == 30)
-        check(getTableColumnWidth(2, table) == 30)
-        check(getTableRowHeight(0, table) == 30)
-        check(getTableRowHeight(1, table) == 30)
-        check(getTableRowHeight(2, table) == 30)
+        check(float_equal(getTableColumnWidth(0, table), (90 - self.defaultBorderWidth)/3))
+        check(float_equal(getTableColumnWidth(1, table), (90 - self.defaultBorderWidth)/3))
+        check(float_equal(getTableColumnWidth(2, table), (90 - self.defaultBorderWidth)/3))
+        check(float_equal(getTableRowHeight(0, table), (90 - self.defaultBorderWidth)/3))
+        check(float_equal(getTableRowHeight(1, table), (90 - self.defaultBorderWidth)/3))
+        check(float_equal(getTableRowHeight(2, table), (90 - self.defaultBorderWidth)/3))
         deleteObject(table)
 
         # Test invalid construction.
@@ -340,6 +344,9 @@ class TestFailure(Exception):
         self.msg = msg
     def __str__(self):
         return repr(self.msg)
+
+def float_equal(a, b):
+    return abs(a - b) < 1e-6
 
 def check(condition):
     """ Fails test if condition is false """
