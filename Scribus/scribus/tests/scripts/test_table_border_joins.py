@@ -17,11 +17,11 @@ http://wiki.scribus.net/canvas/File:Table_border_join_cases.png.
 from scribus import *
 
 
-# Fill the page with 43 tables with null borders.
+# Fill the page with 45 tables with null borders.
 page_size = getPageSize()                                                               
 table_width = (page_size[0] / 6) - 10                                                   
 table_height = (page_size[1] / 8) - 10
-for i in range(43):
+for i in range(45):
     col = i % 6
     row = i / 6
     x = 5 + ((table_width + 10) * col)
@@ -49,7 +49,7 @@ for i in range(43):
     setCellBottomBorder(1, 0, [], table_name)
     setCellBottomBorder(1, 1, [], table_name)
 
-# Define the four borders to use.
+# Define the test borders to use.
 defineColorRGB("Red", 255, 128, 128)
 defineColorRGB("Green", 128, 255, 136)
 defineColorRGB("Yellow", 255, 253, 128)
@@ -57,10 +57,12 @@ defineColorRGB("Blue", 128, 146, 255)
 defineColorRGB("Gray", 200, 200, 200)
 red = [(24, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Red")]
 green = [(24, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Green")]
+green_thick = [(32, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Green")]
 yellow = [(24, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Yellow")]
 blue = [(24, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Blue")]
+blue_thick = [(32, LINE_SOLID, "Gray"), (8, LINE_SOLID, "Blue")]
 
-# Set up the borders for each of the 43 test cases.
+# Set up the borders for each of the 45 test cases.
 
 # Case 1
 setCellRightBorder(0, 0, red, "tbl0")
@@ -140,147 +142,158 @@ setCellRightBorder(1, 0, green, "tbl12")
 setCellBottomBorder(0, 1, yellow, "tbl12")
 setCellBottomBorder(0, 0, red, "tbl12")
 
-# Case 14
-setCellRightBorder(0, 0, blue, "tbl13")
+# Case 14A
+setCellRightBorder(0, 0, blue_thick, "tbl13")
 setCellRightBorder(1, 0, green, "tbl13")
 setCellBottomBorder(0, 1, green, "tbl13")
-setCellBottomBorder(0, 0, blue, "tbl13")
+setCellBottomBorder(0, 0, blue_thick, "tbl13")
 
-# Case 15
+# Case 14B
 setCellRightBorder(0, 0, blue, "tbl14")
-setCellRightBorder(1, 0, green, "tbl14")
-setCellBottomBorder(0, 1, blue, "tbl14")
-setCellBottomBorder(0, 0, green, "tbl14")
+setCellRightBorder(1, 0, green_thick, "tbl14")
+setCellBottomBorder(0, 1, green_thick, "tbl14")
+setCellBottomBorder(0, 0, blue, "tbl14")
+
+# Case 15A
+setCellRightBorder(0, 0, blue_thick, "tbl15")
+setCellRightBorder(1, 0, green, "tbl15")
+setCellBottomBorder(0, 1, blue_thick, "tbl15")
+setCellBottomBorder(0, 0, green, "tbl15")
+
+# Case 15B
+setCellRightBorder(0, 0, blue, "tbl16")
+setCellRightBorder(1, 0, green_thick, "tbl16")
+setCellBottomBorder(0, 1, blue, "tbl16")
+setCellBottomBorder(0, 0, green_thick, "tbl16")
 
 # Case 16
-setCellRightBorder(1, 0, green, "tbl15")
-setCellBottomBorder(0, 1, yellow, "tbl15")
-setCellBottomBorder(0, 0, red, "tbl15")
-
-# Case 17
-setCellRightBorder(1, 0, green, "tbl16")
-setCellBottomBorder(0, 1, yellow, "tbl16")
-setCellBottomBorder(0, 0, green, "tbl16")
-
-# Case 18
 setCellRightBorder(1, 0, green, "tbl17")
-setCellBottomBorder(0, 1, green, "tbl17")
+setCellBottomBorder(0, 1, yellow, "tbl17")
 setCellBottomBorder(0, 0, red, "tbl17")
 
-# Case 19
+# Case 17
 setCellRightBorder(1, 0, green, "tbl18")
-setCellBottomBorder(0, 1, green, "tbl18")
+setCellBottomBorder(0, 1, yellow, "tbl18")
 setCellBottomBorder(0, 0, green, "tbl18")
 
-# Case 20
-setCellRightBorder(1, 0, red, "tbl19")
+# Case 18
+setCellRightBorder(1, 0, green, "tbl19")
 setCellBottomBorder(0, 1, green, "tbl19")
-setCellBottomBorder(0, 0, green, "tbl19")
+setCellBottomBorder(0, 0, red, "tbl19")
 
-# Case 21
-setCellRightBorder(0, 0, green, "tbl20")
-setCellBottomBorder(0, 1, yellow, "tbl20")
-setCellBottomBorder(0, 0, red, "tbl20")
+# Case 19
+setCellRightBorder(1, 0, green, "tbl20")
+setCellBottomBorder(0, 1, green, "tbl20")
+setCellBottomBorder(0, 0, green, "tbl20")
 
-# Case 22
-setCellRightBorder(0, 0, green, "tbl21")
-setCellBottomBorder(0, 1, yellow, "tbl21")
+# Case 20
+setCellRightBorder(1, 0, red, "tbl21")
+setCellBottomBorder(0, 1, green, "tbl21")
 setCellBottomBorder(0, 0, green, "tbl21")
 
-# Case 23
+# Case 21
 setCellRightBorder(0, 0, green, "tbl22")
-setCellBottomBorder(0, 1, green, "tbl22")
+setCellBottomBorder(0, 1, yellow, "tbl22")
 setCellBottomBorder(0, 0, red, "tbl22")
 
-# Case 24
+# Case 22
 setCellRightBorder(0, 0, green, "tbl23")
-setCellBottomBorder(0, 1, green, "tbl23")
+setCellBottomBorder(0, 1, yellow, "tbl23")
 setCellBottomBorder(0, 0, green, "tbl23")
 
-# Case 25
-setCellRightBorder(0, 0, red, "tbl24")
+# Case 23
+setCellRightBorder(0, 0, green, "tbl24")
 setCellBottomBorder(0, 1, green, "tbl24")
-setCellBottomBorder(0, 0, green, "tbl24")
+setCellBottomBorder(0, 0, red, "tbl24")
 
-# Case 26
-setCellRightBorder(0, 0, yellow, "tbl25")
-setCellRightBorder(1, 0, red, "tbl25")
+# Case 24
+setCellRightBorder(0, 0, green, "tbl25")
+setCellBottomBorder(0, 1, green, "tbl25")
 setCellBottomBorder(0, 0, green, "tbl25")
 
-# Case 27
-setCellRightBorder(0, 0, yellow, "tbl26")
-setCellRightBorder(1, 0, green, "tbl26")
+# Case 25
+setCellRightBorder(0, 0, red, "tbl26")
+setCellBottomBorder(0, 1, green, "tbl26")
 setCellBottomBorder(0, 0, green, "tbl26")
 
-# Case 28
-setCellRightBorder(0, 0, green, "tbl27")
+# Case 26
+setCellRightBorder(0, 0, yellow, "tbl27")
 setCellRightBorder(1, 0, red, "tbl27")
 setCellBottomBorder(0, 0, green, "tbl27")
 
-# Case 29
-setCellRightBorder(0, 0, green, "tbl28")
+# Case 27
+setCellRightBorder(0, 0, yellow, "tbl28")
 setCellRightBorder(1, 0, green, "tbl28")
 setCellBottomBorder(0, 0, green, "tbl28")
 
-# Case 30
+# Case 28
 setCellRightBorder(0, 0, green, "tbl29")
-setCellRightBorder(1, 0, green, "tbl29")
-setCellBottomBorder(0, 0, red, "tbl29")
+setCellRightBorder(1, 0, red, "tbl29")
+setCellBottomBorder(0, 0, green, "tbl29")
+
+# Case 29
+setCellRightBorder(0, 0, green, "tbl30")
+setCellRightBorder(1, 0, green, "tbl30")
+setCellBottomBorder(0, 0, green, "tbl30")
+
+# Case 30
+setCellRightBorder(0, 0, green, "tbl31")
+setCellRightBorder(1, 0, green, "tbl31")
+setCellBottomBorder(0, 0, red, "tbl31")
 
 # Case 31
-setCellRightBorder(0, 0, yellow, "tbl30")
-setCellRightBorder(1, 0, red, "tbl30")
-setCellBottomBorder(0, 1, green, "tbl30")
-
-# Case 32
-setCellRightBorder(0, 0, yellow, "tbl31")
-setCellRightBorder(1, 0, green, "tbl31")
-setCellBottomBorder(0, 1, green, "tbl31")
-
-# Case 33
-setCellRightBorder(0, 0, green, "tbl32")
+setCellRightBorder(0, 0, yellow, "tbl32")
 setCellRightBorder(1, 0, red, "tbl32")
 setCellBottomBorder(0, 1, green, "tbl32")
 
-# Case 34
-setCellRightBorder(0, 0, green, "tbl33")
+# Case 32
+setCellRightBorder(0, 0, yellow, "tbl33")
 setCellRightBorder(1, 0, green, "tbl33")
 setCellBottomBorder(0, 1, green, "tbl33")
 
-# Case 35
+# Case 33
 setCellRightBorder(0, 0, green, "tbl34")
-setCellRightBorder(1, 0, green, "tbl34")
-setCellBottomBorder(0, 1, red, "tbl34")
+setCellRightBorder(1, 0, red, "tbl34")
+setCellBottomBorder(0, 1, green, "tbl34")
 
-# Case 36
+# Case 34
+setCellRightBorder(0, 0, green, "tbl35")
 setCellRightBorder(1, 0, green, "tbl35")
 setCellBottomBorder(0, 1, green, "tbl35")
 
-# Case 37
+# Case 35
+setCellRightBorder(0, 0, green, "tbl36")
 setCellRightBorder(1, 0, green, "tbl36")
 setCellBottomBorder(0, 1, red, "tbl36")
 
-# Case 38
+# Case 36
 setCellRightBorder(1, 0, green, "tbl37")
-setCellBottomBorder(0, 0, green, "tbl37")
+setCellBottomBorder(0, 1, green, "tbl37")
+
+# Case 37
+setCellRightBorder(1, 0, green, "tbl38")
+setCellBottomBorder(0, 1, red, "tbl38")
+
+# Case 38
+setCellRightBorder(1, 0, green, "tbl39")
+setCellBottomBorder(0, 0, green, "tbl39")
 
 # Case 39
-setCellRightBorder(1, 0, green, "tbl38")
-setCellBottomBorder(0, 0, red, "tbl38")
+setCellRightBorder(1, 0, green, "tbl40")
+setCellBottomBorder(0, 0, red, "tbl40")
 
 # Case 40
-setCellRightBorder(0, 0, green, "tbl39")
-setCellBottomBorder(0, 1, green, "tbl39")
+setCellRightBorder(0, 0, green, "tbl41")
+setCellBottomBorder(0, 1, green, "tbl41")
 
 # Case 41
-setCellRightBorder(0, 0, green, "tbl40")
-setCellBottomBorder(0, 1, red, "tbl40")
+setCellRightBorder(0, 0, green, "tbl42")
+setCellBottomBorder(0, 1, red, "tbl42")
 
 # Case 42
-setCellRightBorder(0, 0, green, "tbl41")
-setCellBottomBorder(0, 0, green, "tbl41")
+setCellRightBorder(0, 0, green, "tbl43")
+setCellBottomBorder(0, 0, green, "tbl43")
 
 # Case 43
-setCellRightBorder(0, 0, green, "tbl42")
-setCellBottomBorder(0, 0, red, "tbl42")
-
+setCellRightBorder(0, 0, green, "tbl44")
+setCellBottomBorder(0, 0, red, "tbl44")

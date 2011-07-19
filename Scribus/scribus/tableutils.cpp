@@ -81,7 +81,7 @@ void joinVertical(const TableBorder& border, const TableBorder& topLeft, const T
 	endOffsetFactors->setY(0.0);
 
 	/*
-	 * The numbered cases in the code below refers to the 43 possible join cases illustrated
+	 * The numbered cases in the code below refers to the 45 possible join cases illustrated
 	 * in the picture at http://wiki.scribus.net/canvas/File:Table_border_join_cases.png
 	 */
 
@@ -102,8 +102,16 @@ void joinVertical(const TableBorder& border, const TableBorder& topLeft, const T
 		{
 			if (top.joinsWith(topRight))
 			{
-				// Cases: 15.
-				start->setY(start->y() + 0.5 * topRight.width());
+				if (border.width() < top.width())
+				{
+					// Cases: 15A.
+					start->setY(start->y() + 0.5 * top.width());
+				}
+				else
+				{
+					// Cases: 15B.
+					startOffsetFactors->setY(-0.5);
+				}
 			}
 			else
 			{
@@ -118,8 +126,16 @@ void joinVertical(const TableBorder& border, const TableBorder& topLeft, const T
 		{
 			if (top.joinsWith(topLeft))
 			{
-				// Cases: 14.
-				start->setY(start->y() + 0.5 * topLeft.width());
+				if (border.width() < top.width())
+				{
+					// Cases: 14A.
+					start->setY(start->y() + 0.5 * top.width());
+				}
+				else
+				{
+					// Cases: 14B.
+					startOffsetFactors->setY(-0.5);
+				}
 			}
 			else
 			{
@@ -158,16 +174,48 @@ void joinVertical(const TableBorder& border, const TableBorder& topLeft, const T
 		}
 		else if (!border.joinsWith(bottom))
 		{
-			// Cases: 2, 14, 22, 28, 42.
-			endOffsetFactors->setY(0.5);
+			if (bottom.joinsWith(bottomRight))
+			{
+				if (bottom.width() < border.width())
+				{
+					// Cases: 14A.
+					endOffsetFactors->setY(0.5);
+				}
+				else
+				{
+					// Cases: 14B.
+					end->setY(end->y() - 0.5 * bottom.width());
+				}
+			}
+			else
+			{
+				// Cases: 2, 22, 28, 42.
+				endOffsetFactors->setY(0.5);
+			}
 		}
 	}
 	else if (border.joinsWith(bottomRight))
 	{
 		if (!border.joinsWith(bottom))
 		{
-			// Cases: 3, 15, 23, 33, 40.
-			endOffsetFactors->setY(0.5);
+			if (bottom.joinsWith(bottomLeft))
+			{
+				if (bottom.width() < border.width())
+				{
+					// Cases: 15A.
+					endOffsetFactors->setY(0.5);
+				}
+				else
+				{
+					// Cases: 15B.
+					end->setY(end->y() - 0.5 * bottom.width());
+				}
+			}
+			else
+			{
+				// Cases: 3, 23, 33, 40.
+				endOffsetFactors->setY(0.5);
+			}
 		}
 	}
 	else if (border.joinsWith(bottom))
@@ -203,7 +251,7 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 	endOffsetFactors->setY(0.0);
 
 	/*
-	 * The numbered cases in the code below refers to the 43 possible join cases illustrated
+	 * The numbered cases in the code below refers to the 45 possible join cases illustrated
 	 * in the picture at http://wiki.scribus.net/canvas/File:Table_border_join_cases.png
 	 */
 
@@ -234,8 +282,16 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 			}
 			else if (left.joinsWith(topLeft))
 			{
-				// Cases: 14.
-				start->setX(start->x() + 0.5 * topLeft.width());
+				if (border.width() < left.width())
+				{
+					// Cases: 14A.
+					start->setX(start->x() + 0.5 * left.width());
+				}
+				else
+				{
+					// Cases: 14B.
+					startOffsetFactors->setX(0.5);
+				}
 			}
 			else
 			{
@@ -253,8 +309,24 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 		}
 		else
 		{
-			// Cases: 3, 15, 23, 33, 40.
-			startOffsetFactors->setX(0.5);
+			if (left.joinsWith(bottomLeft))
+			{
+				if (left.width() < border.width())
+				{
+					// Cases: 15A.
+					startOffsetFactors->setX(0.5);
+				}
+				else
+				{
+					// Cases: 15B.
+					start->setX(start->x() + 0.5 * left.width());
+				}
+			}
+			else
+			{
+				// Cases: 3, 23, 33, 40.
+				startOffsetFactors->setX(0.5);
+			}
 		}
 	}
 	else if (!border.joinsWith(left) &&
@@ -297,8 +369,16 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 		{
 			if (right.joinsWith(topRight))
 			{
-				// Cases: 15.
-				end->setX(end->x() - 0.5 * topRight.width());
+				if (border.width() < right.width())
+				{
+					// Cases: 15A.
+					end->setX(end->x() - 0.5 * right.width());
+				}
+				else
+				{
+					// Cases: 15B.
+					endOffsetFactors->setX(-0.5);
+				}
 			}
 			else
 			{
@@ -316,8 +396,24 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 		}
 		else
 		{
-			// Cases: 2, 14, 22, 28, 42.
-			endOffsetFactors->setX(-0.5);
+			if (right.joinsWith(bottomRight))
+			{
+				if (right.width() < border.width())
+				{
+					// Cases: 14A.
+					endOffsetFactors->setX(-0.5);
+				}
+				else
+				{
+					// Cases: 14B.
+					end->setX(end->x() - 0.5 * right.width());
+				}
+			}
+			else
+			{
+				// Cases: 2, 22, 28, 42.
+				endOffsetFactors->setX(-0.5);
+			}
 		}
 	}
 	else if (!border.joinsWith(right) &&
