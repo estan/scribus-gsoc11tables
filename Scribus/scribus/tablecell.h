@@ -137,7 +137,14 @@ private:
 	 * The new cell will span <code>1</code> row and <code>1</code> column.
 	 */
 	TableCell(int row, int column, PageItem_Table *table);
-	/// Constructs a new invalid table cell.
+	/**
+	 * Constructs a new invalid table cell.
+	 *
+	 * These are the kinds of cells returned when requesting a cell from an invalid location
+	 * outside the table. The new cell will report a row, column, row span and column span of
+	 * <code>-1</code>. This behavior is relied upon in places such as the painting code, so
+	 * don't change it.
+	 */
 	TableCell() : d(new TableCellData) { setValid(false); }
 
 	/// Set the row of the table that contains this cell to @a row.
