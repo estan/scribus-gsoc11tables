@@ -433,6 +433,10 @@ void ActionManager::initItemMenuActions()
 	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
 	name = "itemAdjustImageToFrame";
 	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
+	name="itemAdjustFrameToTable";
+	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
+	name = "itemAdjustTableToFrame";
+	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
 	name="itemExtendedImageProperties";
 	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
 	name="itemToggleInlineImage";
@@ -1062,6 +1066,8 @@ void ActionManager::disconnectNewDocActions()
 {
 	disconnect( (*scrActions)["itemAdjustFrameToImage"], 0, 0, 0 );
 	disconnect( (*scrActions)["itemAdjustImageToFrame"], 0, 0, 0 );
+	disconnect( (*scrActions)["itemAdjustFrameToTable"], 0, 0, 0 );
+	disconnect( (*scrActions)["itemAdjustTableToFrame"], 0, 0, 0 );
 	disconnect( (*scrActions)["itemLock"], 0, 0, 0);
 	disconnect( (*scrActions)["itemLockSize"], 0, 0, 0);
 	disconnect( (*scrActions)["itemPrintingEnabled"], 0, 0, 0);
@@ -1093,6 +1099,8 @@ void ActionManager::connectNewDocActions(ScribusDoc *currDoc)
 	connect( (*scrActions)["itemDelete"], SIGNAL(triggered()), currDoc, SLOT(itemSelection_DeleteItem()) );
 	connect( (*scrActions)["itemAdjustFrameToImage"], SIGNAL(triggered()), currDoc, SLOT(itemSelection_AdjustFrametoImageSize()) );
 	connect( (*scrActions)["itemAdjustImageToFrame"], SIGNAL(triggered()), currDoc, SLOT(itemSelection_AdjustImagetoFrameSize()) );
+	connect( (*scrActions)["itemAdjustFrameToTable"], SIGNAL(triggered()), currDoc, SLOT(itemSelection_AdjustFrametoTableSize()) );
+	connect( (*scrActions)["itemAdjustTableToFrame"], SIGNAL(triggered()), currDoc, SLOT(itemSelection_AdjustTabletoFrameSize()) );
 }
 
 void ActionManager::disconnectNewViewActions()
@@ -1384,6 +1392,8 @@ void ActionManager::languageChange()
 	(*scrActions)["itemUpdateImage"]->setTexts( tr("&Update Image"));
 	(*scrActions)["itemAdjustFrameToImage"]->setTexts( tr("Adjust Frame to Image"));
 	(*scrActions)["itemAdjustImageToFrame"]->setTexts( tr("Adjust Image to Frame"));
+	(*scrActions)["itemAdjustFrameToTable"]->setTexts( tr("Adjust Frame to Table"));
+	(*scrActions)["itemAdjustTableToFrame"]->setTexts( tr("Adjust Table to Frame"));
 	(*scrActions)["itemToggleInlineImage"]->setTexts( tr("Embed Image"));
 	(*scrActions)["itemExtendedImageProperties"]->setTexts( tr("Extended Image Properties"));
 	(*scrActions)["itemPreviewLow"]->setTexts( tr("&Low Resolution"));
@@ -1843,6 +1853,8 @@ void ActionManager::createDefaultMenus()
 		<< "itemUpdateImage" 
 		<< "itemAdjustFrameToImage" 
 		<< "itemAdjustImageToFrame" 
+		<< "itemAdjustFrameToTable"
+		<< "itemAdjustTableToFrame"
 		<< "itemToggleInlineImage" 
 		<< "itemExtendedImageProperties" 
 		<< "itemPreviewLow" 

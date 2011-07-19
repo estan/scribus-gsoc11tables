@@ -549,6 +549,12 @@ qreal PageItem_Table::maxBottomBorderWidth() const
 	return maxWidth;
 }
 
+void PageItem_Table::applicableActions(QStringList& actionList)
+{
+	actionList << "itemAdjustFrameToTable";
+	actionList << "itemAdjustTableToFrame";
+}
+
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 {
 	if (m_Doc->RePos)

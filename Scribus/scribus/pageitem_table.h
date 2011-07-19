@@ -316,7 +316,7 @@ public:
 	virtual ItemType realItemType() const { return PageItem::Table; }
 
 	/// Adds the applicable actions for this table to @a actionList.
-	virtual void applicableActions(QStringList& actionList) {};
+	virtual void applicableActions(QStringList& actionList);
 
 	/// Returns a textual description of this item.
 	virtual QString infoDescription() { return QString(); }

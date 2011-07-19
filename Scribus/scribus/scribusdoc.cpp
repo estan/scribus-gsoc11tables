@@ -12845,7 +12845,43 @@ void ScribusDoc::itemSelection_AdjustImagetoFrameSize( Selection *customSelectio
 	}
 }
 
+void ScribusDoc::itemSelection_AdjustFrametoTableSize()
+{
+	// TODO: Do this in an undo transaction?
+	int selectedItemCount = m_Selection->count();
 
+	if (selectedItemCount < 1)
+		return;
+
+	for (int i = 0; i < selectedItemCount; ++i)
+	{
+		PageItem *item = m_Selection->itemAt(i);
+		if (item && item->isTable())
+			item->asTable()->adjustFrameToTable();
+	}
+
+	regionsChanged()->update(QRectF());
+	changed();
+}
+
+void ScribusDoc::itemSelection_AdjustTabletoFrameSize()
+{
+	// TODO: Do this in an undo transaction?
+	int selectedItemCount = m_Selection->count();
+
+	if (selectedItemCount < 1)
+		return;
+
+	for (int i = 0; i < selectedItemCount; ++i)
+	{
+		PageItem *item = m_Selection->itemAt(i);
+		if (item && item->isTable())
+			item->asTable()->adjustTableToFrame();
+	}
+
+	regionsChanged()->update(QRectF());
+	changed();
+}
 
 NodeEditContext::NodeEditContext() 
 : submode(MOVE_POINT), isContourLine(false), oldClip(NULL), nodeTransaction(NULL),

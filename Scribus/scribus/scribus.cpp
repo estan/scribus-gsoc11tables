@@ -770,6 +770,8 @@ void ScribusMainWindow::initMenuBar()
 	scrMenuMgr->addMenuSeparator("Item");
 	scrMenuMgr->addMenuItem(scrActions["itemAdjustFrameToImage"], "Item", false);
 	scrMenuMgr->addMenuItem(scrActions["itemAdjustImageToFrame"], "Item", false);
+	scrMenuMgr->addMenuItem(scrActions["itemAdjustFrameToTable"], "Item", false);
+	scrMenuMgr->addMenuItem(scrActions["itemAdjustTableToFrame"], "Item", false);
 	scrMenuMgr->addMenuItem(scrActions["itemUpdateImage"], "Item", false);
 	scrMenuMgr->addMenuItem(scrActions["styleImageEffects"], "Item", false);
 	scrMenuMgr->addMenuItem(scrActions["itemExtendedImageProperties"], "Item", false);
@@ -2621,6 +2623,8 @@ void ScribusMainWindow::HaveNewSel(int SelectedType)
 	scrActions["itemUpdateImage"]->setEnabled(SelectedType==PageItem::ImageFrame && (currItem->PictureIsAvailable || currItem->asLatexFrame()));
 	scrActions["itemAdjustFrameToImage"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable && !currItem->isTableItem);
 	scrActions["itemAdjustImageToFrame"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable);
+	scrActions["itemAdjustFrameToTable"]->setEnabled(SelectedType==PageItem::Table);
+	scrActions["itemAdjustTableToFrame"]->setEnabled(SelectedType==PageItem::Table);
 	scrActions["itemExtendedImageProperties"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable && currItem->pixm.imgInfo.valid);
 	scrActions["itemToggleInlineImage"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable);
 	scrMenuMgr->setMenuEnabled("ItemPreviewSettings", SelectedType==PageItem::ImageFrame);
@@ -4585,6 +4589,8 @@ bool ScribusMainWindow::DoFileClose()
 		scrActions["itemSendToPattern"]->setEnabled(false);
 		scrActions["itemAdjustFrameToImage"]->setEnabled(false);
 		scrActions["itemAdjustImageToFrame"]->setEnabled(false);
+		scrActions["itemAdjustFrameToTable"]->setEnabled(false);
+		scrActions["itemAdjustTableToFrame"]->setEnabled(false);
 		scrActions["itemExtendedImageProperties"]->setEnabled(false);
 		scrActions["itemUpdateImage"]->setEnabled(false);
 		scrActions["itemPreviewLow"]->setEnabled(false);

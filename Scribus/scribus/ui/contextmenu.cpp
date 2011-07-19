@@ -191,6 +191,10 @@ void ContextMenu::createMenuItems_Selection()
 			addAction(m_AP->scrActions["itemAdjustFrameToImage"]);
 		if (m_actionList.contains("itemAdjustImageToFrame"))
 			addAction(m_AP->scrActions["itemAdjustImageToFrame"]);
+		if (m_actionList.contains("itemAdjustFrameToTable"))
+			addAction(m_AP->scrActions["itemAdjustFrameToTable"]);
+		if (m_actionList.contains("itemAdjustTableToFrame"))
+			addAction(m_AP->scrActions["itemAdjustTableToFrame"]);
 		if (m_actionList.contains("itemExtendedImageProperties"))
 			addAction(m_AP->scrActions["itemExtendedImageProperties"]);
 		if (m_actionList.contains("itemAdjustFrameToImage"))
