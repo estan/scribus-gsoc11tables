@@ -306,6 +306,9 @@ public:
 	/// Returns the width of the widest border along the bottom side of this table.
 	qreal maxBottomBorderWidth() const;
 
+	/// Returns <code>true</code> if the table is overflowing its frame.
+	bool isOverflowing() const { return effectiveWidth() > width() || effectiveHeight() > height(); }
+
 	/// Returns this item as a PageItem_Table.
 	virtual PageItem_Table* asTable() { return this; }
 

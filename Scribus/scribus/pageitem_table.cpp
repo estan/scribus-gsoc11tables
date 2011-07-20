@@ -570,6 +570,10 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	m_tablePainter->paintTable(p);
 
 	p->restore();
+
+	// Paint the overflow marker.
+	if (isOverflowing())
+		drawOverflowMarker(p);
 }
 
 void PageItem_Table::resizeEqual(qreal width, qreal height)
