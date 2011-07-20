@@ -28,6 +28,7 @@ for which a new license (GPL+exception) is in place.
 #include <QFont>
 #include <QRegion>
 #include <QPoint>
+#include <QPointF>
 #include <QFileInfo>
 #include <qdrawutil.h>
 #include <QRegExp>
@@ -1092,6 +1093,38 @@ bool PageItem::frameUnderflows() const
 	//and has been linked with previous frame
 	//if you will find any better solution - fix that function
 	return (firstInFrame() > lastInFrame());
+}
+
+void PageItem::drawOverflowMarker(ScPainter *p)
+{
+	qreal sideLength = 10 / qMax(p->zoomFactor(), 1.0);
+	qreal left = Width - sideLength / 2;
+	qreal right = left + sideLength;
+	qreal top = Height - sideLength * 1.5;
+	qreal bottom = top + sideLength;
+
+	QColor color(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor);
+	if ((isBookmark) || (m_isAnnotation))
+		color = PrefsManager::instance()->appPrefs.displayPrefs.frameAnnotationColor;
+	if ((BackBox != 0) || (NextBox != 0))
+		color = PrefsManager::instance()->appPrefs.displayPrefs.frameLinkColor;
+	if (m_Locked)
+		color = PrefsManager::instance()->appPrefs.displayPrefs.frameLockColor;
+	if (m_Doc->m_Selection->containsItem(this))
+		color = Qt::red;
+
+	p->save();
+
+	p->setPen(color, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
+	p->setPenOpacity(1.0);
+	p->setBrush(Qt::white);
+	p->setBrushOpacity(1.0);
+	p->setFillMode(ScPainter::Solid);
+	p->drawRect(left, top, sideLength, sideLength);
+	p->drawLine(QPointF(left, top), QPointF(right, bottom));
+	p->drawLine(QPointF(left, bottom), QPointF(right, top));
+
+	p->restore();
 }
 
 int PageItem::firstInFrame() const

@@ -3505,53 +3505,6 @@ double PageItem_TextFrame::columnWidth()
 //	return (Width - (ColGap * (Cols - 1)) - Extra - RExtra - lineCorr) / Cols;
 }
 
-void PageItem_TextFrame::drawOverflowMarker(ScPainter *p)
-{
-	/*CB Old large corner indicator.
-	double scp1 = 1.0/qMax(ScMW->view->getScale(), 1);
-	double scp16 = 16.0*scp1;
-	double scp14 = 14.0*scp1;
-	double scp3 = 3.0*scp1;
-	double scm_lineWidth16 = Width - scp16;
-	double scpheight16 = Height - scp16;
-	double scm_lineWidth3 = Width - scp3;
-	double scpheight3 = Height - scp3;
-	p->setPen(Qt::black, scp1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	p->setBrush(white);
-	p->drawRect(scm_lineWidth16, scpheight16, scp14, scp14);
-	p->drawLine(FPoint(scm_lineWidth16, scpheight16), FPoint(scm_lineWidth3, scpheight3));
-	p->drawLine(FPoint(scm_lineWidth16, scpheight3), FPoint(scm_lineWidth3, scpheight16));
-	*/
-	//TODO: CB clean
-	double scp1 = p->zoomFactor() ;// / ScMW->view->scale();
-	double ofwh = 8 * scp1;
-	//CB moved down while locked marker disabled
-	//double ofx = Width - ofwh/2;
-	//double ofy = Height - ofwh*3.0;
-	double ofx = Width - ofwh/2;
-	double ofy = Height - ofwh*1.5;
-	double lx1= ofx;
-	double ly1= ofy;
-	double lx2= ofx+ofwh;
-	double ly2= ofy+ofwh;
-	p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	if ((isBookmark) || (m_isAnnotation))
-		p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameAnnotationColor, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	if ((BackBox != 0) || (NextBox != 0))
-		p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameLinkColor, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	if (m_Locked)
-		p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameLockColor, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	if (m_Doc->m_Selection->containsItem(this))
-		p->setPen(Qt::red, 0.5 / p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
-	p->setPenOpacity(1.0);
-	p->setBrush(Qt::white);
-	p->setBrushOpacity(1.0);
-	p->setFillMode(ScPainter::Solid);
-	p->drawRect(ofx, ofy, ofwh, ofwh);
-	p->drawLine(FPoint(lx1, ly1), FPoint(lx2, ly2));
-	p->drawLine(FPoint(lx1, ly2), FPoint(lx2, ly1));
-}
-
 void PageItem_TextFrame::drawColumnBorders(ScPainter *p)
 {
 	p->setPen(Qt::black, 0.5/ p->zoomFactor(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
