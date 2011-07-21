@@ -404,6 +404,8 @@ void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
 		resizeProportional(width, height);
 	else
 		qWarning("Unknown table resize strategy");
+
+	emit changed();
 }
 
 void PageItem_Table::adjustTableToFrame()
