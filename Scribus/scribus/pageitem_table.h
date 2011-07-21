@@ -234,6 +234,16 @@ public:
 	 */
 	TableCell cellAt(int row, int column) const;
 
+	/**
+	 * Returns the cell at @a x, @a y.
+	 *
+	 * @a x and @a y specify a point in the item's local coordinate system. If the cell is
+	 * covered by a spanning cell, the spanning cell is returned. If the point is outside the
+	 * table grid, an invalid cell is returned. The table may later mark cells returned by
+	 * this function as invalid, if the row or column containing the cell is removed.
+	 */
+	TableCell cellAtPoint(qreal x, qreal y) const;
+
 	/// Resizes the table to fit the frame, using a Proportional resize strategy.
 	void adjustTableToFrame();
 

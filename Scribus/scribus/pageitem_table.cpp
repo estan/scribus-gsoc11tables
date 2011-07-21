@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 #include <QMutableListIterator>
 #include <QRectF>
 #include <QString>
+#include <QtAlgorithms>
 
 #include "cellarea.h"
 #include "collapsedtablepainter.h"
@@ -370,6 +371,26 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 	}
 
 	return cell;
+}
+
+TableCell PageItem_Table::cellAtPoint(qreal x, qreal y) const
+{
+	qreal gridOriginX = maxLeftBorderWidth() / 2;
+	qreal gridOriginY = maxTopBorderWidth() / 2;
+
+	if (x < gridOriginX || y < gridOriginY)
+		return TableCell(); // Outside table grid at top/left.
+
+	// Rebase the point against the table grid origin.
+	x -= gridOriginX;
+	y -= gridOriginY;
+
+	if (x > tableWidth() || y > tableHeight())
+		return TableCell(); // Outside table grid at bottom/right.
+
+	return cellAt(
+		qUpperBound(m_rowPositions, y) - m_rowPositions.begin() - 1,
+		qUpperBound(m_columnPositions, x) - m_columnPositions.begin() - 1);
 }
 
 void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
