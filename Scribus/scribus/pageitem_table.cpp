@@ -375,18 +375,12 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 
 TableCell PageItem_Table::cellAtPoint(qreal x, qreal y) const
 {
-	qreal gridOriginX = maxLeftBorderWidth() / 2;
-	qreal gridOriginY = maxTopBorderWidth() / 2;
-
-	if (x < gridOriginX || y < gridOriginY)
-		return TableCell(); // Outside table grid at top/left.
-
 	// Rebase the point against the table grid origin.
-	x -= gridOriginX;
-	y -= gridOriginY;
+	x -= maxLeftBorderWidth() / 2;
+	y -= maxTopBorderWidth() / 2;
 
-	if (x > tableWidth() || y > tableHeight())
-		return TableCell(); // Outside table grid at bottom/right.
+	if (x < 0 || y < 0 || x > tableWidth() || y > tableHeight())
+		return TableCell(); // Outside table grid.
 
 	return cellAt(
 		qUpperBound(m_rowPositions, y) - m_rowPositions.begin() - 1,
