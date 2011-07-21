@@ -9,8 +9,10 @@ for which a new license (GPL+exception) is in place.
 #include <algorithm>
 
 #include <QMutableListIterator>
+#include <QPointF>
 #include <QRectF>
 #include <QString>
+#include <QTransform>
 #include <QtAlgorithms>
 
 #include "cellarea.h"
@@ -373,18 +375,19 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 	return cell;
 }
 
-TableCell PageItem_Table::cellAtPoint(qreal x, qreal y) const
+TableCell PageItem_Table::cellAtPoint(const QPointF& point) const
 {
-	// Rebase the point against the table grid origin.
-	x -= maxLeftBorderWidth() / 2;
-	y -= maxTopBorderWidth() / 2;
+	QTransform transform = getTransform().inverted();
+	transform.translate(-maxLeftBorderWidth() / 2, -maxTopBorderWidth() / 2);
 
-	if (x < 0 || y < 0 || x > tableWidth() || y > tableHeight())
+	QPointF gridPoint = transform.map(point);
+
+	if (!QRectF(0, 0, tableWidth(), tableHeight()).contains(gridPoint))
 		return TableCell(); // Outside table grid.
 
 	return cellAt(
-		qUpperBound(m_rowPositions, y) - m_rowPositions.begin() - 1,
-		qUpperBound(m_columnPositions, x) - m_columnPositions.begin() - 1);
+		qUpperBound(m_rowPositions, gridPoint.y()) - m_rowPositions.begin() - 1,
+		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
 void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
