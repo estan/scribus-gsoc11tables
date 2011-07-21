@@ -29,6 +29,7 @@
 #include "canvasmode_editmeshgradient.h"
 #include "canvasmode_editpolygon.h"
 #include "canvasmode_editspiral.h"
+#include "canvasmode_edittable.h"
 #include "canvasmode_eyedropper.h"
 #include "canvasmode_framelinks.h"
 #include "canvasmode_magnifier.h"
@@ -183,6 +184,9 @@ CanvasMode* CanvasMode::createForAppMode(ScribusView* view, int appMode)
 			break;
 		case modeEditSpiral:
 			result = new CanvasMode_EditSpiral(view);
+			break;
+		case modeEditTable:
+			result = new CanvasMode_EditTable(view);
 			break;
 			// more modes as they are defined...
 			

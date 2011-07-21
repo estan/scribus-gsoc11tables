@@ -255,6 +255,10 @@ void CanvasMode_Normal::mouseDoubleClickEvent(QMouseEvent *m)
 		{
 			m_view->requestMode(modeEditSpiral);
 		}
+		else if (currItem->asTable())
+		{
+			m_view->requestMode(modeEditTable);
+		}
 	}
 }
 

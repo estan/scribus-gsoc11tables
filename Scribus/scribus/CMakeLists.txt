@@ -171,6 +171,7 @@ SET(SCRIBUS_MOC_CLASSES
   canvasmode_editarc.h
   canvasmode_editpolygon.h
   canvasmode_editspiral.h
+  canvasmode_edittable.h
   canvasmode_measurements.h
   canvasmode_normal.h
   chartablemodel.h
@@ -465,6 +466,7 @@ SET(SCRIBUS_SOURCES
   canvasmode_editmeshgradient.cpp
   canvasmode_editpolygon.cpp
   canvasmode_editspiral.cpp
+  canvasmode_edittable.cpp
   canvasmode_magnifier.cpp
   canvasmode_measurements.cpp
   canvasmode_nodeedit.cpp
