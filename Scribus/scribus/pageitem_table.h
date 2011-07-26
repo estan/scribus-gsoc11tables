@@ -243,7 +243,7 @@ public:
 	 * mark cells returned by this function as invalid, if the row or column containing the
 	 * cell is removed.
 	 */
-	TableCell cellAtPoint(const QPointF& point) const;
+	TableCell cellAt(const QPointF& point) const;
 
 	/// Resizes the table to fit the frame, using a Proportional resize strategy.
 	void adjustTableToFrame();

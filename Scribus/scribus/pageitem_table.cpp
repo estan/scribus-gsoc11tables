@@ -375,12 +375,10 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 	return cell;
 }
 
-TableCell PageItem_Table::cellAtPoint(const QPointF& point) const
+TableCell PageItem_Table::cellAt(const QPointF& point) const
 {
-	QTransform transform = getTransform().inverted();
-	transform.translate(-maxLeftBorderWidth() / 2, -maxTopBorderWidth() / 2);
-
-	QPointF gridPoint = transform.map(point);
+	QPointF gridPoint = getTransform().inverted().map(point) -
+		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
 
 	if (!QRectF(0, 0, tableWidth(), tableHeight()).contains(gridPoint))
 		return TableCell(); // Outside table grid.
