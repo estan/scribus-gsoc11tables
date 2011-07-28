@@ -388,6 +388,54 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
+
+PageItem_Table::HitTarget PageItem_Table::hitTest(const QPointF& point) const
+{
+	const qreal threshold = 3.0; // TODO: Should probably be zoom dependant.
+
+	QPointF gridPoint = getTransform().inverted().map(point) -
+		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
+	qreal bottom = tableHeight();
+	qreal right = tableWidth();
+	qreal x = gridPoint.x();
+	qreal y = gridPoint.y();
+
+	if (x < -threshold || x > right + threshold || y < -threshold || y > bottom + threshold)
+		return Outside; // Outside table.
+
+	if (x < threshold)
+		return Left; // Hit left side of table.
+
+	if (y < threshold)
+		return Top; // Hit top side of table.
+
+	if (x > right - threshold && y > bottom - threshold)
+		return BottomLeft; // Hit bottom left corner of table.
+
+	// Find positions of the sides of the hit cell.
+	TableCell cell = cellAt(
+		qUpperBound(m_rowPositions, gridPoint.y()) - m_rowPositions.begin() - 1,
+		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
+	int endRow = cell.row() + cell.rowSpan() - 1;
+	int endCol = cell.column() + cell.columnSpan() - 1;
+	qreal cellLeft = m_columnPositions[cell.column()];
+	qreal cellRight = m_columnPositions[endCol] + m_columnWidths[endCol];
+	qreal cellTop = m_rowPositions[cell.row()];
+	qreal cellBottom = m_rowPositions[endRow] + m_rowHeights[endRow];
+
+	// Determine shortest horizontal and vertical distance.
+	qreal verticalDistance = qMin(qAbs(cellLeft - x), qAbs(cellRight - x));
+	qreal horizontalDistance = qMin(qAbs(cellTop - y), qAbs(cellBottom - y));
+
+	if (verticalDistance < threshold || horizontalDistance < threshold)
+	{
+		// Hit either right side of column or bottom side of row.
+		return verticalDistance < horizontalDistance ? ColumnRight : RowBottom;
+	}
+
+	return Cell; // Hit cell interior.
+}
+
 void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
 {
 	if (width < 0 || height < 0)

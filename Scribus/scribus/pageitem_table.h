@@ -49,7 +49,7 @@ class TablePainter;
 class SCRIBUS_API PageItem_Table : public PageItem
 {
 	Q_OBJECT
-	Q_ENUMS(ResizeStrategy)
+	Q_ENUMS(ResizeStrategy HitTarget)
 
 	Q_PROPERTY(int rows READ rows NOTIFY changed)
 	Q_PROPERTY(int columns READ columns NOTIFY changed)
@@ -74,6 +74,20 @@ public:
 	{
 		Equal,        /**< Distribute width/height equally to columns/rows. */
 		Proportional  /**< Distribute width/height proportionally to columns/rows. */
+	};
+
+	/**
+	 * This enum specifies hit targets of a table.
+	 */
+	enum HitTarget
+	{
+		Top,         /**< Top side of the table. */
+		Left,        /**< Left side of the table. */
+		BottomLeft,  /**< Bottom left corner of the table. */
+		Cell,        /**< Interior of a cell. */
+		RowBottom,   /**< Bottom side of a row. */
+		ColumnRight, /**< Right side of a column. */
+		Outside      /**< Outside table. */
 	};
 
 	/// The minimum row height.
@@ -244,6 +258,13 @@ public:
 	 * cell is removed.
 	 */
 	TableCell cellAt(const QPointF& point) const;
+
+	/**
+	 * Performs a hit test at @a point, which is in canvas coordinates.
+	 *
+	 * The returned hit target describes the target that was hit.
+	 */
+	HitTarget hitTest(const QPointF& point) const;
 
 	/// Resizes the table to fit the frame, using a Proportional resize strategy.
 	void adjustTableToFrame();
