@@ -13,8 +13,10 @@ for which a new license (GPL+exception) is in place.
 
 #include "canvasmode.h"
 
-class ScribusView;
+class PageItem_Table;
 class QKeyEvent;
+class QMouseEvent;
+class ScribusView;
 
 /**
  * This is a canvas mode for editing tables.
@@ -29,6 +31,11 @@ public:
 	virtual void activate(bool fromGesture);
 	virtual void deactivate(bool forGesture);
 	virtual void keyPressEvent(QKeyEvent* event);
+	virtual void mouseMoveEvent(QMouseEvent* event);
+
+private:
+	/// The table currently being edited.
+	PageItem_Table *m_table;
 };
 
 #endif // CANVASMODE_EDITTABLE_H
