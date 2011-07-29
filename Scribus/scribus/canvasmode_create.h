@@ -33,7 +33,8 @@ class UndoTransaction;
 class CreateMode : public CanvasMode
 {
 public:
-	CreateMode(ScribusView* view);
+	explicit CreateMode(ScribusView* view);
+	virtual ~CreateMode() {}
 
 	virtual void enterEvent(QEvent *);
 	virtual void leaveEvent(QEvent *);

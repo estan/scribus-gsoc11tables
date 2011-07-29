@@ -67,7 +67,7 @@ class SCRIBUS_API CanvasMode : public QObject
 {
 	Q_OBJECT
 protected:
-	CanvasMode (ScribusView* view);
+	explicit CanvasMode (ScribusView* view);
 	
 public:
 	static CanvasMode* createForAppMode(ScribusView* view, int appMode);
