@@ -391,7 +391,7 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 PageItem_Table::HitTarget PageItem_Table::hitTest(const QPointF& point) const
 {
-	const qreal threshold = 3.0; // TODO: Should probably be zoom dependant.
+	static const qreal threshold = 3.0; // TODO: Should probably be zoom dependant.
 
 	QPointF gridPoint = getTransform().inverted().map(point) -
 		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
