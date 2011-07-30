@@ -289,7 +289,7 @@ public:
 	 */
 	Handle hitTest(const QPointF& point, qreal threshold) const;
 
-	/// Resizes the table to fit the frame, using a Proportional resize strategy.
+	/// Resizes the table to fit the frame.
 	void adjustTableToFrame();
 
 	/// Resizes the frame to fit the table.
