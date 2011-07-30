@@ -68,21 +68,6 @@ public:
 	static const qreal MinimumColumnWidth;
 
 	/**
-	 * This enum specifies resize strategies for a table.
-	 *
-	 * With the Equal resize strategy, any width or height that is added to or removed
-	 * from the table during resize is distributed equally to the columns and rows. With
-	 * the Proportional resize strategy, the space distributed to a row or column is
-	 * proportional to how high or wide the row or column is compared to the table width
-	 * or height.
-	 */
-	enum ResizeStrategy
-	{
-		Equal,        /**< Distribute width/height equally to columns/rows. */
-		Proportional  /**< Distribute width/height proportionally to columns/rows. */
-	};
-
-	/**
 	 * This class represents handles on a table.
 	 *
 	 * These are areas that when clicked/dragged will initiate a resize or selection
@@ -181,13 +166,12 @@ public:
 	/**
 	 * Resizes the table grid to @a width, @a height.
 	 *
-	 * The change in width and height will be distributed to each column and row in the table
-	 * according to the resize strategy specified by @a strategy.
+	 * The change in width and height will be distributed proportionally to columns and rows.
 	 *
-	 * If any row or column hits the limit MinimumRowHeight or MinimumColumnWidth, respectively,
-	 * then resizing in that direction will stop for the entire table.
+	 * If any row or column hits the limit MinimumRowHeight or MinimumColumnWidth, resizing in that
+	 * direction will stop for the entire table.
 	 */
-	void resize(qreal width, qreal height, ResizeStrategy strategy = Proportional);
+	void resize(qreal width, qreal height);
 
 	/**
 	 * Inserts @a numRows rows before the row at @a index.
@@ -422,12 +406,6 @@ private:
 
 	/// Returns the rectangle of @a cell on the table grid.
 	QRectF cellRect(const TableCell& cell) const;
-
-	/// Resizes the table to @a width, @a height, affecting rows and columns equally.
-	void resizeEqual(qreal width, qreal height);
-
-	/// Resizes the table to @a width, @a height, affecting rows and columns proportionally.
-	void resizeProportional(qreal width, qreal height);
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.

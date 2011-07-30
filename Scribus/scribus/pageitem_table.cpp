@@ -59,6 +59,42 @@ PageItem_Table::~PageItem_Table()
 	delete m_tablePainter;
 }
 
+void PageItem_Table::resize(qreal width, qreal height)
+{
+	if (width < 0 || height < 0)
+		return;
+
+	/*
+	 * Distribute width proportionally to columns, but don't let any column width below
+	 * MinimumColumnWidth.
+	 */
+	qreal requestedWidthFactor = width / tableWidth();
+	qreal oldMinWidth = *std::min_element(m_columnWidths.begin(), m_columnWidths.end());
+	qreal newMinWidth = qMax(oldMinWidth * requestedWidthFactor, MinimumColumnWidth);
+	qreal actualWidthFactor = newMinWidth / oldMinWidth;
+	for (int col = 0; col < columns(); ++col)
+	{
+		m_columnWidths[col] *= actualWidthFactor;
+		m_columnPositions[col] *= actualWidthFactor;
+	}
+
+	/*
+	 * Distribute height proportionally to rows, but don't let any row height below
+	 * MinimumRowHeight.
+	 */
+	qreal requestedHeightFactor = height / tableHeight();
+	qreal oldMinHeight = *std::min_element(m_rowHeights.begin(), m_rowHeights.end());
+	qreal newMinHeight = qMax(oldMinHeight * requestedHeightFactor, MinimumRowHeight);
+	qreal actualHeightFactor = newMinHeight / oldMinHeight;
+	for (int row = 0; row < rows(); ++row)
+	{
+		m_rowHeights[row] *= actualHeightFactor;
+		m_rowPositions[row] *= actualHeightFactor;
+	}
+
+	emit changed();
+}
+
 void PageItem_Table::insertRows(int index, int numRows)
 {
 	ASSERT_VALID();
@@ -462,21 +498,6 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 	return handle;
 }
 
-void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
-{
-	if (width < 0 || height < 0)
-		return;
-
-	if (strategy == Equal)
-		resizeEqual(width, height);
-	else if (strategy == Proportional)
-		resizeProportional(width, height);
-	else
-		qWarning("Unknown table resize strategy");
-
-	emit changed();
-}
-
 void PageItem_Table::adjustTableToFrame()
 {
 	resize(width() - (maxLeftBorderWidth() + maxRightBorderWidth()) / 2,
@@ -681,68 +702,6 @@ QRectF PageItem_Table::cellRect(const TableCell& cell) const
 	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
 
 	return QRectF(x, y, width, height);
-}
-
-void PageItem_Table::resizeEqual(qreal width, qreal height)
-{
-	/*
-	 * Distribute width equally to columns, but don't let any column width below
-	 * MinimumColumnWidth.
-	 */
-	qreal requestedWidthChange = (width - tableWidth()) / columns();
-	qreal oldMinWidth = *std::min_element(m_columnWidths.begin(), m_columnWidths.end());
-	qreal newMinWidth = qMax(oldMinWidth + requestedWidthChange, MinimumColumnWidth);
-	qreal actualWidthChange = newMinWidth - oldMinWidth;
-	for (int col = 0; col < columns(); ++col)
-	{
-		m_columnWidths[col] += actualWidthChange;
-		m_columnPositions[col] += col * actualWidthChange;
-	}
-
-	/*
-	 * Distribute height equally to rows, but don't let any row height below
-	 * MinimumRowHeight.
-	 */
-	qreal requestedHeightChange = (height - tableHeight()) / rows();
-	qreal oldMinHeight = *std::min_element(m_rowHeights.begin(), m_rowHeights.end());
-	qreal newMinHeight = qMax(oldMinHeight + requestedHeightChange, MinimumRowHeight);
-	qreal actualHeightChange = newMinHeight - oldMinHeight;
-	for (int row = 0; row < rows(); ++row)
-	{
-		m_rowHeights[row] += actualHeightChange;
-		m_rowPositions[row] += row * actualHeightChange;
-	}
-}
-
-void PageItem_Table::resizeProportional(qreal width, qreal height)
-{
-	/*
-	 * Distribute width proportionally to columns, but don't let any column width below
-	 * MinimumColumnWidth.
-	 */
-	qreal requestedWidthFactor = width / tableWidth();
-	qreal oldMinWidth = *std::min_element(m_columnWidths.begin(), m_columnWidths.end());
-	qreal newMinWidth = qMax(oldMinWidth * requestedWidthFactor, MinimumColumnWidth);
-	qreal actualWidthFactor = newMinWidth / oldMinWidth;
-	for (int col = 0; col < columns(); ++col)
-	{
-		m_columnWidths[col] *= actualWidthFactor;
-		m_columnPositions[col] *= actualWidthFactor;
-	}
-
-	/*
-	 * Distribute height proportionally to rows, but don't let any row height below
-	 * MinimumRowHeight.
-	 */
-	qreal requestedHeightFactor = height / tableHeight();
-	qreal oldMinHeight = *std::min_element(m_rowHeights.begin(), m_rowHeights.end());
-	qreal newMinHeight = qMax(oldMinHeight * requestedHeightFactor, MinimumRowHeight);
-	qreal actualHeightFactor = newMinHeight / oldMinHeight;
-	for (int row = 0; row < rows(); ++row)
-	{
-		m_rowHeights[row] *= actualHeightFactor;
-		m_rowPositions[row] *= actualHeightFactor;
-	}
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
