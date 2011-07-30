@@ -51,6 +51,7 @@ void CanvasMode_EditTable::deactivate(bool forGesture)
 
 void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 {
+	event->accept();
 	// Set an appropriate cursor.
 	QCursor cursor(Qt::ArrowCursor);
 	switch (m_table->hitTest(
@@ -84,6 +85,7 @@ void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 
 void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 {
+	event->accept();
 	PageItem_Table::Handle handle = m_table->hitTest(
 		m_canvas->globalToCanvas(event->globalPos()).toQPointF(),
 		m_doc->guidesPrefs().grabRadius / m_canvas->scale());

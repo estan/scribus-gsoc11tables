@@ -29,6 +29,7 @@ void RowResize::keyPressEvent(QKeyEvent* event)
 	if (event->key() == Qt::Key_Escape)
 	{
 		// Cancel the resize.
+		event->accept();
 		m_table->setRowHeight(m_row, m_oldRowHeight);
 		m_table->update();
 		m_view->stopGesture();
@@ -37,11 +38,13 @@ void RowResize::keyPressEvent(QKeyEvent* event)
 
 void RowResize::mousePressEvent(QMouseEvent* event)
 {
+	event->accept();
 	m_oldRowHeight = m_table->rowHeight(m_row);
 }
 
 void RowResize::mouseReleaseEvent(QMouseEvent* event)
 {
+	event->accept();
 	m_view->stopGesture();
 }
 
@@ -52,6 +55,7 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 	 *         slow. We probably want to draw a "ghost" table instead.
 	 * FIXME2: Snap to guides.
 	 */
+	event->accept();
 	QPointF gridPoint = m_table->getTransform().inverted().map(
 		m_canvas->globalToCanvas(event->globalPos()).toQPointF());
 	qreal height = gridPoint.y() - m_table->rowPosition(m_row);
