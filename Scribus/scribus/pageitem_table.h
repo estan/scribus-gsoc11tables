@@ -61,6 +61,12 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY changed)
 
 public:
+	/// The minimum row height.
+	static const qreal MinimumRowHeight;
+
+	/// The minimum column width.
+	static const qreal MinimumColumnWidth;
+
 	/**
 	 * This enum specifies resize strategies for a table.
 	 *
@@ -77,24 +83,56 @@ public:
 	};
 
 	/**
-	 * This enum specifies hit targets of a table.
+	 * This class represents handles on a table.
+	 *
+	 * These are areas that when clicked/dragged will initiate a resize or selection
+	 * of some parts of the table. To test for a handle at some point, use the hitTest()
+	 * function.
+	 *
+	 * TODO: Perhaps this class should get its own .h/.cpp?
 	 */
-	enum HitTarget
+	class Handle
 	{
-		Top,         /**< Top side of the table. */
-		Left,        /**< Left side of the table. */
-		BottomLeft,  /**< Bottom left corner of the table. */
-		Cell,        /**< Interior of a cell. */
-		RowBottom,   /**< Bottom side of a row. */
-		ColumnRight, /**< Right side of a column. */
-		Outside      /**< Outside table. */
+	public:
+		/// This enum specifies different types of handles on a table.
+		enum Type
+		{
+			RowSelect,    /**< Row selection handle. */
+			RowResize,    /**< Row resize handle. */
+			ColumnSelect, /**< Column selection handle. */
+			ColumnResize, /**< Column resize handle. */
+			TableResize,  /**< Table resize handle. */
+			CellSelect,   /**< Cell selection handle. */
+			None          /**< No handle was hit. */
+		};
+
+		/// Returns the type of the handle.
+		Type type() const { return m_type; }
+
+		/**
+		 * If type() is RowResize or ColumnResize, this function returns the index of the
+		 * row or column the handle is for, otherwise its return value is undefined.
+		 */
+		int index() const { return m_index; }
+
+	private:
+		friend class PageItem_Table;
+
+		/// Creates a handle of type @a type.
+		Handle(Type type) : m_type(type), m_index(-1) {}
+		/// Creates a handle of type @a type and with row or column index @a index.
+		Handle(Type type, int index) : m_type(type), m_index(index) {}
+
+		/// Sets the type of the handle to @a type.
+		void setType(Type type) { m_type = type; }
+		/// Sets the row or column index of the handle to @a index.
+		void setIndex(int index) { m_index = index; }
+
+		/// The type of the handle.
+		Type m_type;
+		/// The row or column index, if applicable.
+		int m_index;
 	};
-
-	/// The minimum row height.
-	static const qreal MinimumRowHeight;
-
-	/// The minimum column width.
-	static const qreal MinimumColumnWidth;
 
 public:
 	/// Construct a new table item with @a numRows rows and @a numColumns columns.
@@ -262,9 +300,10 @@ public:
 	/**
 	 * Performs a hit test at @a point, which is in canvas coordinates.
 	 *
-	 * The returned hit target describes the target that was hit.
+	 * The returned handle describes what was hit. @a threshold is a distance in points.
+	 * @a point is considered to hit a handle if it is within @a threshold from it.
 	 */
-	HitTarget hitTest(const QPointF& point) const;
+	Handle hitTest(const QPointF& point, qreal threshold) const;
 
 	/// Resizes the table to fit the frame, using a Proportional resize strategy.
 	void adjustTableToFrame();
@@ -380,6 +419,9 @@ private:
 	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
 	/// Returns true if there is a cell at @a row, @a column in this table.
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
+
+	/// Returns the rectangle of @a cell on the table grid.
+	QRectF cellRect(const TableCell& cell) const;
 
 	/// Resizes the table to @a width, @a height, affecting rows and columns equally.
 	void resizeEqual(qreal width, qreal height);

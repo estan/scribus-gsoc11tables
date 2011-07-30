@@ -8,6 +8,7 @@ for which a new license (GPL+exception) is in place.
 */
 #include <algorithm>
 
+#include <QDebug>
 #include <QMutableListIterator>
 #include <QPointF>
 #include <QRectF>
@@ -388,11 +389,8 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
-
-PageItem_Table::HitTarget PageItem_Table::hitTest(const QPointF& point) const
+PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 {
-	static const qreal threshold = 3.0; // TODO: Should probably be zoom dependant.
-
 	const QPointF gridPoint = getTransform().inverted().map(point) -
 		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
 	const qreal bottom = tableHeight();
@@ -401,39 +399,67 @@ PageItem_Table::HitTarget PageItem_Table::hitTest(const QPointF& point) const
 	const qreal y = gridPoint.y();
 
 	if (x < -threshold || x > right + threshold || y < -threshold || y > bottom + threshold)
-		return Outside; // Outside table.
+		return Handle(Handle::None); // No hit.
 
 	if (x < threshold)
-		return Left; // Hit left side of table.
+		return Handle(Handle::RowSelect); // Hit left edge of table.
 
 	if (y < threshold)
-		return Top; // Hit top side of table.
+		return Handle(Handle::ColumnSelect); // Hit top edge of table.
 
 	if (x > right - threshold && y > bottom - threshold)
-		return BottomLeft; // Hit bottom left corner of table.
+		return Handle(Handle::TableResize); // Hit bottom right corner of table.
 
-	// Find positions of the sides of the hit cell.
-	const TableCell cell = cellAt(
-		qUpperBound(m_rowPositions, gridPoint.y()) - m_rowPositions.begin() - 1,
-		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
-	const int endRow = cell.row() + cell.rowSpan() - 1;
-	const int endCol = cell.column() + cell.columnSpan() - 1;
-	const qreal cellLeft = m_columnPositions[cell.column()];
-	const qreal cellRight = m_columnPositions[endCol] + m_columnWidths[endCol];
-	const qreal cellTop = m_rowPositions[cell.row()];
-	const qreal cellBottom = m_rowPositions[endRow] + m_rowHeights[endRow];
+	if (y > bottom - threshold && y < bottom + threshold)
+		return Handle(Handle::RowResize, rows() - 1); // Hit right edge of table.
 
-	// Determine shortest horizontal and vertical distance.
-	const qreal verticalDistance = qMin(qAbs(cellLeft - x), qAbs(cellRight - x));
-	const qreal horizontalDistance = qMin(qAbs(cellTop - y), qAbs(cellBottom - y));
+	if (x > right - threshold && x < right + threshold)
+		return Handle(Handle::ColumnResize, columns() - 1); // Hit bottom edge of table.
 
-	if (verticalDistance < threshold || horizontalDistance < threshold)
+	// Invariants:
+	//    - x >= threshold && x <= tableWidth()
+	//    - y >= threshold && y <= tableHeight()
+
+	const TableCell hitCell = cellAt(point);
+	const QRectF hitRect(cellRect(hitCell));
+	if (hitRect.adjusted(threshold, threshold, -threshold, -threshold).contains(gridPoint))
+		return Handle(Handle::CellSelect); // Hit interior of cell.
+
+	const qreal toLeft = x - hitRect.left();
+	const qreal toRight = hitRect.right() - x;
+	const qreal toTop = y - hitRect.top();
+	const qreal toBottom = hitRect.bottom() - y;
+
+	Handle handle(Handle::None);
+	if (qMin(toLeft, toRight) < qMin(toTop, toBottom))
 	{
-		// Hit either right side of column or bottom side of row.
-		return verticalDistance < horizontalDistance ? ColumnRight : RowBottom;
+		handle.setType(Handle::ColumnResize);
+		if (toLeft < toRight)
+		{
+			// Hit cell left edge.
+			handle.setIndex(hitCell.column() - 1);
+		}
+		else
+		{
+			// Hit cell right edge.
+			handle.setIndex(hitCell.column() + hitCell.columnSpan() - 1);
+		}
 	}
-
-	return Cell; // Hit cell interior.
+	else
+	{
+		handle.setType(Handle::RowResize);
+		if (toTop < toBottom)
+		{
+			// Hit cell top edge.
+			handle.setIndex(hitCell.row() - 1);
+		}
+		else
+		{
+			// Hit cell bottom edge.
+			handle.setIndex(hitCell.row() + hitCell.rowSpan() - 1);
+		}
+	}
+	return handle;
 }
 
 void PageItem_Table::resize(qreal width, qreal height, ResizeStrategy strategy)
@@ -640,6 +666,21 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	// Paint the overflow marker.
 	if (isOverflowing())
 		drawOverflowMarker(p);
+}
+
+QRectF PageItem_Table::cellRect(const TableCell& cell) const
+{
+	int row = cell.row();
+	int col = cell.column();
+	int endRow = row + cell.rowSpan() - 1;
+	int endCol = col + cell.columnSpan() - 1;
+
+	qreal x = m_columnPositions[col];
+	qreal y = m_rowPositions[row];
+	qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
+	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
+
+	return QRectF(x, y, width, height);
 }
 
 void PageItem_Table::resizeEqual(qreal width, qreal height)
