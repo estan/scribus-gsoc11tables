@@ -49,6 +49,7 @@ public:
 	virtual void setZoomFactor( double );
 	virtual double zoomFactor() { return m_zoomFactor; }
 	virtual void translate( double, double );
+	virtual void translate( const QPointF& offset );
 	virtual void rotate( double );
 	virtual void scale( double, double );
 

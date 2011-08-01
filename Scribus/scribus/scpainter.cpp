@@ -467,6 +467,11 @@ void ScPainter::translate( double x, double y )
 	cairo_translate (m_cr, x, y);
 }
 
+void ScPainter::translate( const QPointF& offset )
+{
+	cairo_translate (m_cr, offset.x(), offset.y());
+}
+
 void ScPainter::rotate( double r )
 {
 	cairo_rotate (m_cr, r * 3.1415927 / 180.0);
