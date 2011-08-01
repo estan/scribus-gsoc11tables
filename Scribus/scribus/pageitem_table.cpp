@@ -426,44 +426,49 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 {
-	const QPointF gridPoint = getTransform().inverted().map(point) - gridOffset();
-	const qreal bottom = tableHeight();
-	const qreal right = tableWidth();
+	const QPointF framePoint = getTransform().inverted().map(point);
+	const QPointF gridPoint = framePoint - gridOffset();
+
+	const QRectF frameRect = QRectF(0.0, 0.0, width(), height());
+	const QRectF gridRect = QRectF(0.0, 0.0, tableWidth(), tableHeight());
+
+	if (!frameRect.adjusted(-threshold, -threshold, 0.0, 0.0).contains(framePoint))
+		return Handle(Handle::None); // No hit on frame.
+
+	if (!gridRect.adjusted(-threshold, -threshold, threshold, threshold).contains(gridPoint))
+		return Handle(Handle::None); // No hit on table.
+
+	const qreal tableHeight = this->tableHeight();
+	const qreal tableWidth = this->tableWidth();
 	const qreal x = gridPoint.x();
 	const qreal y = gridPoint.y();
 
-	if (x < -threshold || x > right + threshold || y < -threshold || y > bottom + threshold)
-		return Handle(Handle::None); // No hit.
-
-	if (x < threshold)
+	if (x <= threshold)
 		return Handle(Handle::RowSelect); // Hit left edge of table.
 
-	if (y < threshold)
+	if (y <= threshold)
 		return Handle(Handle::ColumnSelect); // Hit top edge of table.
 
-	if (x > right - threshold && y > bottom - threshold)
+	if (x >= tableWidth - threshold && y >= tableHeight - threshold)
 		return Handle(Handle::TableResize); // Hit bottom right corner of table.
 
-	if (y > bottom - threshold && y < bottom + threshold)
+	if (y >= tableHeight - threshold && y <= tableHeight + threshold)
 		return Handle(Handle::RowResize, rows() - 1); // Hit right edge of table.
 
-	if (x > right - threshold && x < right + threshold)
+	if (x >= tableWidth - threshold && x <= tableWidth + threshold)
 		return Handle(Handle::ColumnResize, columns() - 1); // Hit bottom edge of table.
-
-	// Invariants:
-	//    - x >= threshold && x <= tableWidth()
-	//    - y >= threshold && y <= tableHeight()
 
 	const TableCell hitCell = cellAt(point);
 	const QRectF hitRect(cellRect(hitCell));
+
 	if (hitRect.adjusted(threshold, threshold, -threshold, -threshold).contains(gridPoint))
 		return Handle(Handle::CellSelect); // Hit interior of cell.
 
+	// Hit one of the cell edges, so find the closest one.
 	const qreal toLeft = x - hitRect.left();
 	const qreal toRight = hitRect.right() - x;
 	const qreal toTop = y - hitRect.top();
 	const qreal toBottom = hitRect.bottom() - y;
-
 	Handle handle(Handle::None);
 	if (qMin(toLeft, toRight) < qMin(toTop, toBottom))
 	{
