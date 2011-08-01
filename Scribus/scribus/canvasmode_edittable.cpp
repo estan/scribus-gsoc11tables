@@ -15,6 +15,7 @@ for which a new license (GPL+exception) is in place.
 #include "canvas.h"
 #include "canvasgesture_columnresize.h"
 #include "canvasgesture_rowresize.h"
+#include "canvasgesture_tableresize.h"
 #include "cellarea.h"
 #include "fpoint.h"
 #include "pageitem_table.h"
@@ -28,6 +29,7 @@ CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view)
 	m_table(0),
 	m_selectRowCursor(loadIcon("select_row.png")),
 	m_selectColumnCursor(loadIcon("select_column.png")),
+	m_tableResizeGesture(new TableResize(this)),
 	m_rowResizeGesture(new RowResize(this)),
 	m_columnResizeGesture(new ColumnResize(this))
 {
@@ -35,6 +37,7 @@ CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view)
 
 CanvasMode_EditTable::~CanvasMode_EditTable()
 {
+	delete m_tableResizeGesture;
 	delete m_rowResizeGesture;
 	delete m_columnResizeGesture;
 }
@@ -107,12 +110,12 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			// Not implemented.
 			break;
 		case PageItem_Table::Handle::ColumnResize:
-			// Not implemented.
 			m_columnResizeGesture->setup(m_table, handle.index());
 			m_view->startGesture(m_columnResizeGesture);
 			break;
 		case PageItem_Table::Handle::TableResize:
-			// Not implemented.
+			m_tableResizeGesture->setup(m_table);
+			m_view->startGesture(m_tableResizeGesture);
 			break;
 		case PageItem_Table::Handle::CellSelect:
 			// Not implemented.

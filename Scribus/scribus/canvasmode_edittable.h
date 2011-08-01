@@ -22,6 +22,7 @@ class QPainter;
 class RowResize;
 class ColumnResize;
 class ScribusView;
+class TableResize;
 
 /**
  * This is a canvas mode for editing tables.
@@ -49,6 +50,8 @@ private:
 	/// The "select column" cursor.
 	QCursor m_selectColumnCursor;
 
+	/// Gesture for resizing a table.
+	TableResize* m_tableResizeGesture;
 	/// Gesture for resizing a row.
 	RowResize* m_rowResizeGesture;
 	/// Gesture for resizing a column.
