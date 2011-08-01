@@ -51,9 +51,9 @@ private:
 	PageItem_Table* m_table;
 	/// Row being resized.
 	int m_row;
-	/// List of row heights during the resize.
+	/// List of row heights for the table outline.
 	QList<qreal> m_rowHeights;
-	/// List of row positions during the resize.
+	/// List of row positions for the table outline.
 	QList<qreal> m_rowPositions;
 };
 

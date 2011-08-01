@@ -68,7 +68,7 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
 		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
 
-	// Update height of row.
+	// Set height of row for the table outline.
 	qreal rowPosition = m_rowPositions[m_row];
 	qreal requestedHeight = gridPoint.y() - rowPosition;
 	qreal actualHeight = qMax(PageItem_Table::MinimumRowHeight, requestedHeight);
@@ -91,7 +91,7 @@ void RowResize::drawControls(QPainter* p)
 	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
 	p->setTransform(m_table->getTransform(), true);
 
-	// Paint the outline using the transformed row geometries.
+	// Paint the table outline using the changed row geometries.
 	TableUtils::paintOutline(m_table, m_rowHeights, m_rowPositions,
 		m_table->columnWidths(), m_table->columnPositions(), m_canvas, p);
 
