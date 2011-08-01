@@ -425,7 +425,6 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 {
 	const QPointF framePoint = getTransform().inverted().map(point);
 	const QPointF gridPoint = framePoint - gridOffset();
-
 	const QRectF frameRect = QRectF(0.0, 0.0, width(), height());
 	const QRectF gridRect = QRectF(0.0, 0.0, tableWidth(), tableHeight());
 
@@ -470,30 +469,12 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 	if (qMin(toLeft, toRight) < qMin(toTop, toBottom))
 	{
 		handle.setType(Handle::ColumnResize);
-		if (toLeft < toRight)
-		{
-			// Hit cell left edge.
-			handle.setIndex(hitCell.column() - 1);
-		}
-		else
-		{
-			// Hit cell right edge.
-			handle.setIndex(hitCell.column() + hitCell.columnSpan() - 1);
-		}
+		handle.setIndex((toLeft < toRight ? hitCell.column() : hitCell.columnSpan()) - 1);
 	}
 	else
 	{
 		handle.setType(Handle::RowResize);
-		if (toTop < toBottom)
-		{
-			// Hit cell top edge.
-			handle.setIndex(hitCell.row() - 1);
-		}
-		else
-		{
-			// Hit cell bottom edge.
-			handle.setIndex(hitCell.row() + hitCell.rowSpan() - 1);
-		}
+		handle.setIndex((toTop < toBottom ? hitCell.row() : hitCell.row() + hitCell.rowSpan()) - 1);
 	}
 	return handle;
 }
