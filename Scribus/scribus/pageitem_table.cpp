@@ -290,7 +290,7 @@ qreal PageItem_Table::rowHeight(int row) const
 
 void PageItem_Table::setRowHeight(int row, qreal height)
 {
-	if (!validRow(row) || height <= 0.0)
+	if (!validRow(row))
 		return;
 
 	// Set the height and save the change.
@@ -323,7 +323,7 @@ qreal PageItem_Table::columnWidth(int column) const
 
 void PageItem_Table::setColumnWidth(int column, qreal width)
 {
-	if (!validColumn(column) || width <= 0.0)
+	if (!validColumn(column))
 		return;
 
 	// Set the width and save the change.
