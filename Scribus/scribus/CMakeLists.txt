@@ -165,6 +165,7 @@ SET(SCRIBUS_UI_SRC
 SET(SCRIBUS_MOC_CLASSES
   actionmanager.h
   canvas.h
+  canvasgesture_columnresize.h
   canvasgesture_rowresize.h
   canvasgesture_rulermove.h
   canvasmode.h
@@ -448,6 +449,7 @@ SET(SCRIBUS_MOC_CLASSES
 SET(SCRIBUS_SOURCES
   actionmanager.cpp
   canvas.cpp
+  canvasgesture_columnresize.cpp
   canvasgesture_linemove.cpp
   canvasgesture_pan.cpp
   canvasgesture_rectselect.cpp

@@ -13,6 +13,7 @@ for which a new license (GPL+exception) is in place.
 #include <QPointF>
 
 #include "canvas.h"
+#include "canvasgesture_columnresize.h"
 #include "canvasgesture_rowresize.h"
 #include "cellarea.h"
 #include "fpoint.h"
@@ -27,13 +28,15 @@ CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view)
 	m_table(0),
 	m_selectRowCursor(loadIcon("select_row.png")),
 	m_selectColumnCursor(loadIcon("select_column.png")),
-	m_rowResizeGesture(new RowResize(this))
+	m_rowResizeGesture(new RowResize(this)),
+	m_columnResizeGesture(new ColumnResize(this))
 {
 }
 
 CanvasMode_EditTable::~CanvasMode_EditTable()
 {
 	delete m_rowResizeGesture;
+	delete m_columnResizeGesture;
 }
 
 void CanvasMode_EditTable::activate(bool fromGesture)
@@ -105,6 +108,8 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			break;
 		case PageItem_Table::Handle::ColumnResize:
 			// Not implemented.
+			m_columnResizeGesture->setup(m_table, handle.index());
+			m_view->startGesture(m_columnResizeGesture);
 			break;
 		case PageItem_Table::Handle::TableResize:
 			// Not implemented.

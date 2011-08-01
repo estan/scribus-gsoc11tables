@@ -20,6 +20,7 @@ class PageItem_Table;
 class QMouseEvent;
 class QPainter;
 class RowResize;
+class ColumnResize;
 class ScribusView;
 
 /**
@@ -50,6 +51,8 @@ private:
 
 	/// Gesture for resizing a row.
 	RowResize* m_rowResizeGesture;
+	/// Gesture for resizing a column.
+	ColumnResize* m_columnResizeGesture;
 };
 
 #endif // CANVASMODE_EDITTABLE_H
