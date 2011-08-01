@@ -90,8 +90,11 @@ void RowResize::drawControls(QPainter* p)
 	p->scale(m_canvas->scale(), m_canvas->scale());
 	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
 	p->setTransform(m_table->getTransform(), true);
+
+	// Paint the outline using the transformed row geometries.
 	TableUtils::paintOutline(m_table, m_rowHeights, m_rowPositions,
 		m_table->columnWidths(), m_table->columnPositions(), m_canvas, p);
+
 	p->restore();
 }
 
