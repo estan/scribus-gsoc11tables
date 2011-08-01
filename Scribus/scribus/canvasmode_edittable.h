@@ -18,6 +18,7 @@ for which a new license (GPL+exception) is in place.
 class CanvasGesture;
 class PageItem_Table;
 class QMouseEvent;
+class QPainter;
 class RowResize;
 class ScribusView;
 
@@ -36,6 +37,7 @@ public:
 	virtual void deactivate(bool forGesture);
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	virtual void mousePressEvent(QMouseEvent* event);
+	virtual void drawControls(QPainter* p);
 
 private:
 	/// Table being edited.

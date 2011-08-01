@@ -9,6 +9,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QCursor>
 #include <QDebug>
+#include <QPainter>
 #include <QPointF>
 
 #include "canvas.h"
@@ -118,4 +119,11 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			qWarning("Unknown hit target");
 			break;
 	}
+}
+
+void CanvasMode_EditTable::drawControls(QPainter* p)
+{
+	p->save();
+	commonDrawControls(p, false);
+	p->restore();
 }

@@ -87,6 +87,10 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 void RowResize::drawControls(QPainter* p)
 {
 	p->save();
+	commonDrawControls(p, false);
+	p->restore();
+
+	p->save();
 	p->scale(m_canvas->scale(), m_canvas->scale());
 	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
 	p->setTransform(m_table->getTransform(), true);
