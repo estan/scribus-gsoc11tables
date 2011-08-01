@@ -129,7 +129,7 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
  * The size of these vectors must match the table dimensions, or the result of this
  * function is undefined.
  *
- * The painter will be scaled to match the scale of @a canvas before painting.
+ * The width of the outline pen will depend on the scale of @a canvas.
  *
  * This function is used in the canvas gestures during row, column and table resizing.
  */

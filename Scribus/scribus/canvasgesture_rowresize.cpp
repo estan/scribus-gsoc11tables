@@ -9,9 +9,11 @@ for which a new license (GPL+exception) is in place.
 
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QPainter>
 #include <QPointF>
 
 #include "canvas.h"
+#include "fpoint.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
 #include "selection.h"
@@ -33,14 +35,20 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// TODO: Snap to grid/guides.
-	QPointF gridPoint = m_table->getTransform().inverted().map(
-		m_canvas->globalToCanvas(event->globalPos()).toQPointF()) -
+	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
+
+	// Snap to grid and guides.
+	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
+	m_doc->ApplyGuides(&canvasPoint);
+
+	// Convert to table grid coordinates.
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
 		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
 
 	// Perform the actual resize of the row.
-	qreal rowHeight = qMax(PageItem_Table::MinimumRowHeight, gridPoint.y() - m_table->rowPosition(m_row));
-	m_table->setRowHeight(m_row, rowHeight);
+	qreal requestedHeight = gridPoint.y() - m_table->rowPosition(m_row);
+	qreal actualHeight = qMax(PageItem_Table::MinimumRowHeight, requestedHeight);
+	m_table->setRowHeight(m_row, actualHeight);
 	m_table->update();
 
 	m_view->stopGesture();
@@ -50,16 +58,23 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// TODO: Snap to grid/guides.
-	QPointF gridPoint = m_table->getTransform().inverted().map(
-		m_canvas->globalToCanvas(event->globalPos()).toQPointF()) -
+	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
+
+	// Snap to grid and guides.
+	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
+	m_doc->ApplyGuides(&canvasPoint);
+
+	// Convert to table grid coordinates.
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
 		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
 
 	// Update height of row.
 	qreal rowPosition = m_rowPositions[m_row];
-	m_rowHeights[m_row] = qMax(PageItem_Table::MinimumRowHeight, gridPoint.y() - rowPosition);
+	qreal requestedHeight = gridPoint.y() - rowPosition;
+	qreal actualHeight = qMax(PageItem_Table::MinimumRowHeight, requestedHeight);
+	m_rowHeights[m_row] = actualHeight;
 
-	// Update positions of following rows.
+	// Set positions of following rows.
 	for (int row = m_row; row < m_rowPositions.size(); ++row)
 	{
 		m_rowPositions[row] = rowPosition;
@@ -71,8 +86,13 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 
 void RowResize::drawControls(QPainter* p)
 {
+	p->save();
+	p->scale(m_canvas->scale(), m_canvas->scale());
+	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
+	p->setTransform(m_table->getTransform(), true);
 	TableUtils::paintOutline(m_table, m_rowHeights, m_rowPositions,
 		m_table->columnWidths(), m_table->columnPositions(), m_canvas, p);
+	p->restore();
 }
 
 void RowResize::setup(PageItem_Table* table, int row)

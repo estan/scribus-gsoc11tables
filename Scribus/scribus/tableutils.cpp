@@ -444,8 +444,6 @@ void paintOutline(PageItem_Table* table, const QList<qreal>& rowHeights, const Q
 
 	p->save();
 	p->setRenderHint(QPainter::Antialiasing);
-	p->scale(canvas->scale(), canvas->scale());
-	p->setTransform(table->getTransform(), true);
 	p->setPen(QPen(QColor(100, 200, 255), 3.0 / canvas->scale(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
 
 	qreal xOffset = table->maxLeftBorderWidth() / 2;
