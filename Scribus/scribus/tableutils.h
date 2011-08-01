@@ -9,7 +9,13 @@ for which a new license (GPL+exception) is in place.
 #ifndef TABLEUTILS_H
 #define TABLEUTILS_H
 
+#include <QList>
+
 #include "tableborder.h"
+
+class Canvas;
+class QPainter;
+class PageItem_Table;
 
 /**
  * Table utility functions.
@@ -114,6 +120,21 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 				  const TableBorder& bottomLeft, const TableBorder& topRight, const TableBorder& right,
 				  const TableBorder& bottomRight, QPointF* start, QPointF* end, QPointF* startOffsetFactors,
 				  QPointF* endOffsetFactors);
+
+/**
+ * Paints the outline of @a table using the given row and column geometries.
+ *
+ * @a rowHeights, @a rowPositions, @a columnWidths and @a columnPositions specifies
+ * alternate geometries for the rows and columns to use when painting the outline.
+ * The size of these vectors must match the table dimensions, or the result of this
+ * function is undefined.
+ *
+ * The painter will be scaled to match the scale of @a canvas before painting.
+ *
+ * This function is used in the canvas gestures during row, column and table resizing.
+ */
+void paintOutline(PageItem_Table* table, const QList<qreal>& rowHeights, const QList<qreal>& rowPositions,
+	const QList<qreal>& columnWidths, const QList<qreal>& columnPositions, Canvas* canvas, QPainter* p);
 
 } // namespace TableUtils
 

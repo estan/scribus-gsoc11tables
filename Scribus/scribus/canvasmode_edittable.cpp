@@ -96,9 +96,8 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			// Not implemented.
 			break;
 		case PageItem_Table::Handle::RowResize:
-			m_rowResizeGesture->setRow(handle.index());
+			m_rowResizeGesture->setup(m_table, handle.index());
 			m_view->startGesture(m_rowResizeGesture);
-			m_rowResizeGesture->mousePressEvent(event);
 			break;
 		case PageItem_Table::Handle::ColumnSelect:
 			// Not implemented.

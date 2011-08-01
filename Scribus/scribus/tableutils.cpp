@@ -7,9 +7,15 @@ a copyright and/or license notice that predates the release of Scribus 1.3.2
 for which a new license (GPL+exception) is in place.
 */
 
+#include <QList>
+#include <QPainter>
 #include <QPointF>
+#include <QRectF>
 
+#include "canvas.h"
+#include "pageitem_table.h"
 #include "tableborder.h"
+
 #include "tableutils.h"
 
 namespace TableUtils
@@ -428,6 +434,51 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 		end->setX(end->x() + 0.5 * qMax(topRight.width(), bottomRight.width()));
 	}
 	// Cases: 1, 11, 12, 16, 20, 21, 25 - No adjustment to end point(s) needed.
+}
+
+void paintOutline(PageItem_Table* table, const QList<qreal>& rowHeights, const QList<qreal>& rowPositions,
+	const QList<qreal>& columnWidths, const QList<qreal>& columnPositions, Canvas* canvas, QPainter* p)
+{
+	if (!table || !canvas || !p)
+		return;
+
+	p->save();
+	p->setRenderHint(QPainter::Antialiasing);
+	p->scale(canvas->scale(), canvas->scale());
+	p->setTransform(table->getTransform(), true);
+	p->setPen(QPen(QColor(100, 200, 255), 3.0 / canvas->scale(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+
+	qreal xOffset = table->maxLeftBorderWidth() / 2;
+	qreal yOffset = table->maxTopBorderWidth() / 2;
+
+	p->drawRect(QRectF(xOffset, yOffset, columnPositions.last() + columnWidths.last(),
+		rowPositions.last() + rowHeights.last()));
+
+	for (int row = 0; row < table->rows(); ++row)
+	{
+		int colSpan = 0;
+		for (int col = 0; col < table->columns(); col += colSpan)
+		{
+			TableCell cell = table->cellAt(row, col);
+			if (row == cell.row())
+			{
+				int endCol = col + cell.columnSpan() - 1;
+				int endRow = row + cell.rowSpan() - 1;
+				qreal left = columnPositions[col] + xOffset;
+				qreal right = columnPositions[endCol] + columnWidths[endCol] + xOffset;
+				qreal top = rowPositions[row] + yOffset;
+				qreal bottom = rowPositions[endRow] + rowHeights[endRow] + yOffset;
+				// Paint left and top edge of cell.
+				if (col != 0)
+					p->drawLine(QPointF(left, top), QPointF(left, bottom));
+				if (row != 0)
+					p->drawLine(QPointF(left, top), QPointF(right, top));
+			}
+			colSpan = cell.columnSpan();
+		}
+	}
+
+	p->restore();
 }
 
 } // namespace TableUtils

@@ -197,6 +197,11 @@ public:
 	qreal rowHeight(int row) const;
 
 	/**
+	 * Returns the list of row heights for the table.
+	 */
+	QList<qreal> rowHeights() const { return m_rowHeights; }
+
+	/**
 	 * Sets the height of @a row to <code>qMax(MinimumRowHeight, height)</code>.
 	 *
 	 * If @a row does not exists or @a height is less than or equal to 0, this method does nothing.
@@ -207,6 +212,11 @@ public:
 	 * Returns the position of @a row, or 0 if @a row does not exist.
 	 */
 	qreal rowPosition(int row) const;
+
+	/**
+	 * Returns the list of row positions for the table.
+	 */
+	QList<qreal> rowPositions() const { return m_rowPositions; }
 
 	/**
 	 * Inserts @a numColumns columns before the column at @a index.
@@ -232,6 +242,11 @@ public:
 	qreal columnWidth(int column) const;
 
 	/**
+	 * Returns the list of column widths for the table.
+	 */
+	QList<qreal> columnWidths() const { return m_columnWidths; }
+
+	/**
 	 * Sets the width of @a column to <code>qMax(MinimumColumnWidth, width)</code>.
 	 *
 	 * If @a column does not exists or @a width is less than or equal to 0, this method does nothing.
@@ -242,6 +257,11 @@ public:
 	 * Returns the position of @a column, or 0 if @a column does not exist.
 	 */
 	qreal columnPosition(int column) const;
+
+	/**
+	 * Returns the list of column positions for the table.
+	 */
+	QList<qreal> columnPositions() const { return m_columnPositions; }
 
 	/**
 	 * Merges the cell at the specified @a row and @a column with the adjacent cells into
