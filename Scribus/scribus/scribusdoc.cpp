@@ -42,6 +42,7 @@ for which a new license (GPL+exception) is in place.
 //#include "desaxe/saxXML.h"
 #include "fileloader.h"
 #include "filewatcher.h"
+#include "fpoint.h"
 #include "ui/guidemanager.h"
 #include "hyphenator.h"
 #include "page.h"
@@ -11572,6 +11573,18 @@ bool ScribusDoc::ApplyGuides(double *x, double *y)
 	}
 //	if (m_SnapCounter > 10)
 //		m_SnapCounter = 0;
+	return ret;
+}
+
+
+bool ScribusDoc::ApplyGuides(FPoint* point)
+{
+	double newX = point->x();
+	double newY = point->y();
+	bool ret = ApplyGuides(&newX, &newY);
+	point->setX(newX);
+	point->setY(newY);
+
 	return ret;
 }
 

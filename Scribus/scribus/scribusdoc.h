@@ -58,6 +58,7 @@ for which a new license (GPL+exception) is in place.
 #include FT_FREETYPE_H
 
 class DocUpdater;
+class FPoint;
 class UndoManager;
 class UndoState;
 class PDFOptions;
@@ -1056,6 +1057,7 @@ public:
 	//! \brief Snap an item to the guides
 	void SnapToGuides(PageItem *currItem);
 	bool ApplyGuides(double *x, double *y);
+	bool ApplyGuides(FPoint* point);
 	bool MoveItem(double newX, double newY, PageItem* ite, bool fromMP = false);
 	void RotateItem(double win, int ite);
 	void RotateItem(double win, PageItem *currItem);
