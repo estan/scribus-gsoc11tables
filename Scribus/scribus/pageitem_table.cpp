@@ -461,7 +461,7 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 		return Handle(Handle::ColumnResize, columns() - 1);
 
 	const TableCell hitCell = cellAt(point);
-	const QRectF hitRect(cellRect(hitCell));
+	const QRectF hitRect = cellRect(hitCell);
 
 	// Test if hit is on cell interior.
 	if (hitRect.adjusted(threshold, threshold, -threshold, -threshold).contains(gridPoint))
