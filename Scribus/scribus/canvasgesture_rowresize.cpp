@@ -35,8 +35,6 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
-
 	// Snap to grid and guides.
 	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
 	m_doc->ApplyGuides(&canvasPoint);
@@ -45,9 +43,7 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Perform the actual resize of the row.
-	qreal requestedHeight = gridPoint.y() - m_table->rowPosition(m_row);
-	qreal actualHeight = qMax(PageItem_Table::MinimumRowHeight, requestedHeight);
-	m_table->setRowHeight(m_row, actualHeight);
+	m_table->setRowHeight(m_row, gridPoint.y() - m_table->rowPosition(m_row));
 	m_table->update();
 
 	m_view->stopGesture();
@@ -56,8 +52,6 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 void RowResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
-
-	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
 
 	// Snap to grid and guides.
 	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));

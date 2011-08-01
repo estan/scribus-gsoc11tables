@@ -45,9 +45,7 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Perform the actual resize of the column.
-	qreal requestedWidth = gridPoint.x() - m_table->columnPosition(m_column);
-	qreal actualWidth = qMax(PageItem_Table::MinimumColumnWidth, requestedWidth);
-	m_table->setColumnWidth(m_column, actualWidth);
+	m_table->setColumnWidth(m_column, gridPoint.x() - m_table->columnPosition(m_column));
 	m_table->update();
 
 	m_view->stopGesture();
@@ -56,8 +54,6 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 void ColumnResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
-
-	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
 
 	// Snap to grid and guides.
 	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
