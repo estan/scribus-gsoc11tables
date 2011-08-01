@@ -446,10 +446,9 @@ void paintOutline(PageItem_Table* table, const QList<qreal>& rowHeights, const Q
 	p->setRenderHint(QPainter::Antialiasing);
 	p->setPen(QPen(QColor(100, 200, 255), 3.0 / canvas->scale(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
 
-	qreal xOffset = table->maxLeftBorderWidth() / 2;
-	qreal yOffset = table->maxTopBorderWidth() / 2;
+	QPointF offset = table->gridOffset();
 
-	p->drawRect(QRectF(xOffset, yOffset, columnPositions.last() + columnWidths.last(),
+	p->drawRect(QRectF(offset.x(), offset.y(), columnPositions.last() + columnWidths.last(),
 		rowPositions.last() + rowHeights.last()));
 
 	for (int row = 0; row < table->rows(); ++row)
@@ -462,10 +461,10 @@ void paintOutline(PageItem_Table* table, const QList<qreal>& rowHeights, const Q
 			{
 				int endCol = col + cell.columnSpan() - 1;
 				int endRow = row + cell.rowSpan() - 1;
-				qreal left = columnPositions[col] + xOffset;
-				qreal right = columnPositions[endCol] + columnWidths[endCol] + xOffset;
-				qreal top = rowPositions[row] + yOffset;
-				qreal bottom = rowPositions[endRow] + rowHeights[endRow] + yOffset;
+				qreal left = columnPositions[col] + offset.x();
+				qreal right = columnPositions[endCol] + columnWidths[endCol] + offset.x();
+				qreal top = rowPositions[row] + offset.y();
+				qreal bottom = rowPositions[endRow] + rowHeights[endRow] + offset.y();
 				// Paint left and top edge of cell.
 				if (col != 0)
 					p->drawLine(QPointF(left, top), QPointF(left, bottom));

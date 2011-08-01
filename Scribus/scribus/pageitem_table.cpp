@@ -414,8 +414,7 @@ TableCell PageItem_Table::cellAt(int row, int column) const
 
 TableCell PageItem_Table::cellAt(const QPointF& point) const
 {
-	QPointF gridPoint = getTransform().inverted().map(point) -
-		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
+	QPointF gridPoint = getTransform().inverted().map(point) - gridOffset();
 
 	if (!QRectF(0, 0, tableWidth(), tableHeight()).contains(gridPoint))
 		return TableCell(); // Outside table grid.
@@ -427,8 +426,7 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 {
-	const QPointF gridPoint = getTransform().inverted().map(point) -
-		QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2);
+	const QPointF gridPoint = getTransform().inverted().map(point) - gridOffset();
 	const qreal bottom = tableHeight();
 	const qreal right = tableWidth();
 	const qreal x = gridPoint.x();
@@ -614,6 +612,48 @@ QString PageItem_Table::style() const
 	return m_style.parent();
 }
 
+void PageItem_Table::applicableActions(QStringList& actionList)
+{
+	actionList << "itemAdjustFrameToTable";
+	actionList << "itemAdjustTableToFrame";
+}
+
+void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
+{
+	if (m_Doc->RePos)
+		return;
+
+	p->save();
+
+	// Set the clip path.
+	p->setupPolygon(&PoLine);
+	p->setClipPath();
+
+	// Paint the table.
+	m_tablePainter->paintTable(p);
+
+	p->restore();
+
+	// Paint the overflow marker.
+	if (isOverflowing())
+		drawOverflowMarker(p);
+}
+
+QRectF PageItem_Table::cellRect(const TableCell& cell) const
+{
+	int row = cell.row();
+	int col = cell.column();
+	int endRow = row + cell.rowSpan() - 1;
+	int endCol = col + cell.columnSpan() - 1;
+
+	qreal x = m_columnPositions[col];
+	qreal y = m_rowPositions[row];
+	qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
+	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
+
+	return QRectF(x, y, width, height);
+}
+
 qreal PageItem_Table::maxLeftBorderWidth() const
 {
 	qreal maxWidth = 0.0;
@@ -660,48 +700,6 @@ qreal PageItem_Table::maxBottomBorderWidth() const
 		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(bottomBorder(), cell.bottomBorder()).width());
 	}
 	return maxWidth;
-}
-
-void PageItem_Table::applicableActions(QStringList& actionList)
-{
-	actionList << "itemAdjustFrameToTable";
-	actionList << "itemAdjustTableToFrame";
-}
-
-void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
-{
-	if (m_Doc->RePos)
-		return;
-
-	p->save();
-
-	// Set the clip path.
-	p->setupPolygon(&PoLine);
-	p->setClipPath();
-
-	// Paint the table.
-	m_tablePainter->paintTable(p);
-
-	p->restore();
-
-	// Paint the overflow marker.
-	if (isOverflowing())
-		drawOverflowMarker(p);
-}
-
-QRectF PageItem_Table::cellRect(const TableCell& cell) const
-{
-	int row = cell.row();
-	int col = cell.column();
-	int endRow = row + cell.rowSpan() - 1;
-	int endCol = col + cell.columnSpan() - 1;
-
-	qreal x = m_columnPositions[col];
-	qreal y = m_rowPositions[row];
-	qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
-	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
-
-	return QRectF(x, y, width, height);
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)

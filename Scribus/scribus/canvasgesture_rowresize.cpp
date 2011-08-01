@@ -42,8 +42,7 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 	m_doc->ApplyGuides(&canvasPoint);
 
 	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
-		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Perform the actual resize of the row.
 	qreal requestedHeight = gridPoint.y() - m_table->rowPosition(m_row);
@@ -65,8 +64,7 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 	m_doc->ApplyGuides(&canvasPoint);
 
 	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
-		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Set height of row for the table outline.
 	qreal rowPosition = m_rowPositions[m_row];

@@ -42,8 +42,7 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 	m_doc->ApplyGuides(&canvasPoint);
 
 	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
-		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Perform the actual resize of the column.
 	qreal requestedWidth = gridPoint.x() - m_table->columnPosition(m_column);
@@ -65,8 +64,7 @@ void ColumnResize::mouseMoveEvent(QMouseEvent* event)
 	m_doc->ApplyGuides(&canvasPoint);
 
 	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) -
-		QPointF(m_table->maxLeftBorderWidth()/2, m_table->maxTopBorderWidth()/2);
+	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
 
 	// Set width of column for the table outline.
 	qreal columnPosition = m_columnPositions[m_column];

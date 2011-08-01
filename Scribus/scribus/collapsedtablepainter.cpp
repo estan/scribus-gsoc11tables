@@ -22,9 +22,7 @@ using namespace TableUtils;
 void CollapsedTablePainter::paintTable(ScPainter* p)
 {
 	p->save();
-
-	// Translate the painter to stay inside frame at left and top edge.
-	p->translate(table()->maxLeftBorderWidth() / 2, table()->maxTopBorderWidth() / 2);
+	p->translate(table()->gridOffset());
 
 	// Paint table fill.
 	paintTableFill(p);

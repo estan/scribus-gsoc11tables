@@ -148,6 +148,11 @@ public:
 	qreal tableHeight() const { return m_rowPositions.last() + m_rowHeights.last(); }
 
 	/**
+	 * Returns the offset of the table grid from the item origin.
+	 */
+	QPointF gridOffset() const { return QPointF(maxLeftBorderWidth()/2, maxTopBorderWidth()/2); }
+
+	/**
 	 * Returns the effective width of the table.
 	 *
 	 * The effective table width includes the width of the table grid plus half the width of the widest
@@ -369,18 +374,6 @@ public:
 	/// Returns the style of this table.
 	QString style() const;
 
-	/// Returns the width of the widest border along the left side of this table.
-	qreal maxLeftBorderWidth() const;
-
-	/// Returns the width of the widest border along the right side of this table.
-	qreal maxRightBorderWidth() const;
-
-	/// Returns the width of the widest border along the top side of this table.
-	qreal maxTopBorderWidth() const;
-
-	/// Returns the width of the widest border along the bottom side of this table.
-	qreal maxBottomBorderWidth() const;
-
 	/// Returns <code>true</code> if the table is overflowing its frame.
 	bool isOverflowing() const { return effectiveWidth() > width() || effectiveHeight() > height(); }
 
@@ -426,6 +419,18 @@ private:
 
 	/// Returns the rectangle of @a cell on the table grid.
 	QRectF cellRect(const TableCell& cell) const;
+
+	/// Returns the width of the widest border along the left side of this table.
+	qreal maxLeftBorderWidth() const;
+
+	/// Returns the width of the widest border along the right side of this table.
+	qreal maxRightBorderWidth() const;
+
+	/// Returns the width of the widest border along the top side of this table.
+	qreal maxTopBorderWidth() const;
+
+	/// Returns the width of the widest border along the bottom side of this table.
+	qreal maxBottomBorderWidth() const;
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.
