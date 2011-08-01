@@ -61,9 +61,6 @@ PageItem_Table::~PageItem_Table()
 
 void PageItem_Table::resize(qreal width, qreal height)
 {
-	if (width < 0 || height < 0)
-		return;
-
 	/*
 	 * Distribute width proportionally to columns, but don't let any column width below
 	 * MinimumColumnWidth.
