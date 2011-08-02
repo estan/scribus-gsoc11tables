@@ -11,8 +11,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QList>
 
-#include "canvasgesture.h"
-#include "scribusview.h"
+#include "canvasgesture_table.h"
 
 class CanvasMode;
 class PageItem_Table;
@@ -27,12 +26,12 @@ class QPainter;
  * to a new location and then releases the button. The resize may be cancelled by
  * pressing the Escape key.
  */
-class SCRIBUS_API RowResize : public CanvasGesture
+class SCRIBUS_API RowResize : public TableGesture
 {
 	Q_OBJECT
 
 public:
-	explicit RowResize(CanvasMode* parent) : CanvasGesture(parent), m_table(0), m_row(0) {}
+	explicit RowResize(CanvasMode* parent) : TableGesture(parent), m_row(0) {}
 	virtual ~RowResize() {}
 
 	virtual void activate(bool fromGesture) {};
@@ -47,8 +46,6 @@ public:
 	void setup(PageItem_Table* table, int row);
 
 private:
-	/// Table being edited.
-	PageItem_Table* m_table;
 	/// Row being resized.
 	int m_row;
 	/// List of row heights for the table outline.

@@ -16,6 +16,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
+#include "scribusview.h"
 #include "selection.h"
 #include "tableutils.h"
 
@@ -35,16 +36,11 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Perform the actual resize of the row.
-	m_table->setRowHeight(m_row, gridPoint.y() - m_table->rowPosition(m_row));
-	m_table->update();
+	table()->setRowHeight(m_row, gridPoint.y() - table()->rowPosition(m_row));
+	table()->update();
 
 	m_view->stopGesture();
 }
@@ -53,12 +49,7 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Set height of row for the table outline.
 	qreal rowPosition = m_rowPositions[m_row];
@@ -85,16 +76,9 @@ void RowResize::drawControls(QPainter* p)
 	commonDrawControls(p, false);
 	p->restore();
 
-	p->save();
-	p->scale(m_canvas->scale(), m_canvas->scale());
-	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
-	p->setTransform(m_table->getTransform(), true);
-
 	// Paint the table outline using the changed row geometries.
-	TableUtils::paintOutline(m_table, m_rowHeights, m_rowPositions,
-		m_table->columnWidths(), m_table->columnPositions(), m_canvas, p);
-
-	p->restore();
+	paintTableOutline(m_rowHeights, m_rowPositions,
+		table()->columnWidths(), table()->columnPositions(), p);
 }
 
 void RowResize::setup(PageItem_Table* table, int row)
@@ -102,10 +86,10 @@ void RowResize::setup(PageItem_Table* table, int row)
 	Q_ASSERT(table);
 	Q_ASSERT(row >= 0 && row < table->rows());
 
-	m_table = table;
+	setTable(table);
 	m_row = row;
 
 	// Make copies of the row geometries to be used during resize.
-	m_rowHeights = m_table->rowHeights();
-	m_rowPositions = m_table->rowPositions();
+	m_rowHeights = table->rowHeights();
+	m_rowPositions = table->rowPositions();
 }

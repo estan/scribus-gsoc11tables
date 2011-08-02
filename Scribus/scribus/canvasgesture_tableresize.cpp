@@ -18,6 +18,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
+#include "scribusview.h"
 #include "selection.h"
 #include "tableutils.h"
 
@@ -37,16 +38,11 @@ void TableResize::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Perform the actual resize of the table.
-	m_table->resize(gridPoint.x(), gridPoint.y());
-	m_table->update();
+	table()->resize(gridPoint.x(), gridPoint.y());
+	table()->update();
 
 	m_view->stopGesture();
 }
@@ -55,36 +51,31 @@ void TableResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Set the column  geometries for the table outline.
-	qreal requestedWidthFactor = gridPoint.x() / m_table->tableWidth();
+	qreal requestedWidthFactor = gridPoint.x() / table()->tableWidth();
 	qreal newMinWidth = qMax(m_minWidth * requestedWidthFactor, PageItem_Table::MinimumColumnWidth);
 	qreal actualWidthFactor = newMinWidth / m_minWidth;
 	for (int col = 0; col < m_columnWidths.size(); ++col)
 	{
-		m_columnWidths[col] = m_table->columnWidth(col) * actualWidthFactor;
-		m_columnPositions[col] = m_table->columnPosition(col) * actualWidthFactor;
+		m_columnWidths[col] = table()->columnWidth(col) * actualWidthFactor;
+		m_columnPositions[col] = table()->columnPosition(col) * actualWidthFactor;
 	}
 
 	// Set the row geometries for the table outline.
-	qreal requestedHeightFactor = gridPoint.y() / m_table->tableHeight();
+	qreal requestedHeightFactor = gridPoint.y() / table()->tableHeight();
 	qreal newMinHeight = qMax(m_minHeight * requestedHeightFactor, PageItem_Table::MinimumRowHeight);
 	qreal actualHeightFactor = newMinHeight / m_minHeight;
 	for (int row = 0; row < m_rowHeights.size(); ++row)
 	{
-		m_rowHeights[row] = m_table->rowHeight(row) * actualHeightFactor;
-		m_rowPositions[row] = m_table->rowPosition(row) * actualHeightFactor;
+		m_rowHeights[row] = table()->rowHeight(row) * actualHeightFactor;
+		m_rowPositions[row] = table()->rowPosition(row) * actualHeightFactor;
 	}
 
 	// Display size tooltip.
-	qreal actualTableWidth = m_table->tableWidth() * actualWidthFactor;
-	qreal actualTableHeight = m_table->tableHeight() * actualHeightFactor;
+	qreal actualTableWidth = table()->tableWidth() * actualWidthFactor;
+	qreal actualTableHeight = table()->tableHeight() * actualHeightFactor;
 	m_canvas->displaySizeHUD(event->globalPos(), actualTableWidth, actualTableHeight, false);
 
 	m_canvas->update();
@@ -96,29 +87,21 @@ void TableResize::drawControls(QPainter* p)
 	commonDrawControls(p, false);
 	p->restore();
 
-	p->save();
-	p->scale(m_canvas->scale(), m_canvas->scale());
-	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
-	p->setTransform(m_table->getTransform(), true);
-
 	// Paint the table outline using the changed table geometries.
-	TableUtils::paintOutline(m_table, m_rowHeights, m_rowPositions,
-		m_columnWidths, m_columnPositions, m_canvas, p);
-
-	p->restore();
+	paintTableOutline(m_rowHeights, m_rowPositions, m_columnWidths, m_columnPositions, p);
 }
 
 void TableResize::setup(PageItem_Table* table)
 {
 	Q_ASSERT(table);
 
-	m_table = table;
+	setTable(table);
 
 	// Make copies of the row and column geometries to be used during resize.
-	m_rowHeights = m_table->rowHeights();
-	m_rowPositions = m_table->rowPositions();
-	m_columnWidths = m_table->columnWidths();
-	m_columnPositions = m_table->columnPositions();
+	m_rowHeights = table->rowHeights();
+	m_rowPositions = table->rowPositions();
+	m_columnWidths = table->columnWidths();
+	m_columnPositions = table->columnPositions();
 
 	// Save the minimum row height and column width.
 	m_minHeight = *std::min_element(m_rowHeights.begin(), m_rowHeights.end());

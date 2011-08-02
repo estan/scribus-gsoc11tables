@@ -168,6 +168,7 @@ SET(SCRIBUS_MOC_CLASSES
   canvasgesture_columnresize.h
   canvasgesture_rowresize.h
   canvasgesture_rulermove.h
+  canvasgesture_table.h
   canvasgesture_tableresize.h
   canvasmode.h
   canvasmode_edit.h
@@ -457,6 +458,7 @@ SET(SCRIBUS_SOURCES
   canvasgesture_resize.cpp
   canvasgesture_rowresize.cpp
   canvasgesture_rulermove.cpp
+  canvasgesture_table.cpp
   canvasgesture_tableresize.cpp
   canvasmode.cpp
   canvasmode_copyproperties.cpp

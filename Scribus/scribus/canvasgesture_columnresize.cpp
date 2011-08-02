@@ -16,6 +16,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
+#include "scribusview.h"
 #include "selection.h"
 #include "tableutils.h"
 
@@ -35,18 +36,11 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// TODO: There must be a bug in ApplyGuides() as there's some "wiggle room". Fix it.
-
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Perform the actual resize of the column.
-	m_table->setColumnWidth(m_column, gridPoint.x() - m_table->columnPosition(m_column));
-	m_table->update();
+	table()->setColumnWidth(m_column, gridPoint.x() - table()->columnPosition(m_column));
+	table()->update();
 
 	m_view->stopGesture();
 }
@@ -55,12 +49,7 @@ void ColumnResize::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Snap to grid and guides.
-	FPoint canvasPoint = m_doc->ApplyGridF(m_canvas->globalToCanvas(event->globalPos()));
-	m_doc->ApplyGuides(&canvasPoint);
-
-	// Convert to table grid coordinates.
-	QPointF gridPoint = m_table->getTransform().inverted().map(canvasPoint.toQPointF()) - m_table->gridOffset();
+	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Set width of column for the table outline.
 	qreal columnPosition = m_columnPositions[m_column];
@@ -87,16 +76,9 @@ void ColumnResize::drawControls(QPainter* p)
 	commonDrawControls(p, false);
 	p->restore();
 
-	p->save();
-	p->scale(m_canvas->scale(), m_canvas->scale());
-	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
-	p->setTransform(m_table->getTransform(), true);
-
 	// Paint the table outline using the changed column geometries.
-	TableUtils::paintOutline(m_table, m_table->rowHeights(), m_table->rowPositions(),
-		m_columnWidths, m_columnPositions, m_canvas, p);
-
-	p->restore();
+	paintTableOutline(table()->rowHeights(), table()->rowPositions(),
+		m_columnWidths, m_columnPositions, p);
 }
 
 void ColumnResize::setup(PageItem_Table* table, int column)
@@ -104,10 +86,10 @@ void ColumnResize::setup(PageItem_Table* table, int column)
 	Q_ASSERT(table);
 	Q_ASSERT(column >= 0 && column < table->columns());
 
-	m_table = table;
+	setTable(table);
 	m_column = column;
 
 	// Make copies of the column geometries to be used during resize.
-	m_columnWidths = m_table->columnWidths();
-	m_columnPositions = m_table->columnPositions();
+	m_columnWidths = table->columnWidths();
+	m_columnPositions = table->columnPositions();
 }
