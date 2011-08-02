@@ -82,6 +82,11 @@ void TableResize::mouseMoveEvent(QMouseEvent* event)
 		m_rowPositions[row] = m_table->rowPosition(row) * actualHeightFactor;
 	}
 
+	// Display size tooltip.
+	qreal actualTableWidth = m_table->tableWidth() * actualWidthFactor;
+	qreal actualTableHeight = m_table->tableHeight() * actualHeightFactor;
+	m_canvas->displaySizeHUD(event->globalPos(), actualTableWidth, actualTableHeight, false);
+
 	m_canvas->update();
 }
 

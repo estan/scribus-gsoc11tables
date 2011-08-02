@@ -197,7 +197,13 @@ public:
 	void displaySizeHUD(QPoint m, double x, double y, bool isLine = false);
 	void displayRotHUD(QPoint m, double rot);
 	void displayRealRotHUD(QPoint m, double rot);
-	
+	/**
+	 * Displays a tooltip of the format <code>{label}: {N} {unit}</code> where <code>N</code> is
+	 * @a value converted to the current document unit and <code>unit</code> the current document
+	 * unit. The tooltip will be displayed nearby the global point @a point.
+	 */
+	void displayDoubleHUD(QPoint point, const QString& label, double value);
+
 	void setupEditHRuler(PageItem * item, bool forceAndReset = false);
 	
 private:

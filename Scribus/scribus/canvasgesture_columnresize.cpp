@@ -75,6 +75,9 @@ void ColumnResize::mouseMoveEvent(QMouseEvent* event)
 		columnPosition += m_columnWidths[column];
 	}
 
+	// Display width tooltip.
+	m_canvas->displayDoubleHUD(event->globalPos(), tr("Width"), actualWidth);
+
 	m_canvas->update();
 }
 

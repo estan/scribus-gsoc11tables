@@ -73,6 +73,9 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 		rowPosition += m_rowHeights[row];
 	}
 
+	// Display height tooltip.
+	m_canvas->displayDoubleHUD(event->globalPos(), tr("Height"), actualHeight);
+
 	m_canvas->update();
 }
 
