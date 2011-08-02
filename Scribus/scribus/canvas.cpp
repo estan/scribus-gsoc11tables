@@ -1775,6 +1775,7 @@ void Canvas::DrawPageMarks(ScPainter *p, Page *page, QRect clip)
 	double pageHeight=page->height();
 	double pageWidth=page->width();
 	p->setFillMode(ScPainter::None);
+	p->setStrokeMode(ScPainter::Solid);
 	p->setPen(Qt::black, lineWidth, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->drawRect(0, 0, pageWidth, pageHeight);
 	//Draw the margins
