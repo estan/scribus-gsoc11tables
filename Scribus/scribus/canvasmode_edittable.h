@@ -16,11 +16,12 @@ for which a new license (GPL+exception) is in place.
 #include "cellarea.h"
 
 class CanvasGesture;
+class CellSelect;
+class ColumnResize;
 class PageItem_Table;
 class QMouseEvent;
 class QPainter;
 class RowResize;
-class ColumnResize;
 class ScribusView;
 class TableResize;
 
@@ -56,6 +57,8 @@ private:
 	RowResize* m_rowResizeGesture;
 	/// Gesture for resizing a column.
 	ColumnResize* m_columnResizeGesture;
+	/// Gesture for selecting cells.
+	CellSelect* m_cellSelectGesture;
 };
 
 #endif // CANVASMODE_EDITTABLE_H

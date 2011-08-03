@@ -13,6 +13,7 @@ for which a new license (GPL+exception) is in place.
 #include <QPointF>
 
 #include "canvas.h"
+#include "canvasgesture_cellselect.h"
 #include "canvasgesture_columnresize.h"
 #include "canvasgesture_rowresize.h"
 #include "canvasgesture_tableresize.h"
@@ -32,7 +33,8 @@ CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view)
 	m_selectColumnCursor(loadIcon("select_column.png")),
 	m_tableResizeGesture(new TableResize(this)),
 	m_rowResizeGesture(new RowResize(this)),
-	m_columnResizeGesture(new ColumnResize(this))
+	m_columnResizeGesture(new ColumnResize(this)),
+	m_cellSelectGesture(new CellSelect(this))
 {
 }
 
@@ -41,6 +43,7 @@ CanvasMode_EditTable::~CanvasMode_EditTable()
 	delete m_tableResizeGesture;
 	delete m_rowResizeGesture;
 	delete m_columnResizeGesture;
+	delete m_cellSelectGesture;
 }
 
 void CanvasMode_EditTable::activate(bool fromGesture)
@@ -60,11 +63,14 @@ void CanvasMode_EditTable::deactivate(bool forGesture)
 void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();
+
+	QPointF canvasPoint = m_canvas->globalToCanvas(event->globalPos()).toQPointF();
+	qreal threshold = m_doc->guidesPrefs().grabRadius / m_canvas->scale();
+	PageItem_Table::Handle handle = m_table->hitTest(canvasPoint, threshold);
+
 	// Set an appropriate cursor.
 	QCursor cursor(Qt::ArrowCursor);
-	switch (m_table->hitTest(
-		m_canvas->globalToCanvas(event->globalPos()).toQPointF(),
-		m_doc->guidesPrefs().grabRadius / m_canvas->scale()).type())
+	switch (handle.type())
 	{
 		case PageItem_Table::Handle::RowSelect:
 			cursor = m_selectRowCursor;
@@ -94,9 +100,9 @@ void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 {
 	event->accept();
-	PageItem_Table::Handle handle = m_table->hitTest(
-		m_canvas->globalToCanvas(event->globalPos()).toQPointF(),
-		m_doc->guidesPrefs().grabRadius / m_canvas->scale());
+	QPointF canvasPoint = m_canvas->globalToCanvas(event->globalPos()).toQPointF();
+	qreal threshold = m_doc->guidesPrefs().grabRadius / m_canvas->scale();
+	PageItem_Table::Handle handle = m_table->hitTest(canvasPoint, threshold);
 
 	switch (handle.type())
 	{
@@ -119,7 +125,9 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			m_view->startGesture(m_tableResizeGesture);
 			break;
 		case PageItem_Table::Handle::CellSelect:
-			// Not implemented.
+			m_cellSelectGesture->setup(m_table);
+			m_view->startGesture(m_cellSelectGesture);
+			m_cellSelectGesture->mousePressEvent(event);
 			break;
 		case PageItem_Table::Handle::None:
 			// Not implemented.
