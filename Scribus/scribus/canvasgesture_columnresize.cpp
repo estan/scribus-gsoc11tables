@@ -17,8 +17,6 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem.h"
 #include "pageitem_table.h"
 #include "scribusview.h"
-#include "selection.h"
-#include "tableutils.h"
 
 #include "canvasgesture_columnresize.h"
 
