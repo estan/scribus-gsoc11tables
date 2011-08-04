@@ -22,6 +22,7 @@ for which a new license (GPL+exception) is in place.
 #include "scpainter.h"
 #include "scribusdoc.h"
 #include "styles/tablestyle.h"
+#include "tablehandle.h"
 #include "tableutils.h"
 
 #include "pageitem_table.h"
@@ -476,7 +477,7 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
-PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
+TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 {
 	const QPointF framePoint = getTransform().inverted().map(point);
 	const QPointF gridPoint = framePoint - gridOffset();
@@ -484,11 +485,11 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 
 	// Test if hit is outside frame.
 	if (!QRectF(0.0, 0.0, width(), height()).contains(framePoint))
-		return Handle(Handle::None);
+		return TableHandle(TableHandle::None);
 
 	// Test if hit is outside table.
 	if (!gridRect.adjusted(-threshold, -threshold, threshold, threshold).contains(gridPoint))
-		return Handle(Handle::None);
+		return TableHandle(TableHandle::None);
 
 	const qreal tableHeight = this->tableHeight();
 	const qreal tableWidth = this->tableWidth();
@@ -497,46 +498,46 @@ PageItem_Table::Handle PageItem_Table::hitTest(const QPointF& point, qreal thres
 
 	// Test if hit is on left edge of table.
 	if (x <= threshold)
-		return Handle(Handle::RowSelect);
+		return TableHandle(TableHandle::RowSelect);
 
 	// Test if hit is on top edge of table.
 	if (y <= threshold)
-		return Handle(Handle::ColumnSelect);
+		return TableHandle(TableHandle::ColumnSelect);
 
 	// Test if hit is on bottom right corner of table.
 	if (x >= tableWidth - threshold && y >= tableHeight - threshold)
-		return Handle(Handle::TableResize);
+		return TableHandle(TableHandle::TableResize);
 
 	// Test if hit is on right edge of table.
 	if (y >= tableHeight - threshold && y <= tableHeight + threshold)
-		return Handle(Handle::RowResize, rows() - 1);
+		return TableHandle(TableHandle::RowResize, rows() - 1);
 
 	// Test if hit is on bottom edge of table.
 	if (x >= tableWidth - threshold && x <= tableWidth + threshold)
-		return Handle(Handle::ColumnResize, columns() - 1);
+		return TableHandle(TableHandle::ColumnResize, columns() - 1);
 
 	const TableCell hitCell = cellAt(point);
 	const QRectF hitRect = cellRect(hitCell);
 
 	// Test if hit is on cell interior.
 	if (hitRect.adjusted(threshold, threshold, -threshold, -threshold).contains(gridPoint))
-		return Handle(Handle::CellSelect); // Hit interior of cell.
+		return TableHandle(TableHandle::CellSelect); // Hit interior of cell.
 
 	const qreal toLeft = x - hitRect.left();
 	const qreal toRight = hitRect.right() - x;
 	const qreal toTop = y - hitRect.top();
 	const qreal toBottom = hitRect.bottom() - y;
-	Handle handle(Handle::None);
+	TableHandle handle(TableHandle::None);
 
 	// Test which side of the cell was hit.
 	if (qMin(toLeft, toRight) < qMin(toTop, toBottom))
 	{
-		handle.setType(Handle::ColumnResize);
+		handle.setType(TableHandle::ColumnResize);
 		handle.setIndex((toLeft < toRight ? hitCell.column() : hitCell.column() + hitCell.columnSpan()) - 1);
 	}
 	else
 	{
-		handle.setType(Handle::RowResize);
+		handle.setType(TableHandle::RowResize);
 		handle.setIndex((toTop < toBottom ? hitCell.row() : hitCell.row() + hitCell.rowSpan()) - 1);
 	}
 	return handle;

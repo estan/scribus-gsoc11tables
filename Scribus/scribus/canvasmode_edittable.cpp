@@ -23,6 +23,7 @@ for which a new license (GPL+exception) is in place.
 #include "scribusdoc.h"
 #include "scribusview.h"
 #include "selection.h"
+#include "tablehandle.h"
 #include "util_icon.h"
 
 #include "canvasmode_edittable.h"
@@ -66,29 +67,29 @@ void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 
 	QPointF canvasPoint = m_canvas->globalToCanvas(event->globalPos()).toQPointF();
 	qreal threshold = m_doc->guidesPrefs().grabRadius / m_canvas->scale();
-	PageItem_Table::Handle handle = m_table->hitTest(canvasPoint, threshold);
+	TableHandle handle = m_table->hitTest(canvasPoint, threshold);
 
 	// Set an appropriate cursor.
 	QCursor cursor(Qt::ArrowCursor);
 	switch (handle.type())
 	{
-		case PageItem_Table::Handle::RowSelect:
+		case TableHandle::RowSelect:
 			cursor = m_selectRowCursor;
 			break;
-		case PageItem_Table::Handle::RowResize:
+		case TableHandle::RowResize:
 			cursor = Qt::SizeVerCursor;
 			break;
-		case PageItem_Table::Handle::ColumnSelect:
+		case TableHandle::ColumnSelect:
 			cursor = m_selectColumnCursor;
 			break;
-		case PageItem_Table::Handle::ColumnResize:
+		case TableHandle::ColumnResize:
 			cursor = Qt::SizeHorCursor;
 			break;
-		case PageItem_Table::Handle::TableResize:
+		case TableHandle::TableResize:
 			cursor = Qt::SizeFDiagCursor;
 			break;
-		case PageItem_Table::Handle::CellSelect:
-		case PageItem_Table::Handle::None:
+		case TableHandle::CellSelect:
+		case TableHandle::None:
 			break;
 		default:
 			qWarning("Unknown hit target");
@@ -102,33 +103,33 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 	event->accept();
 	QPointF canvasPoint = m_canvas->globalToCanvas(event->globalPos()).toQPointF();
 	qreal threshold = m_doc->guidesPrefs().grabRadius / m_canvas->scale();
-	PageItem_Table::Handle handle = m_table->hitTest(canvasPoint, threshold);
+	TableHandle handle = m_table->hitTest(canvasPoint, threshold);
 
 	switch (handle.type())
 	{
-		case PageItem_Table::Handle::RowSelect:
+		case TableHandle::RowSelect:
 			// Not implemented.
 			break;
-		case PageItem_Table::Handle::RowResize:
+		case TableHandle::RowResize:
 			m_rowResizeGesture->setup(m_table, handle.index());
 			m_view->startGesture(m_rowResizeGesture);
 			break;
-		case PageItem_Table::Handle::ColumnSelect:
+		case TableHandle::ColumnSelect:
 			// Not implemented.
 			break;
-		case PageItem_Table::Handle::ColumnResize:
+		case TableHandle::ColumnResize:
 			m_columnResizeGesture->setup(m_table, handle.index());
 			m_view->startGesture(m_columnResizeGesture);
 			break;
-		case PageItem_Table::Handle::TableResize:
+		case TableHandle::TableResize:
 			m_tableResizeGesture->setup(m_table);
 			m_view->startGesture(m_tableResizeGesture);
 			break;
-		case PageItem_Table::Handle::CellSelect:
+		case TableHandle::CellSelect:
 			m_cellSelectGesture->setup(m_table, m_table->cellAt(canvasPoint));
 			m_view->startGesture(m_cellSelectGesture);
 			break;
-		case PageItem_Table::Handle::None:
+		case TableHandle::None:
 			// Not implemented.
 			break;
 		default:
