@@ -54,31 +54,62 @@ void TableGesture::paintTableOutline(
 
 	QPointF offset = m_table->gridOffset();
 
+	// First draw a rect around the table.
 	p->drawRect(QRectF(offset.x(), offset.y(), columnPositions.last() + columnWidths.last(),
 		rowPositions.last() + rowHeights.last()));
 
-	for (int row = 0; row < m_table->rows(); ++row)
+	/**
+	 * cellAt() and cellRect() are fast, stroking is not. So we paint the
+	 * left and top edges of the cells in two passes as this allows us to
+	 * greatly minimize the number of strokes.
+	 */
+
+	TableCell cell;
+
+	// Paint left edge(s) in each of the columns.
+	for (int col = 1; col < m_table->columns(); ++col)
 	{
-		int colSpan = 0;
-		for (int col = 0; col < m_table->columns(); col += colSpan)
+		QPointF startPoint(columnPositions[col], 0.0);
+		QPointF endPoint(startPoint);
+		for (int row = 0; row < m_table->rows(); row += cell.rowSpan())
 		{
-			TableCell cell = m_table->cellAt(row, col);
-			if (row == cell.row())
+			cell = m_table->cellAt(row, col);
+			int endRow = cell.row() + cell.rowSpan() - 1;
+			qreal bottom = rowPositions[endRow] + rowHeights[endRow];
+
+			if (cell.column() == col)
+				endPoint.setY(bottom);
+			else
 			{
-				int endCol = col + cell.columnSpan() - 1;
-				int endRow = row + cell.rowSpan() - 1;
-				qreal left = columnPositions[col] + offset.x();
-				qreal right = columnPositions[endCol] + columnWidths[endCol] + offset.x();
-				qreal top = rowPositions[row] + offset.y();
-				qreal bottom = rowPositions[endRow] + rowHeights[endRow] + offset.y();
-				// Paint left and top edge of cell.
-				if (col != 0)
-					p->drawLine(QPointF(left, top), QPointF(left, bottom));
-				if (row != 0)
-					p->drawLine(QPointF(left, top), QPointF(right, top));
+				p->drawLine(startPoint + offset, endPoint + offset);
+				startPoint.setY(bottom);
 			}
-			colSpan = cell.columnSpan();
 		}
+		if (endPoint.y() > startPoint.y())
+			p->drawLine(startPoint + offset, endPoint + offset);
+	}
+
+	// Paint top edge(s) in each of the rows.
+	for (int row = 1; row < m_table->rows(); ++row)
+	{
+		QPointF startPoint(0.0, rowPositions[row]);
+		QPointF endPoint(startPoint);
+		for (int col = 0; col < m_table->columns(); col += cell.columnSpan())
+		{
+			cell = m_table->cellAt(row, col);
+			int endCol = cell.column() + cell.columnSpan() - 1;
+			qreal right = columnPositions[endCol] + columnWidths[endCol];
+
+			if (cell.row() == row)
+				endPoint.setX(right);
+			else
+			{
+				p->drawLine(startPoint + offset, endPoint + offset);
+				startPoint.setX(right);
+			}
+		}
+		if (endPoint.x() > startPoint.x())
+			p->drawLine(startPoint + offset, endPoint + offset);
 	}
 
 	p->restore();
