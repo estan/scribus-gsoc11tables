@@ -9,6 +9,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QColor>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPen>
 #include <QPointF>
 #include <QRectF>
@@ -80,5 +81,42 @@ void TableGesture::paintTableOutline(
 		}
 	}
 
+	p->restore();
+}
+
+void TableGesture::paintCellSelection(QPainter* p)
+{
+	if (!m_table || !m_canvas || !p)
+		return;
+
+	p->save();
+	p->scale(m_canvas->scale(), m_canvas->scale());
+	p->translate(-m_doc->minCanvasCoordinate.x(), -m_doc->minCanvasCoordinate.y());
+	p->setTransform(m_table->getTransform(), true);
+	p->setRenderHint(QPainter::Antialiasing);
+	p->setPen(QPen(QColor(100, 200, 255), 3.0 / m_canvas->scale(), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin));
+	p->setBrush(QColor(100, 200, 255, 50));
+
+	const QPointF offset = m_table->gridOffset();
+	const qreal rectExpand = 1.0;
+	QPainterPath selectionPath;
+
+	/*
+	 * The code below makes selectionPath a union of the cell rectangles of the selected cells.
+	 * Since the cell rectangles are adjacent, they must be expanded slightly (1.0) for the
+	 * uniting to work. This may not be the fastest way to compose the path of the selection,
+	 * but it makes for some very simple code, and the result looks good.
+	 */
+	foreach (const TableCell& cell, m_table->selection())
+	{
+		QRectF cellRect = m_table->cellRect(cell);
+		cellRect.translate(offset);
+		cellRect.adjust(-rectExpand, -rectExpand, rectExpand, rectExpand);
+		QPainterPath cellPath;
+		cellPath.addRect(cellRect);
+		selectionPath = selectionPath.united(cellPath);
+	}
+
+	p->drawPath(selectionPath);
 	p->restore();
 }

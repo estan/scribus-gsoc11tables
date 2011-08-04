@@ -74,8 +74,22 @@ public:
 class TableCell
 {
 public:
+	/**
+	 * Constructs a new invalid table cell.
+	 *
+	 * The cell will report a row, column, row span and column span of <code>-1</code>. This
+	 * behavior is relied upon in places such as the painting code, so don't change it.
+	 */
+	TableCell() : d(new TableCellData) { setValid(false); }
+
 	/// Construct a new table cell as a shallow copy of @a other.
 	TableCell(const TableCell& other) : d(other.d) {}
+
+	/// Returns <code>true</code> if this cell is equal to @a other.
+	bool operator==(const TableCell& other) const { return other.d == d; }
+
+	/// Returns <code>true</code> if this cell is not equal to @a other.
+	bool operator!=(const TableCell& other) const { return !(other == *this); }
 
 	/// Returns <code>true</code> if this cell is valid.
 	bool isValid() const { return d->isValid && d->table; }
@@ -137,15 +151,6 @@ private:
 	 * The new cell will span <code>1</code> row and <code>1</code> column.
 	 */
 	TableCell(int row, int column, PageItem_Table *table);
-	/**
-	 * Constructs a new invalid table cell.
-	 *
-	 * These are the kinds of cells returned when requesting a cell from an invalid location
-	 * outside the table. The new cell will report a row, column, row span and column span of
-	 * <code>-1</code>. This behavior is relied upon in places such as the painting code, so
-	 * don't change it.
-	 */
-	TableCell() : d(new TableCellData) { setValid(false); }
 
 	/// Set the row of the table that contains this cell to @a row.
 	void setRow(int row) { d->row = row; }
@@ -171,6 +176,11 @@ private:
 	friend class PageItem_Table;
 	QExplicitlySharedDataPointer<TableCellData> d;
 };
+
+inline uint qHash(const TableCell& cell)
+{
+	return (cell.row() << 16) ^ cell.column();
+}
 
 QDebug operator<<(QDebug debug, const TableCell& cell);
 

@@ -125,9 +125,8 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			m_view->startGesture(m_tableResizeGesture);
 			break;
 		case PageItem_Table::Handle::CellSelect:
-			m_cellSelectGesture->setup(m_table);
+			m_cellSelectGesture->setup(m_table, m_table->cellAt(canvasPoint));
 			m_view->startGesture(m_cellSelectGesture);
-			m_cellSelectGesture->mousePressEvent(event);
 			break;
 		case PageItem_Table::Handle::None:
 			// Not implemented.

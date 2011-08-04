@@ -9,6 +9,8 @@ for which a new license (GPL+exception) is in place.
 #ifndef CANVASGESTURE_CELLSELECT_H
 #define CANVASGESTURE_CELLSELECT_H
 
+#include "tablecell.h"
+
 #include "canvasgesture_table.h"
 
 class PageItem_Table;
@@ -34,8 +36,8 @@ public:
 	explicit CellSelect(CanvasMode* parent) : TableGesture(parent) {}
 	virtual ~CellSelect() {}
 
-	virtual void activate(bool fromGesture) {};
-	virtual void deactivate(bool forGesture) {}
+	virtual void activate(bool fromGesture) {}
+	virtual void deactivate(bool forGesture);
 	virtual void keyPressEvent(QKeyEvent* event);
 	virtual void mousePressEvent(QMouseEvent* event);
 	virtual void mouseReleaseEvent(QMouseEvent* event);
@@ -43,8 +45,14 @@ public:
 	virtual bool handleKeyEvents() { return true; }
 	virtual void drawControls(QPainter* p);
 
-	/// Sets up this cell selection gesture to select cells in @a table.
-	void setup(PageItem_Table* table);
+	/// Sets up this gesture to select cells in @a table, starting with @a cell.
+	void setup(PageItem_Table* table, const TableCell& cell);
+
+private:
+	/// The start cell of the current selection.
+	TableCell m_startCell;
+	/// The end cell of the current selection.
+	TableCell m_endCell;
 };
 
 #endif // CANVASGESTURE_CELLSELECT_H

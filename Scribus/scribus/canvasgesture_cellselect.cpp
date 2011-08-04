@@ -19,9 +19,15 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem.h"
 #include "pageitem_table.h"
 #include "scribusview.h"
+#include "tablecell.h"
 #include "tableutils.h"
 
 #include "canvasgesture_cellselect.h"
+
+void CellSelect::deactivate(bool forGesture)
+{
+	table()->clearSelection();
+}
 
 void CellSelect::keyPressEvent(QKeyEvent* event)
 {
@@ -29,9 +35,6 @@ void CellSelect::keyPressEvent(QKeyEvent* event)
 	{
 		// Cancel the resize.
 		event->accept();
-
-		// TODO: Clear the selection.
-
 		m_view->stopGesture();
 	}
 }
@@ -39,25 +42,47 @@ void CellSelect::keyPressEvent(QKeyEvent* event)
 void CellSelect::mousePressEvent(QMouseEvent* event)
 {
 	event->accept();
+	table()->clearSelection();
 
-	m_view->registerMousePress(event->globalPos());
+	// Set a new start cell.
+	m_startCell = table()->cellAt(m_canvas->globalToCanvas(event->globalPos()).toQPointF());
 
-	// TODO: Select single cell.
+	// If it is valid, select it, otherwise stop the gesture.
+	if (m_startCell.isValid())
+	{
+		table()->selectCell(m_startCell.row(), m_startCell.column());
+		m_canvas->update();
+	}
+	else
+		m_view->stopGesture();
 }
 
 void CellSelect::mouseReleaseEvent(QMouseEvent* event)
 {
 	event->accept();
+
+	// Reset start and end cells.
+	m_startCell = TableCell();
+	m_endCell = TableCell();
 }
 
 void CellSelect::mouseMoveEvent(QMouseEvent* event)
 {
-	if (!m_view->moveTimerElapsed())
-		return; // This was just a click.
-
 	event->accept();
 
-	// TODO: Select area of cells.
+	TableCell newCell = table()->cellAt(m_canvas->globalToCanvas(event->globalPos()).toQPointF());
+
+	if (newCell == m_endCell || !newCell.isValid() || !m_startCell.isValid())
+		return;
+
+	m_endCell = newCell;
+
+	// Select the new area.
+	table()->clearSelection();
+	table()->selectCells(
+		m_startCell.row(), m_startCell.column(), m_endCell.row(), m_endCell.column());
+
+	m_canvas->update();
 }
 
 void CellSelect::drawControls(QPainter* p)
@@ -66,13 +91,18 @@ void CellSelect::drawControls(QPainter* p)
 	commonDrawControls(p, false);
 	p->restore();
 
-	// TODO: Draw selection overlay.
-	// Idea: Use a union of QPainterPaths of slightly expanded cell rects.
+	paintCellSelection(p);
 }
 
-void CellSelect::setup(PageItem_Table* table)
+void CellSelect::setup(PageItem_Table* table, const TableCell& cell)
 {
 	Q_ASSERT(table);
+	Q_ASSERT(cell.isValid());
 
 	setTable(table);
+
+	m_startCell = cell;
+	m_endCell = cell;
+
+	table->selectCell(cell.row(), cell.column());
 }

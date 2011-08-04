@@ -61,6 +61,12 @@ protected:
 	 */
 	void paintTableOutline(const QList<qreal>& rowHeights, const QList<qreal>& rowPositions,
 		const QList<qreal>& columnWidths, const QList<qreal>& columnPositions, QPainter* p);
+
+	/**
+	 * Paints the selection of the currently edited table.
+	 */
+	void paintCellSelection(QPainter* p);
+
 private:
 	/// The currently edited table.
 	PageItem_Table* m_table;

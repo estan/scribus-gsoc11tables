@@ -387,6 +387,61 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 	emit changed();
 }
 
+QRectF PageItem_Table::cellRect(const TableCell& cell) const
+{
+	if (!validCell(cell.row(), cell.column()))
+		return QRectF();
+
+	const int row = cell.row();
+	const int col = cell.column();
+	const int endRow = row + cell.rowSpan() - 1;
+	const int endCol = col + cell.columnSpan() - 1;
+
+	const qreal x = m_columnPositions[col];
+	const qreal y = m_rowPositions[row];
+	const qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
+	const qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
+
+	return QRectF(x, y, width, height);
+}
+
+void PageItem_Table::selectCell(int row, int column)
+{
+	if (!validCell(row, column))
+		return;
+
+	m_selection.insert(cellAt(row, column));
+}
+
+void PageItem_Table::selectCells(int startRow, int startColumn, int endRow, int endColumn)
+{
+	if (!validCell(startRow, startColumn) || !validCell(endRow, endColumn))
+		return;
+
+	const TableCell startCell = cellAt(startRow, startColumn);
+	const TableCell endCell = cellAt(endRow, endColumn);
+
+	const int topRow = qMin(startCell.row(), endCell.row());
+	const int bottomRow = qMax(startCell.row() + startCell.rowSpan() - 1,
+		endCell.row() + endCell.rowSpan() - 1);
+
+	const int leftCol = qMin(startCell.column(), endCell.column());
+	const int rightCol = qMax(startCell.column() + startCell.columnSpan() - 1,
+		endCell.column() + endCell.columnSpan() - 1);
+
+	for (int row = topRow; row <= bottomRow; ++row)
+		for (int col = leftCol; col <= rightCol; ++col)
+			selectCell(row, col);
+
+	emit selectionChanged();
+}
+
+void PageItem_Table::clearSelection()
+{
+	m_selection.clear();
+	emit selectionChanged();
+}
+
 TableCell PageItem_Table::cellAt(int row, int column) const
 {
 	if (!validCell(row, column))
@@ -628,21 +683,6 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	// Paint the overflow marker.
 	if (isOverflowing())
 		drawOverflowMarker(p);
-}
-
-QRectF PageItem_Table::cellRect(const TableCell& cell) const
-{
-	int row = cell.row();
-	int col = cell.column();
-	int endRow = row + cell.rowSpan() - 1;
-	int endCol = col + cell.columnSpan() - 1;
-
-	qreal x = m_columnPositions[col];
-	qreal y = m_rowPositions[row];
-	qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
-	qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
-
-	return QRectF(x, y, width, height);
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const

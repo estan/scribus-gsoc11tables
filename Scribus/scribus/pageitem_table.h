@@ -12,6 +12,7 @@ for which a new license (GPL+exception) is in place.
 #include <QList>
 #include <QPointF>
 #include <QRectF>
+#include <QSet>
 #include <QString>
 
 #include "cellarea.h"
@@ -288,6 +289,41 @@ public:
 	void splitCell(int row, int column, int numRows, int numCols);
 
 	/**
+	 * Returns the rectangle of @a cell on the table grid.
+	 *
+	 * If @a cell is invalid or not in this table, an invalid rectangle is returned.
+	 */
+	QRectF cellRect(const TableCell& cell) const;
+
+	/**
+	 * Returns the cell selection.
+	 */
+	QSet<TableCell> selection() const { return m_selection; }
+
+	/**
+	 * Adds the cell at @a row, @column to the selection.
+	 *
+	 * If there's no cell at @a row, @a column, this function does nothing.
+	 */
+	void selectCell(int row, int column);
+
+	/**
+	 * Adds the cells in the area between two cells to the selection.
+	 *
+	 * This functions first fetches the two cells at @a startRow, @a startColumn and
+	 * @a endRow, @a endColumn and then selects all cells that intersect the rectangular
+	 * area of cells that encloses the two cells.
+	 *
+	 * If any of the specified cell locations are outside the table, this function does nothing.
+	 */
+	void selectCells(int startRow, int startColumn, int endRow, int endColumn);
+
+	/**
+	 * Clears the cell selection.
+	 */
+	void clearSelection();
+
+	/**
 	 * Returns the cell at @a row, @a column.
 	 *
 	 * If the cell is covered by a spanning cell, the spanning cell is returned. If the cell is
@@ -393,8 +429,10 @@ public:
 	virtual QString infoDescription() { return QString(); }
 
 signals:
-	/// This signal is emitted whenever something in the table changes.
+	/// This signal is emitted whenever table changes.
 	void changed();
+	/// This signal is emitted whenever the cell selection changes.
+	void selectionChanged();
 
 protected:
 	/// Paints this item.
@@ -416,9 +454,6 @@ private:
 	bool validColumn(int column) const { return column >= 0 && column < m_columns; }
 	/// Returns true if there is a cell at @a row, @a column in this table.
 	bool validCell(int row, int column) const { return validRow(row) && validColumn(column); }
-
-	/// Returns the rectangle of @a cell on the table grid.
-	QRectF cellRect(const TableCell& cell) const;
 
 	/// Returns the width of the widest border along the left side of this table.
 	qreal maxLeftBorderWidth() const;
@@ -470,6 +505,9 @@ private:
 
 	/// List of areas of merged cells.
 	QList<CellArea> m_cellAreas;
+
+	/// Set of selected cells.
+	QSet<TableCell> m_selection;
 
 	/// Style of the table.
 	TableStyle m_style;
