@@ -28,6 +28,22 @@ void RowResize::keyPressEvent(QKeyEvent* event)
 		event->accept();
 		m_view->stopGesture();
 	}
+	if (event->key() == Qt::Key_Shift)
+	{
+		// Re-copy row geometires since resizing behavior will change.
+		m_rowHeights = table()->rowHeights();
+		m_rowPositions = table()->rowPositions();
+	}
+}
+
+void RowResize::keyReleaseEvent(QKeyEvent* event)
+{
+	if (event->key() == Qt::Key_Shift)
+	{
+		// Re-copy row geometires since resizing behavior will change.
+		m_rowHeights = table()->rowHeights();
+		m_rowPositions = table()->rowPositions();
+	}
 }
 
 void RowResize::mouseReleaseEvent(QMouseEvent* event)
@@ -37,7 +53,13 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
 	// Perform the actual resize of the row.
-	table()->setRowHeight(m_row, gridPoint.y() - table()->rowPosition(m_row));
+	PageItem_Table::ResizeStrategy strategy;
+	if (event->modifiers() & Qt::ShiftModifier)
+		 strategy = PageItem_Table::ResizeFollowing;
+	else
+		 strategy = PageItem_Table::MoveFollowing;
+
+	table()->setRowHeight(m_row, gridPoint.y() - table()->rowPosition(m_row), strategy);
 	table()->update();
 
 	m_view->stopGesture();
@@ -49,22 +71,18 @@ void RowResize::mouseMoveEvent(QMouseEvent* event)
 
 	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
-	// Set height of row for the table outline.
-	qreal rowPosition = m_rowPositions[m_row];
-	qreal requestedHeight = gridPoint.y() - rowPosition;
-	qreal actualHeight = qMax(PageItem_Table::MinimumRowHeight, requestedHeight);
-	m_rowHeights[m_row] = actualHeight;
+	qreal requestedHeight = gridPoint.y() - m_rowPositions[m_row];
+	qreal actualHeight = 0.0;
 
-	// Set positions of following rows.
-	for (int row = m_row; row < m_rowPositions.size(); ++row)
-	{
-		m_rowPositions[row] = rowPosition;
-		rowPosition += m_rowHeights[row];
-	}
+	if (event->modifiers() & Qt::ShiftModifier)
+		actualHeight = resizeRowResizeFollowing(requestedHeight);
+	else
+		actualHeight = resizeRowMoveFollowing(requestedHeight);
 
 	// Display height tooltip.
 	m_canvas->displayDoubleHUD(event->globalPos(), tr("Height"), actualHeight);
 
+	// Update canvas.
 	m_canvas->update();
 }
 
@@ -90,4 +108,46 @@ void RowResize::setup(PageItem_Table* table, int row)
 	// Make copies of the row geometries to be used during resize.
 	m_rowHeights = table->rowHeights();
 	m_rowPositions = table->rowPositions();
+}
+
+qreal RowResize::resizeRowMoveFollowing(qreal height)
+{
+	// Set row height.
+	qreal newHeight = m_rowHeights[m_row] = qMax(PageItem_Table::MinimumRowHeight, height);
+
+	// Move following rows.
+	qreal rowPosition = m_rowPositions[m_row];
+	for (int row = m_row; row < m_rowPositions.size(); ++row)
+	{
+		m_rowPositions[row] = rowPosition;
+		rowPosition += m_rowHeights[row];
+	}
+
+	return newHeight;
+}
+
+qreal RowResize::resizeRowResizeFollowing(qreal height)
+{
+	qreal oldHeight = m_rowHeights[m_row];
+	qreal newHeight = 0.0;
+
+	if (m_row < table()->rows() - 1)
+	{
+		// Following row exists, so height is bounded at both ends.
+		newHeight = m_rowHeights[m_row] = qBound(
+			PageItem_Table::MinimumRowHeight, height,
+			oldHeight + m_rowHeights[m_row + 1] - PageItem_Table::MinimumRowHeight);
+
+		// Resize/move following row.
+		qreal heightChange = newHeight - oldHeight;
+		m_rowPositions[m_row + 1] += heightChange;
+		m_rowHeights[m_row + 1] -= heightChange;
+	}
+	else
+	{
+		// Last row, so height only bounded by MinimumRowHeight.
+		newHeight = m_rowHeights[m_row] = qMax(PageItem_Table::MinimumRowHeight, height);
+	}
+
+	return newHeight;
 }

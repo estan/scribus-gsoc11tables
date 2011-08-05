@@ -37,6 +37,7 @@ public:
 	virtual void activate(bool fromGesture) {};
 	virtual void deactivate(bool forGesture) {}
 	virtual void keyPressEvent(QKeyEvent* event);
+	virtual void keyReleaseEvent(QKeyEvent* event);
 	virtual void mouseReleaseEvent(QMouseEvent* event);
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	virtual bool handleKeyEvents() { return true; }
@@ -44,6 +45,21 @@ public:
 
 	/// Sets up this row resize gesture to resize @a row in @a table.
 	void setup(PageItem_Table* table, int row);
+
+private:
+	/**
+	 * Resizes the row to @a height and returns the new height.
+	 *
+	 * The resize will imitate the behavior of the PageItem_Table::MoveFollowing strategy.
+	 */
+	qreal resizeRowMoveFollowing(qreal height);
+
+	/**
+	 * Resizes the row to @a height and returns the new height.
+	 *
+	 * The resize will imitate the behavior of the PageItem_Table::ResizeFollowing strategy.
+	 */
+	qreal resizeRowResizeFollowing(qreal height);
 
 private:
 	/// Row being resized.

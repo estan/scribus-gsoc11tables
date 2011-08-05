@@ -286,19 +286,17 @@ qreal PageItem_Table::rowHeight(int row) const
 	return m_rowHeights.at(row);
 }
 
-void PageItem_Table::setRowHeight(int row, qreal height)
+void PageItem_Table::setRowHeight(int row, qreal height, ResizeStrategy strategy)
 {
 	if (!validRow(row))
 		return;
 
-	// Set the height and save the change.
-	qreal newRowHeight = qMax(height, MinimumRowHeight);
-	qreal deltaHeight = newRowHeight - m_rowHeights.at(row);
-	m_rowHeights[row] = newRowHeight;
-
-	// Adjust positions of following rows.
-	for (int nextRow = row + 1; nextRow < rows(); ++nextRow)
-		m_rowPositions[nextRow] += deltaHeight;
+	if (strategy == MoveFollowing)
+		resizeRowMoveFollowing(row, height);
+	else if (strategy == ResizeFollowing)
+		resizeRowResizeFollowing(row, height);
+	else
+		qWarning("Unknown resize strategy!");
 
 	emit changed();
 }
@@ -319,19 +317,17 @@ qreal PageItem_Table::columnWidth(int column) const
 	return m_columnWidths.at(column);
 }
 
-void PageItem_Table::setColumnWidth(int column, qreal width)
+void PageItem_Table::setColumnWidth(int column, qreal width, ResizeStrategy strategy)
 {
 	if (!validColumn(column))
 		return;
 
-	// Set the width and save the change.
-	qreal newColumnWidth = qMax(width, MinimumColumnWidth);
-	qreal deltaWidth = newColumnWidth - m_columnWidths.at(column);
-	m_columnWidths[column] = newColumnWidth;
-
-	// Adjust positions of following columns.
-	for (int nextColumn = column + 1; nextColumn < columns(); ++nextColumn)
-		m_columnPositions[nextColumn] += deltaWidth;
+	if (strategy == MoveFollowing)
+		resizeColumnMoveFollowing(column, width);
+	else if (strategy == ResizeFollowing)
+		resizeColumnResizeFollowing(column, width);
+	else
+		qWarning("Unknown resize strategy!");
 
 	emit changed();
 }
@@ -732,6 +728,90 @@ qreal PageItem_Table::maxBottomBorderWidth() const
 		maxWidth = qMax(maxWidth, TableUtils::collapseBorders(bottomBorder(), cell.bottomBorder()).width());
 	}
 	return maxWidth;
+}
+
+qreal PageItem_Table::resizeRowMoveFollowing(int row, qreal height)
+{
+	// Set row height.
+	qreal newHeight = m_rowHeights[row] = qMax(MinimumRowHeight, height);
+
+	// Move following rows.
+	qreal rowPosition = m_rowPositions[row];
+	for (int nextRow = row; nextRow < m_rowPositions.size(); ++nextRow)
+	{
+		m_rowPositions[nextRow] = rowPosition;
+		rowPosition += m_rowHeights[nextRow];
+	}
+
+	return newHeight;
+}
+
+qreal PageItem_Table::resizeRowResizeFollowing(int row, qreal height)
+{
+	qreal oldHeight = m_rowHeights[row];
+	qreal newHeight = oldHeight;
+
+	if (row < rows() - 1)
+	{
+		// Following row exists, so height is bounded at both ends.
+		newHeight = m_rowHeights[row] = qBound(
+			PageItem_Table::MinimumRowHeight, height,
+			oldHeight + m_rowHeights[row + 1] - MinimumRowHeight);
+
+		// Resize/move following row.
+		qreal heightChange = newHeight - oldHeight;
+		m_rowPositions[row + 1] += heightChange;
+		m_rowHeights[row + 1] -= heightChange;
+	}
+	else
+	{
+		// Last row, so height only bounded by MinimumRowHeight.
+		newHeight = m_rowHeights[row] = qMax(MinimumRowHeight, height);
+	}
+
+	return newHeight;
+}
+
+qreal PageItem_Table::resizeColumnMoveFollowing(int column, qreal width)
+{
+	// Set column width.
+	qreal newWidth = m_columnWidths[column] = qMax(MinimumColumnWidth, width);
+
+	// Move following columns.
+	qreal columnPosition = m_columnPositions[column];
+	for (int nextColumn = column; nextColumn < m_columnPositions.size(); ++nextColumn)
+	{
+		m_columnPositions[nextColumn] = columnPosition;
+		columnPosition += m_columnWidths[nextColumn];
+	}
+
+	return newWidth;
+}
+
+qreal PageItem_Table::resizeColumnResizeFollowing(int column, qreal width)
+{
+	qreal oldWidth = m_columnWidths[column];
+	qreal newWidth = oldWidth;
+
+	if (column < columns() - 1)
+	{
+		// Following column exists, so width is bounded at both ends.
+		newWidth = m_columnWidths[column] = qBound(
+			PageItem_Table::MinimumColumnWidth, width,
+			oldWidth + m_columnWidths[column + 1] - MinimumColumnWidth);
+
+		// Resize/move following column.
+		qreal widthChange = newWidth - oldWidth;
+		m_columnPositions[column + 1] += widthChange;
+		m_columnWidths[column + 1] -= widthChange;
+	}
+	else
+	{
+		// Last column, so width only bounded by MinimumColumnWidth.
+		newWidth = m_columnWidths[column] = qMax(MinimumColumnWidth, width);
+	}
+
+	return newWidth;
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)

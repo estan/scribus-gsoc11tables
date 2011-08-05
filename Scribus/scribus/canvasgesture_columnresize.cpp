@@ -28,6 +28,22 @@ void ColumnResize::keyPressEvent(QKeyEvent* event)
 		event->accept();
 		m_view->stopGesture();
 	}
+	if (event->key() == Qt::Key_Shift)
+	{
+		// Re-copy column geometires since resizing behavior will change.
+		m_columnWidths = table()->columnWidths();
+		m_columnPositions = table()->columnPositions();
+	}
+}
+
+void ColumnResize::keyReleaseEvent(QKeyEvent* event)
+{
+	if (event->key() == Qt::Key_Shift)
+	{
+		// Re-copy column geometires since resizing behavior will change.
+		m_columnWidths = table()->columnWidths();
+		m_columnPositions = table()->columnPositions();
+	}
 }
 
 void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
@@ -36,8 +52,14 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 
 	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
-	// Perform the actual resize of the column.
-	table()->setColumnWidth(m_column, gridPoint.x() - table()->columnPosition(m_column));
+	// Perform the actual resize of the row.
+	PageItem_Table::ResizeStrategy strategy;
+	if (event->modifiers() & Qt::ShiftModifier)
+		 strategy = PageItem_Table::ResizeFollowing;
+	else
+		 strategy = PageItem_Table::MoveFollowing;
+
+	table()->setColumnWidth(m_column, gridPoint.x() - table()->columnPosition(m_column), strategy);
 	table()->update();
 
 	m_view->stopGesture();
@@ -49,22 +71,18 @@ void ColumnResize::mouseMoveEvent(QMouseEvent* event)
 
 	QPointF gridPoint = globalToTableGrid(event->globalPos());
 
-	// Set width of column for the table outline.
-	qreal columnPosition = m_columnPositions[m_column];
-	qreal requestedWidth = gridPoint.x() - columnPosition;
-	qreal actualWidth = qMax(PageItem_Table::MinimumColumnWidth, requestedWidth);
-	m_columnWidths[m_column] = actualWidth;
+	qreal requestedWidth = gridPoint.x() - m_columnPositions[m_column];
+	qreal actualWidth = 0.0;
 
-	// Set positions of following columns.
-	for (int column = m_column; column < m_columnPositions.size(); ++column)
-	{
-		m_columnPositions[column] = columnPosition;
-		columnPosition += m_columnWidths[column];
-	}
+	if (event->modifiers() & Qt::ShiftModifier)
+		actualWidth = resizeColumnResizeFollowing(requestedWidth);
+	else
+		actualWidth = resizeColumnMoveFollowing(requestedWidth);
 
 	// Display width tooltip.
 	m_canvas->displayDoubleHUD(event->globalPos(), tr("Width"), actualWidth);
 
+	// Update canvas.
 	m_canvas->update();
 }
 
@@ -90,4 +108,46 @@ void ColumnResize::setup(PageItem_Table* table, int column)
 	// Make copies of the column geometries to be used during resize.
 	m_columnWidths = table->columnWidths();
 	m_columnPositions = table->columnPositions();
+}
+
+qreal ColumnResize::resizeColumnMoveFollowing(qreal width)
+{
+	// Set column width.
+	qreal newWidth = m_columnWidths[m_column] = qMax(PageItem_Table::MinimumColumnWidth, width);
+
+	// Move following columns.
+	qreal columnPosition = m_columnPositions[m_column];
+	for (int column = m_column; column < m_columnPositions.size(); ++column)
+	{
+		m_columnPositions[column] = columnPosition;
+		columnPosition += m_columnWidths[column];
+	}
+
+	return newWidth;
+}
+
+qreal ColumnResize::resizeColumnResizeFollowing(qreal width)
+{
+	qreal oldWidth = m_columnWidths[m_column];
+	qreal newWidth = 0.0;
+
+	if (m_column < table()->columns() - 1)
+	{
+		// Following column exists, so width is bounded at both ends.
+		newWidth = m_columnWidths[m_column] = qBound(
+			PageItem_Table::MinimumColumnWidth, width,
+			oldWidth + m_columnWidths[m_column + 1] - PageItem_Table::MinimumColumnWidth);
+
+		// Resize/move following column.
+		qreal widthChange = newWidth - oldWidth;
+		m_columnPositions[m_column + 1] += widthChange;
+		m_columnWidths[m_column + 1] -= widthChange;
+	}
+	else
+	{
+		// Last column, so width only bounded by MinimumColumnWidth.
+		newWidth = m_columnWidths[m_column] = qMax(PageItem_Table::MinimumColumnWidth, width);
+	}
+
+	return newWidth;
 }

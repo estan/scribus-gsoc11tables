@@ -63,6 +63,19 @@ class SCRIBUS_API PageItem_Table : public PageItem
 	Q_PROPERTY(QString style READ style WRITE setStyle RESET unsetStyle NOTIFY changed)
 
 public:
+	/**
+	 * This enum specifies two different strategies for resizing rows and columns. With the
+	 * <code>MoveFollowing</code> resize strategy, all following rows or columns are moved
+	 * when a column is resized. With the <code>ResizeFollowing</code> strategy, the row or
+	 * column that immediately follows the resized row or column is resized to match, but
+	 * apart from that, all other rows or columns remain unaffected by the resize.
+	 */
+	enum ResizeStrategy
+	{
+		MoveFollowing,
+		ResizeFollowing
+	};
+
 	/// The minimum row height.
 	static const qreal MinimumRowHeight;
 
@@ -157,11 +170,11 @@ public:
 	QList<qreal> rowHeights() const { return m_rowHeights; }
 
 	/**
-	 * Sets the height of @a row to <code>qMax(MinimumRowHeight, height)</code>.
+	 * Sets the height of @a row to @a height using resize strategy @a strategy.
 	 *
-	 * If @a row does not exists or @a height is less than or equal to 0, this method does nothing.
+	 * If @a row does not exists, this method does nothing.
 	 */
-	void setRowHeight(int row, qreal height);
+	void setRowHeight(int row, qreal height, ResizeStrategy strategy = MoveFollowing);
 
 	/**
 	 * Returns the position of @a row, or 0 if @a row does not exist.
@@ -202,11 +215,11 @@ public:
 	QList<qreal> columnWidths() const { return m_columnWidths; }
 
 	/**
-	 * Sets the width of @a column to <code>qMax(MinimumColumnWidth, width)</code>.
+	 * Sets the width of @a column to @a width using resize strategy @a strategy.
 	 *
-	 * If @a column does not exists or @a width is less than or equal to 0, this method does nothing.
+	 * If @a column does not exists, this method does nothing.
 	 */
-	void setColumnWidth(int column, qreal width);
+	void setColumnWidth(int column, qreal width, ResizeStrategy strategy = MoveFollowing);
 
 	/**
 	 * Returns the position of @a column, or 0 if @a column does not exist.
@@ -415,6 +428,16 @@ private:
 
 	/// Returns the width of the widest border along the bottom side of this table.
 	qreal maxBottomBorderWidth() const;
+
+	/// TODO: Turn these into strategies to be reused in resize gestures.
+	/// Resizes @a row according to the MoveFollowing strategy and returns the new height.
+	qreal resizeRowMoveFollowing(int row, qreal height);
+	/// Resizes @a row according to the ResizeFollowing strategy and returns the new height.
+	qreal resizeRowResizeFollowing(int row, qreal height);
+	/// Resizes @a column according to the MoveFollowing strategy and returns the new width.
+	qreal resizeColumnMoveFollowing(int row, qreal width);
+	/// Resizes @a column according to the ResizeFollowing strategy and returns the new width.
+	qreal resizeColumnResizeFollowing(int row, qreal width);
 
 	/**
 	 * Updates row and column spans following a change in rows or columns.
