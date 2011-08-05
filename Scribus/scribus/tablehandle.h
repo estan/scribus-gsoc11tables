@@ -14,7 +14,7 @@ for which a new license (GPL+exception) is in place.
   *
   * These are areas that when clicked/dragged will initiate a resize or selection
   * of some parts of the table. To test for a handle at some point, use the hitTest()
-  * function.
+  * function of PageItem_Table.
   */
 class TableHandle
 {
