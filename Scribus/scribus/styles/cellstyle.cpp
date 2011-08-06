@@ -89,6 +89,10 @@ QString CellStyle::asString() const
 	str += QString("rightBorder=%1%2,").arg(rightBorder().asString()).arg(inh_RightBorder ? "(inh)" : "");
 	str += QString("topBorder=%1%2,").arg(topBorder().asString()).arg(inh_TopBorder ? "(inh)" : "");
 	str += QString("bottomBorder=%1%2,").arg(bottomBorder().asString()).arg(inh_BottomBorder ? "(inh)" : "");
+	str += QString("leftPadding=%1%2,").arg(leftPadding()).arg(inh_LeftPadding ? "(inh)" : "");
+	str += QString("rightPadding=%1%2,").arg(rightPadding()).arg(inh_RightPadding ? "(inh)" : "");
+	str += QString("topPadding=%1%2,").arg(topPadding()).arg(inh_TopPadding ? "(inh)" : "");
+	str += QString("bottomPadding=%1%2,").arg(bottomPadding()).arg(inh_BottomPadding ? "(inh)" : "");
 	str += QString(hasParent() ? QString("parent=%1").arg(parent()) : "");
 	str += QString(")");
 	return str;

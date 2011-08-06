@@ -38,6 +38,8 @@ QString TableCell::asString() const
 	str += QString("rowSpan=%1, columnSpan=%2, ").arg(rowSpan()).arg(columnSpan());
 	str += QString("leftBorder=%1, rightBorder=%2, ").arg(leftBorder().asString()).arg(rightBorder().asString());
 	str += QString("topBorder=%1, bottomBorder=%2, ").arg(topBorder().asString()).arg(bottomBorder().asString());
+	str += QString("leftPadding=%1, rightPadding=%2, ").arg(leftPadding()).arg(rightPadding());
+	str += QString("topPadding=%1, bottomPadding=%2, ").arg(topPadding()).arg(bottomPadding());
 	str += QString("style=%1").arg(d->style.asString());
 	str += QString(")");
 

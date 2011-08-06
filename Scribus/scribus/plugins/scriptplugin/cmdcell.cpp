@@ -292,6 +292,138 @@ PyObject *scribus_setcellbottomborder(PyObject* /* self */, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyObject *scribus_setcellleftpadding(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	double padding;
+	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &padding, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell left padding on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	if (padding < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell padding must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->cellAt(row, column).setLeftPadding(padding);
+
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_setcellrightpadding(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	double padding;
+	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &padding, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell right padding on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	if (padding < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell padding must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->cellAt(row, column).setRightPadding(padding);
+
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_setcelltoppadding(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	double padding;
+	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &padding, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell top padding on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	if (padding < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell padding must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->cellAt(row, column).setTopPadding(padding);
+
+	Py_RETURN_NONE;
+}
+
+PyObject *scribus_setcellbottompadding(PyObject* /* self */, PyObject* args)
+{
+	char *Name = const_cast<char*>("");
+	int row, column;
+	double padding;
+	if (!PyArg_ParseTuple(args, "iid|es", &row, &column, &padding, "utf-8", &Name))
+		return NULL;
+	if(!checkHaveDocument())
+		return NULL;
+	PageItem *i = GetUniqueItem(QString::fromUtf8(Name));
+	if (i == NULL)
+		return NULL;
+	PageItem_Table *table = i->asTable();
+	if (!table)
+	{
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set cell bottom padding on a non-table item.","python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	if (column < 0 || column >= table->columns() || row < 0 || row >= table->rows())
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("The cell %1,%2 does not exist in table", "python error").arg(row).arg(column).toLocal8Bit().constData());
+		return NULL;
+	}
+	if (padding < 0.0)
+	{
+		PyErr_SetString(PyExc_ValueError, QObject::tr("Cell padding must be >= 0.0", "python error").toLocal8Bit().constData());
+		return NULL;
+	}
+	table->cellAt(row, column).setBottomPadding(padding);
+
+	Py_RETURN_NONE;
+}
+
 /*! HACK: this removes "warning: 'blah' defined but not used" compiler warnings
 with header files structure untouched (docstrings are kept near declarations)
 PV */
@@ -302,5 +434,7 @@ void cmdcelldocwarnings()
 	  << scribus_getcellrowspan__doc__ << scribus_getcellcolumnspan__doc__
 	  << scribus_getcellfillcolor__doc__ << scribus_setcellfillcolor__doc__
 	  << scribus_setcellleftborder__doc__ << scribus_setcellrightborder__doc__
-	  << scribus_setcelltopborder__doc__ << scribus_setcellbottomborder__doc__;
+	  << scribus_setcelltopborder__doc__ << scribus_setcellbottomborder__doc__
+	  << scribus_setcellleftpadding__doc__ << scribus_setcellrightpadding__doc__
+	  << scribus_setcelltoppadding__doc__ << scribus_setcellbottompadding__doc__;
 }

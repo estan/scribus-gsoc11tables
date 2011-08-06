@@ -139,4 +139,52 @@ May throw ValueError the cell does not exist or if \"borderLines\" is of the wro
 /*! Set cell bottom border */
 PyObject *scribus_setcellbottomborder(PyObject * /*self*/, PyObject* args);
 
+/*! docstring */
+PyDoc_STRVAR(scribus_setcellleftpadding__doc__,
+QT_TR_NOOP("setCellLeftPadding(row, column, padding, [\"name\"])\n\
+\n\
+Sets the left padding of the cell at \"row\", \"column\" in the table \"name\"\n\
+to \"padding\". If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the cell does not exist or if \"padding\" less than 0.\n\
+"));
+/*! Set cell left padding */
+PyObject *scribus_setcellleftpadding(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_setcellrightpadding__doc__,
+QT_TR_NOOP("setCellRightPadding(row, column, padding, [\"name\"])\n\
+\n\
+Sets the right padding of the cell at \"row\", \"column\" in the table \"name\"\n\
+to \"padding\". If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the cell does not exist or if \"padding\" less than 0.\n\
+"));
+/*! Set cell right padding */
+PyObject *scribus_setcellrightpadding(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_setcelltoppadding__doc__,
+QT_TR_NOOP("setCellTopPadding(row, column, padding, [\"name\"])\n\
+\n\
+Sets the top padding of the cell at \"row\", \"column\" in the table \"name\"\n\
+to \"padding\". If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the cell does not exist or if \"padding\" is less than 0.\n\
+"));
+/*! Set cell top padding */
+PyObject *scribus_setcelltoppadding(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
+PyDoc_STRVAR(scribus_setcellbottompadding__doc__,
+QT_TR_NOOP("setCellBottomPadding(row, column, padding, [\"name\"])\n\
+\n\
+Sets the bottom padding of the cell at \"row\", \"column\" in the table \"name\"\n\
+to \"padding\". If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError the cell does not exist or if \"padding\" is less than 0.\n\
+"));
+/*! Set cell bottom padding */
+PyObject *scribus_setcellbottompadding(PyObject * /*self*/, PyObject* args);
+
 #endif // CMDCELL_H

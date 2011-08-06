@@ -136,6 +136,30 @@ public:
 	/// Returns the bottom border of this cell.
 	TableBorder bottomBorder() const { return d->style.bottomBorder(); }
 
+	/// Sets the left padding of this cell to @a padding.
+	void setLeftPadding(qreal padding) { d->style.setLeftPadding(padding); }
+
+	/// Returns the left padding of this cell.
+	qreal leftPadding() const { return d->style.leftPadding(); }
+
+	/// Sets the right padding of this cell to @a padding.
+	void setRightPadding(qreal padding) { d->style.setRightPadding(padding); }
+
+	/// Returns the right padding of this cell.
+	qreal rightPadding() const { return d->style.rightPadding(); }
+
+	/// Sets the top padding of this cell to @a padding.
+	void setTopPadding(qreal padding) { d->style.setTopPadding(padding); }
+
+	/// Returns the top padding of this cell.
+	qreal topPadding() const { return d->style.topPadding(); }
+
+	/// Sets the bottom padding of this cell to @a padding.
+	void setBottomPadding(qreal padding) { d->style.setBottomPadding(padding); }
+
+	/// Returns the bottom padding of this cell.
+	qreal bottomPadding() const { return d->style.bottomPadding(); }
+
 	/// Sets the cell style for this cell to @a style.
 	void setStyle(const QString& style) { d->style.setParent(style); }
 
