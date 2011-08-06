@@ -59,7 +59,7 @@ void ColumnResize::mouseReleaseEvent(QMouseEvent* event)
 	else
 		 strategy = PageItem_Table::MoveFollowing;
 
-	table()->setColumnWidth(m_column, gridPoint.x() - table()->columnPosition(m_column), strategy);
+	table()->resizeColumn(m_column, gridPoint.x() - table()->columnPosition(m_column), strategy);
 	table()->update();
 
 	m_view->stopGesture();

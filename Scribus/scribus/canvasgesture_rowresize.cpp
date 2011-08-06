@@ -59,7 +59,7 @@ void RowResize::mouseReleaseEvent(QMouseEvent* event)
 	else
 		 strategy = PageItem_Table::MoveFollowing;
 
-	table()->setRowHeight(m_row, gridPoint.y() - table()->rowPosition(m_row), strategy);
+	table()->resizeRow(m_row, gridPoint.y() - table()->rowPosition(m_row), strategy);
 	table()->update();
 
 	m_view->stopGesture();

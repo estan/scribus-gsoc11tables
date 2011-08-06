@@ -138,7 +138,7 @@ PyObject *scribus_gettablerowheight(PyObject* /* self */, PyObject* args)
 	return PyFloat_FromDouble(static_cast<double>(table->rowHeight(row)));
 }
 
-PyObject *scribus_settablerowheight(PyObject* /* self */, PyObject* args)
+PyObject *scribus_resizetablerow(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int row;
@@ -153,7 +153,7 @@ PyObject *scribus_settablerowheight(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set row height on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot resize row on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (row < 0 || row >= table->rows())
@@ -166,7 +166,7 @@ PyObject *scribus_settablerowheight(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table row height must be > 0.0", "python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	table->setRowHeight(row, height);
+	table->resizeRow(row, height);
 	Py_RETURN_NONE;
 }
 
@@ -257,7 +257,7 @@ PyObject *scribus_gettablecolumnwidth(PyObject* /* self */, PyObject* args)
 	return PyFloat_FromDouble(static_cast<double>(table->columnWidth(column)));
 }
 
-PyObject *scribus_settablecolumnwidth(PyObject* /* self */, PyObject* args)
+PyObject *scribus_resizetablecolumn(PyObject* /* self */, PyObject* args)
 {
 	char *Name = const_cast<char*>("");
 	int column;
@@ -272,7 +272,7 @@ PyObject *scribus_settablecolumnwidth(PyObject* /* self */, PyObject* args)
 	PageItem_Table *table = i->asTable();
 	if (!table)
 	{
-		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot set column width on a non-table item.","python error").toLocal8Bit().constData());
+		PyErr_SetString(WrongFrameTypeError, QObject::tr("Cannot resize column on a non-table item.","python error").toLocal8Bit().constData());
 		return NULL;
 	}
 	if (column < 0 || column >= table->columns())
@@ -285,7 +285,7 @@ PyObject *scribus_settablecolumnwidth(PyObject* /* self */, PyObject* args)
 		PyErr_SetString(PyExc_ValueError, QObject::tr("Table column width must be > 0.0", "python error").toLocal8Bit().constData());
 		return NULL;
 	}
-	table->setColumnWidth(column, width);
+	table->resizeColumn(column, width);
 	Py_RETURN_NONE;
 }
 
@@ -524,7 +524,7 @@ void cmdtabledocwarnings()
 	  << scribus_inserttablerows__doc__ << scribus_removetablerows__doc__
 	  << scribus_inserttablecolumns__doc__ << scribus_removetablecolumns__doc__
 	  << scribus_gettablerowheight__doc__ << scribus_gettablecolumnwidth__doc__
-	  << scribus_settablerowheight__doc__ << scribus_settablecolumnwidth__doc__
+	  << scribus_resizetablerow__doc__ << scribus_resizetablecolumn__doc__
 	  << scribus_mergetablecells__doc__ << scribus_settablestyle__doc__
 	  << scribus_gettablestyle__doc__ << scribus_settablefillcolor__doc__
 	  << scribus_gettablefillcolor__doc__ << scribus_settableleftborder__doc__

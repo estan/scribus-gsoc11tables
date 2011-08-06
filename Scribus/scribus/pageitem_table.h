@@ -36,10 +36,8 @@ class TablePainter;
  * <code>insertColumns()</code>, <code>removeRows()</code>, or <code>removeColumns()</code>.
  * Use <code>cellAt()</code> to retrieve table cells.
  * <p>
- * The width and height of the table may be set using the <code>resize()</code> function.
- * <p>
- * Heights and widths of rows and columns can be set by using <code>setRowHeight()</code>
- * and <code>setColumnWidth()</code>.
+ * Rows and columns can be resized by using <code>resizeRow()</code> and <code>resizeColumn()</code>.
+ * The entire table can be resized by using <code>resize()</code>
  * <p>
  * Cells in the table can be merged by using <code>mergeCells()</code>. Cells that have been
  * previously merged can be split up again by using <code>splitCells()</code>.
@@ -170,11 +168,11 @@ public:
 	QList<qreal> rowHeights() const { return m_rowHeights; }
 
 	/**
-	 * Sets the height of @a row to @a height using resize strategy @a strategy.
+	 * Resizes @a row to @a height using resize strategy @a strategy.
 	 *
 	 * If @a row does not exists, this method does nothing.
 	 */
-	void setRowHeight(int row, qreal height, ResizeStrategy strategy = MoveFollowing);
+	void resizeRow(int row, qreal height, ResizeStrategy strategy = MoveFollowing);
 
 	/**
 	 * Returns the position of @a row, or 0 if @a row does not exist.
@@ -215,11 +213,11 @@ public:
 	QList<qreal> columnWidths() const { return m_columnWidths; }
 
 	/**
-	 * Sets the width of @a column to @a width using resize strategy @a strategy.
+	 * Resizes @a column to @a width using resize strategy @a strategy.
 	 *
 	 * If @a column does not exists, this method does nothing.
 	 */
-	void setColumnWidth(int column, qreal width, ResizeStrategy strategy = MoveFollowing);
+	void resizeColumn(int column, qreal width, ResizeStrategy strategy = MoveFollowing);
 
 	/**
 	 * Returns the position of @a column, or 0 if @a column does not exist.

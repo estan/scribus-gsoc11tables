@@ -194,14 +194,14 @@ class TableTests:
                 if objectExists(table):
                     deleteObject(table)
 
-    def test_set_row_height(self):
-        """ Test for setTableRowHeight(...) """
+    def test_resize_table_row(self):
+        """ Test for resizeTableRow(...) """
         # TODO: Test individual cell rects.
 
         # Test valid API usage.
         table1 = createTable(50, 50, 90, 90, 3, 3)
         for row in range(2):
-            setTableRowHeight(row, 20, table1)
+            resizeTableRow(row, 20, table1)
             check(getTableRowHeight(row, table1) == 20)
         deleteObject(table1)
 
@@ -210,7 +210,7 @@ class TableTests:
         for args in bad_args:
             try:
                 table2 = createTable(50, 50, 90, 90, 3, 3)
-                setTableRowHeight(args[0], args[1], table2)
+                resizeTableRow(args[0], args[1], table2)
                 fail('Expected ValueError, row=%i, height=%i' % (args[0], args[1]))
             except ValueError:
                 pass # Expected.
@@ -218,14 +218,14 @@ class TableTests:
                 if objectExists(table2):
                     deleteObject(table2)
 
-    def test_set_column_width(self):
-        """ Test for setTableColumnWidth(...) """
+    def test_resize_table_column(self):
+        """ Test for resizeTableColumn(...) """
         # TODO: Test individual cell rects.
 
         # Test valid API usage.
         table1 = createTable(50, 50, 90, 90, 3, 3)
         for col in range(2):
-            setTableColumnWidth(col, 20, table1)
+            resizeTableColumn(col, 20, table1)
             check(getTableColumnWidth(col, table1) == 20)
         deleteObject(table1)
 
@@ -234,7 +234,7 @@ class TableTests:
         for args in bad_args:
             try:
                 table2 = createTable(50, 50, 90, 90, 3, 3)
-                setTableColumnWidth(args[0], args[1], table2)
+                resizeTableColumn(args[0], args[1], table2)
                 fail('Expected ValueError, col=%i, height=%i' % (args[0], args[1]))
             except ValueError:
                 pass # Expected.

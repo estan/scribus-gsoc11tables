@@ -286,7 +286,7 @@ qreal PageItem_Table::rowHeight(int row) const
 	return m_rowHeights.at(row);
 }
 
-void PageItem_Table::setRowHeight(int row, qreal height, ResizeStrategy strategy)
+void PageItem_Table::resizeRow(int row, qreal height, ResizeStrategy strategy)
 {
 	if (!validRow(row))
 		return;
@@ -317,7 +317,7 @@ qreal PageItem_Table::columnWidth(int column) const
 	return m_columnWidths.at(column);
 }
 
-void PageItem_Table::setColumnWidth(int column, qreal width, ResizeStrategy strategy)
+void PageItem_Table::resizeColumn(int column, qreal width, ResizeStrategy strategy)
 {
 	if (!validColumn(column))
 		return;

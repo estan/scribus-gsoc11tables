@@ -71,16 +71,16 @@ selected item is used.\n\
 PyObject *scribus_gettablerowheight(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_settablerowheight__doc__,
-QT_TR_NOOP("setTableRowHeight(row, height, [\"name\"])\n\
+PyDoc_STRVAR(scribus_resizetablerow__doc__,
+QT_TR_NOOP("resizeTableRow(row, height, [\"name\"])\n\
 \n\
-Sets the height of \"row\" to \"height\" in the table \"name\".\n\
+Resizes \"row\" to \"height\" in the table \"name\".\n\
 If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the height is less than 0 or the row does not exist.\n\
 "));
-/*! Set table row height */
-PyObject *scribus_settablerowheight(PyObject * /*self*/, PyObject* args);
+/*! Resize table row */
+PyObject *scribus_resizetablerow(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
 PyDoc_STRVAR(scribus_inserttablecolumns__doc__,
@@ -118,16 +118,16 @@ selected item is used.\n\
 PyObject *scribus_gettablecolumnwidth(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
-PyDoc_STRVAR(scribus_settablecolumnwidth__doc__,
-QT_TR_NOOP("setTableColumnWidth(column, width, [\"name\"])\n\
+PyDoc_STRVAR(scribus_resizetablecolumn__doc__,
+QT_TR_NOOP("resizeTableColumn(column, width, [\"name\"])\n\
 \n\
-Sets the width of \"column\" to \"width\" in the table \"name\".\n\
+Resizes \"column\" to \"width\" in the table \"name\".\n\
 If \"name\" is not given the currently selected item is used.\n\
 \n\
 May throw ValueError if the width is less than 0 or the column does not exist.\n\
 "));
-/*! Set table column width */
-PyObject *scribus_settablecolumnwidth(PyObject * /*self*/, PyObject* args);
+/*! Resize table column */
+PyObject *scribus_resizetablecolumn(PyObject * /*self*/, PyObject* args);
 
 /*! docstring */
 PyDoc_STRVAR(scribus_mergetablecells__doc__,
