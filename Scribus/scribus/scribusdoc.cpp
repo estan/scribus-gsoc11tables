@@ -496,6 +496,10 @@ void ScribusDoc::init()
 	defaultCellStyle.setRightBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
 	defaultCellStyle.setTopBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
 	defaultCellStyle.setBottomBorder(TableBorder(1.0, Qt::SolidLine, "Black"));
+	defaultCellStyle.setLeftPadding(1.0);
+	defaultCellStyle.setRightPadding(1.0);
+	defaultCellStyle.setTopPadding(1.0);
+	defaultCellStyle.setBottomPadding(1.0);
 	docCellStyles.create(defaultCellStyle);
 	docCellStyles.makeDefault(&(docCellStyles[0]));
 	
