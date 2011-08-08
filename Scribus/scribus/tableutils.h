@@ -10,9 +10,7 @@ for which a new license (GPL+exception) is in place.
 #define TABLEUTILS_H
 
 #include "tableborder.h"
-#include "tablecell.h"
 
-class PageItem_Table;
 class QPointF;
 
 /**
@@ -118,98 +116,6 @@ void joinHorizontal(const TableBorder& border, const TableBorder& topLeft, const
 				  const TableBorder& bottomLeft, const TableBorder& topRight, const TableBorder& right,
 				  const TableBorder& bottomRight, QPointF* start, QPointF* end, QPointF* startOffsetFactors,
 				  QPointF* endOffsetFactors);
-
-	/**
-	 * Resolves the collapsed borders between six cells in a 2x3 area.
-	 *
-	 * Given the six cells @a topLeftCell, @a topRightCell, @a leftCell, @a rightCell,
-	 * @a bottomLeftCell and @a bottomRightCell in the following picture
-	 *
-	 * <pre>
-	 *  +----------------------+----------------------+
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  |    topLeftCell      top     topRightCell    |
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  +--------topLeft-------+-------topRight-------+
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  |      leftCell     center     rightCell      |
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  +-------bottomLeft-----+------bottomRight-----+
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  |  bottomLeftCell   bottom   bottomRightCell  |
-	 *  |                      |                      |
-	 *  |                      |                      |
-	 *  +----------------------+----------------------+
-	 * </pre>
-	 *
-	 * the function will return the collapsed borders @a topLeft, @a top, @a topRight,
-	 * @a center, @a bottomLeft, @a bottom and @a bottomRight. If two adjacent cells are
-	 * invalid, the returned collapsed border between them is null. If only one of two adjacent
-	 * cells is valid, the returned collapsed border will be the border of the valid cell
-	 * collapsed with the appropriate table border instead. If two "adjacent" cells are
-	 * actually the same cell, the returned collapsed border between them is null.
-	 *
-	 * If both @a leftCell and @a rightCell are invalid, the function will print a
-	 * warning message and return immediately, leaving @a topLeft, @a top, @a topRight,
-	 * @a center, @a bottomLeft, @a bottom and @a bottomRight unchanged. All cells that are
-	 * valid must exist in the table @a table, or the result of this function is undefined.
-	 *
-	 * @a topLeft, @a top, @a topRight, @a center, @a bottomLeft, @a bottom and
-	 * @a bottomRight must point to existing borders.
-	 */
-	void resolveBordersVertical(const TableCell& topLeftCell, const TableCell& topRightCell,
-		const TableCell& leftCell, const TableCell& rightCell, const TableCell& bottomLeftCell,
-		const TableCell& bottomRightCell, TableBorder* topLeft, TableBorder* top, TableBorder* topRight,
-		TableBorder* center, TableBorder* bottomLeft, TableBorder* bottom, TableBorder* bottomRight,
-		PageItem_Table* table);
-
-	/**
-	 * Resolves the collapsed borders between six cells in a 3x2 area.
-	 *
-	 * Given the six cells @a topLeftCell, @a topCell, @a topRightCell, @a bottomLeftCell,
-	 * @a bottomCell and @a bottomRightCell in the following picture
-	 *
-	 * <pre>
-	 *  +--------------------------+--------------------------+--------------------------+
-	 *  |                          |                          |                          |
-	 *  |                          |                          |                          |
-	 *  |        topLeftCell   topLeft        topCell      topRight   topRightCell       |
-	 *  |                          |                          |                          |
-	 *  |                          |                          |                          |
-	 *  +----------left------------+--------- center ---------+----------right-----------+
-	 *  |                          |                          |                          |
-	 *  |                          |                          |                          |
-	 *  |     bottomLeftCell   bottomLeft   bottomCell   bottomRight  bottomRightCell    |
-	 *  |                          |                          |                          |
-	 *  |                          |                          |                          |
-	 *  +--------------------------+--------------------------+--------------------------+
-	 * </pre>
-	 *
-	 * the function will return the collapsed borders @a topLeft, @a left, @a bottomLeft,
-	 * @a center, @a topRight, @a right and @a bottomRight. If two adjacent cells are invalid,
-	 * the returned collapsed border between them is null. If only one of two adjacent cells is
-	 * valid, the returned collapsed border will be the border of the valid cell collapsed with
-	 * the appropriate table border instead. If two "adjacent" cells are actually the same
-	 * cell, the returned collapsed border between them is null.
-	 *
-	 * If both @a topCell and @a bottomCell are invalid, the function will print a
-	 * warning message and return immediately, leaving @a topLeft, @a top, @a bottomLeft,
-	 * @a center, @a topRight, @a right and @a bottomRight unchanged. All cells that are
-	 * valid must exist in the table @a table, or the result of this function is undefined.
-	 *
-	 * @a topLeft, @a left , @a bottomLeft, @a center, @a topRight, @a right and
-	 * @a bottomRight must point to existing borders.
-	 */
-	void resolveBordersHorizontal(const TableCell& topLeftCell, const TableCell& topCell,
-		const TableCell& topRightCell, const TableCell& bottomLeftCell, const TableCell& bottomCell,
-		const TableCell& bottomRightCell, TableBorder* topLeft, TableBorder* left, TableBorder* bottomLeft,
-		TableBorder* center, TableBorder* topRight, TableBorder* right, TableBorder* bottomRight,
-		PageItem_Table* table);
 
 } // namespace TableUtils
 
