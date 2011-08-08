@@ -8,6 +8,7 @@ for which a new license (GPL+exception) is in place.
 */
 
 #include <QDebug>
+#include <QRectF>
 #include <QString>
 
 #include "commonstrings.h"
@@ -29,6 +30,28 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 	setColumn(column);
 	setRowSpan(1);
 	setColumnSpan(1);
+}
+
+QRectF TableCell::boundingRect() const
+{
+	if (!isValid())
+		return QRectF();
+
+	const int endRow = row() + rowSpan() - 1;
+	const int endCol = column() + columnSpan() - 1;
+
+	const qreal x = d->table->columnPosition(column());
+	const qreal y = d->table->rowPosition(row());
+	const qreal width = d->table->columnPosition(endCol) + d->table->columnWidth(endCol) - x;
+	const qreal height = d->table->rowPosition(endRow) + d->table->rowHeight(endRow) - y;
+
+	return QRectF(x, y, width, height);
+}
+
+QRectF TableCell::contentRect() const
+{
+	// Not implemented.
+	return QRectF();
 }
 
 QString TableCell::asString() const

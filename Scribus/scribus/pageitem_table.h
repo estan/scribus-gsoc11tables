@@ -249,13 +249,6 @@ public:
 	void splitCell(int row, int column, int numRows, int numCols);
 
 	/**
-	 * Returns the rectangle of @a cell on the table grid.
-	 *
-	 * If @a cell is invalid or not in this table, an invalid rectangle is returned.
-	 */
-	QRectF cellRect(const TableCell& cell) const;
-
-	/**
 	 * Returns the cell selection.
 	 */
 	QSet<TableCell> selection() const { return m_selection; }

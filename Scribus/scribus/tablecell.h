@@ -12,6 +12,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QDebug>
 #include <QExplicitlySharedDataPointer>
+#include <QRectF>
 #include <QSharedData>
 #include <QString>
 
@@ -70,6 +71,13 @@ public:
  * It provides an interface for setting and getting cell properties. A cell may be
  * marked as invalid if the row or column containing the cell is removed. The valid
  * state of a cell may be queried using the <code>isValid()</code> function.
+ * <p>
+ * A cell has a bounding rectangle. This is the rectangle on the table grid containing
+ * the cell. It may be queried using the <code>boundingRect()</code> function.
+ * <p>
+ * A cell also has a content rectangle. This is the bounding rect of the cell adjusted
+ * for any cell paddings and borders. It may be queried using the <code>contentRect()</code>
+ * function.
  */
 class TableCell
 {
@@ -105,6 +113,12 @@ public:
 
 	/// Returns the number of columns this cell spans.
 	int columnSpan() const { return d->columnSpan; }
+
+	/// Returns the bounding rectangle of this cell.
+	QRectF boundingRect() const;
+
+	/// Returns the content rectangle of this cell.
+	QRectF contentRect() const;
 
 	/// Sets the fill color of this cell to @a color.
 	void setFillColor(const QString& color) { d->style.setFillColor(color); }

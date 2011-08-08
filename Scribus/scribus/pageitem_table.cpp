@@ -386,24 +386,6 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 	emit changed();
 }
 
-QRectF PageItem_Table::cellRect(const TableCell& cell) const
-{
-	if (!validCell(cell.row(), cell.column()))
-		return QRectF();
-
-	const int row = cell.row();
-	const int col = cell.column();
-	const int endRow = row + cell.rowSpan() - 1;
-	const int endCol = col + cell.columnSpan() - 1;
-
-	const qreal x = m_columnPositions[col];
-	const qreal y = m_rowPositions[row];
-	const qreal width = m_columnPositions[endCol] + m_columnWidths[endCol] - x;
-	const qreal height = m_rowPositions[endRow] + m_rowHeights[endRow] - y;
-
-	return QRectF(x, y, width, height);
-}
-
 void PageItem_Table::selectCell(int row, int column)
 {
 	if (!validCell(row, column))
@@ -515,7 +497,7 @@ TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 		return TableHandle(TableHandle::ColumnResize, columns() - 1);
 
 	const TableCell hitCell = cellAt(point);
-	const QRectF hitRect = cellRect(hitCell);
+	const QRectF hitRect = hitCell.boundingRect();
 
 	// Test if hit is on cell interior.
 	if (hitRect.adjusted(threshold, threshold, -threshold, -threshold).contains(gridPoint))
