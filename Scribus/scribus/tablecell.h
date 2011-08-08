@@ -210,6 +210,15 @@ private:
 	/// "Move" the cell left by @a numColumns. E.g. decrease its column by @a numColumns.
 	void moveLeft(int numColumns) { d->column -= numColumns; }
 
+	/// Returns the maximum border width found along left side of cell.
+	qreal maxLeftBorderWidth() const;
+	/// Returns the maximum border width found along right side of cell.
+	qreal maxRightBorderWidth() const;
+	/// Returns the maximum border width found along top side of cell.
+	qreal maxTopBorderWidth() const;
+	/// Returns the maximum border width found along bottom side of cell.
+	qreal maxBottomBorderWidth() const;
+
 private:
 	friend class PageItem_Table;
 	QExplicitlySharedDataPointer<TableCellData> d;

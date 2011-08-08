@@ -15,8 +15,11 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem_table.h"
 #include "scribusdoc.h"
 #include "scpainter.h"
+#include "tableutils.h"
 
 #include "tablecell.h"
+
+using namespace TableUtils;
 
 TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCellData)
 {
@@ -48,10 +51,27 @@ QRectF TableCell::boundingRect() const
 	return QRectF(x, y, width, height);
 }
 
+// TODO: We should cache this rectangle.
 QRectF TableCell::contentRect() const
 {
-	// Not implemented.
-	return QRectF();
+	if (!isValid())
+		return QRectF();
+
+	QRectF rect = boundingRect();
+
+	// Insets are paddings plus half border width.
+	const qreal leftInset = leftPadding() + maxLeftBorderWidth()/2;
+	const qreal rightInset = rightPadding() + maxRightBorderWidth()/2;
+	const qreal topInset = topPadding() + maxTopBorderWidth()/2;
+	const qreal bottomInset = bottomPadding() + maxBottomBorderWidth()/2;
+
+	// Adjust rectangle. (We don't allow width or height < 1.0)
+	rect.setLeft(rect.left() + leftInset);
+	rect.setTop(rect.top() + topInset);
+	rect.setWidth(qMax(1.0, rect.width() - rightInset));
+	rect.setHeight(qMax(1.0, rect.height() - bottomInset));
+
+	return rect;
 }
 
 QString TableCell::asString() const
@@ -67,6 +87,84 @@ QString TableCell::asString() const
 	str += QString(")");
 
 	return str;
+}
+
+qreal TableCell::maxLeftBorderWidth() const
+{
+	const int endRow = row() + rowSpan() - 1;
+
+	qreal maxWidth = 0.0;
+	qreal currentWidth = 0.0;
+	for (int currentRow = row(); currentRow <= endRow; ++currentRow)
+	{
+		TableCell cellLeft = d->table->cellAt(currentRow, column() - 1);
+		if (cellLeft.isValid())
+			currentWidth = collapseBorders(leftBorder(), cellLeft.rightBorder()).width();
+		else
+			currentWidth = collapseBorders(leftBorder(), d->table->leftBorder()).width();
+		maxWidth = qMax(maxWidth, currentWidth);
+	}
+
+	return maxWidth;
+}
+
+qreal TableCell::maxRightBorderWidth() const
+{
+	const int endRow = row() + rowSpan() - 1;
+	const int endCol = column() + columnSpan() - 1;
+
+	qreal maxWidth = 0.0;
+	qreal currentWidth = 0.0;
+	for (int currentRow = row(); currentRow <= endRow; ++currentRow)
+	{
+		TableCell cellRight = d->table->cellAt(currentRow, endCol + 1);
+		if (cellRight.isValid())
+			currentWidth = collapseBorders(cellRight.leftBorder(), rightBorder()).width();
+		else
+			currentWidth = collapseBorders(d->table->rightBorder(), rightBorder()).width();
+		maxWidth = qMax(maxWidth, currentWidth);
+	}
+
+	return maxWidth;
+}
+
+qreal TableCell::maxTopBorderWidth() const
+{
+	const int endCol = column() + columnSpan() - 1;
+
+	qreal maxWidth = 0.0;
+	qreal currentWidth = 0.0;
+	for (int currentCol = column(); currentCol <= endCol; ++currentCol)
+	{
+		TableCell cellAbove = d->table->cellAt(row() - 1, currentCol);
+		if (cellAbove.isValid())
+			currentWidth = collapseBorders(cellAbove.bottomBorder(), topBorder()).width();
+		else
+			currentWidth = collapseBorders(topBorder(), d->table->topBorder()).width();
+		maxWidth = qMax(maxWidth, currentWidth);
+	}
+
+	return maxWidth;
+}
+
+qreal TableCell::maxBottomBorderWidth() const
+{
+	const int endRow = row() + rowSpan() - 1;
+	const int endCol = column() + columnSpan() - 1;
+
+	qreal maxWidth = 0.0;
+	qreal currentWidth = 0.0;
+	for (int currentCol = column(); currentCol <= endCol; ++currentCol)
+	{
+		TableCell cellBelow = d->table->cellAt(endRow + 1, currentCol);
+		if (cellBelow.isValid())
+			currentWidth = collapseBorders(bottomBorder(), cellBelow.topBorder()).width();
+		else
+			currentWidth = collapseBorders(d->table->bottomBorder(), bottomBorder()).width();
+		maxWidth = qMax(maxWidth, currentWidth);
+	}
+
+	return maxWidth;
 }
 
 QDebug operator<<(QDebug debug, const TableCell& cell)
