@@ -50,8 +50,15 @@ QRectF TableCell::boundingRect() const
 
 QRectF TableCell::contentRect() const
 {
-	// Not implemented.
-	return QRectF();
+	if (!isValid())
+		return QRectF();
+
+	const qreal leftInset = leftPadding();
+	const qreal rightInset = rightPadding();
+	const qreal topInset = topPadding();
+	const qreal bottomInset = bottomPadding();
+
+	return boundingRect().adjusted(leftInset, topInset, -rightInset, -bottomInset);
 }
 
 QString TableCell::asString() const
