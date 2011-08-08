@@ -408,6 +408,13 @@ private:
 		ColumnsRemoved   /**< Columns were removed. */
 	};
 
+	/**
+	 * Initializes the table with @a numRows rows and @a numColumns columns.
+	 *
+	 * Should be called once, and once only, during table construction.
+	 */
+	void initialize(int numRows, int numColumns);
+
 	/// Returns true if @a row is a row in this table.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }
 	/// Returns true if @a column is a column in this table.

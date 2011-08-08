@@ -44,12 +44,7 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 	PageItem(pa, PageItem::Table, x, y, w, h, w2, fill, outline),
 	m_rows(0), m_columns(0), m_tablePainter(new CollapsedTablePainter(this))
 {
-	Q_ASSERT(m_Doc);
-	m_style.setContext(&m_Doc->tableStyles());
-
-	// NOTE: The order here is important as insertRows() assumes that columns() > 0.
-	insertColumns(0, qMax(1, numColumns));
-	insertRows(0, qMax(1, numRows));
+	initialize(numRows, numColumns);
 
 	adjustTableToFrame();
 	adjustFrameToTable();
@@ -62,6 +57,8 @@ PageItem_Table::~PageItem_Table()
 
 void PageItem_Table::resize(qreal width, qreal height)
 {
+	ASSERT_VALID();
+
 	/*
 	 * Distribute width proportionally to columns, but don't let any column width below
 	 * MinimumColumnWidth.
@@ -91,6 +88,8 @@ void PageItem_Table::resize(qreal width, qreal height)
 	}
 
 	emit changed();
+
+	ASSERT_VALID();
 }
 
 void PageItem_Table::insertRows(int index, int numRows)
@@ -100,11 +99,9 @@ void PageItem_Table::insertRows(int index, int numRows)
 	if (index < 0 || index > rows() || numRows < 1)
 		return;
 
-	// Height and position of first inserted row.
-	qreal rowHeight = rows() == 0 ? height() : m_rowHeights.at(qMax(index - 1, 0));
-	qreal rowPosition = index == 0 ? 0.0 : m_rowPositions.at(qMax(index - 1, 0)) + rowHeight;
+	qreal rowHeight = m_rowHeights.at(qMax(index - 1, 0));
+	qreal rowPosition = index == 0 ? 0.0 : m_rowPositions.at(index - 1) + rowHeight;
 
-	// Insert row heights, row positions and a new row of cells.
 	for (int row = index; row < index + numRows; ++row)
 	{
 		// Insert row height and position.
@@ -112,8 +109,7 @@ void PageItem_Table::insertRows(int index, int numRows)
 		m_rowPositions.insert(row, rowPosition);
 		rowPosition += rowHeight;
 
-		// Insert a new row of cells if table is non-empty.
-		// NOTE: We assume here that columns() > 0.
+		// Insert a row of cells.
 		QList<TableCell> cellRow;
 		for (int col = 0; col < columns(); ++col)
 			cellRow.append(TableCell(row, col, this));
@@ -195,19 +191,17 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	if (index < 0 || index > columns() || numColumns < 1)
 		return;
 
-	// Width and position of first inserted column.
-	qreal columnWidth = columns() == 0 ? width() : m_columnWidths.at(qMax(index - 1, 0));
-	qreal columnPosition = index == 0 ? 0.0 : m_columnPositions.at(qMax(index - 1, 0)) + columnWidth;
+	qreal columnWidth = m_columnWidths.at(qMax(index - 1, 0));
+	qreal columnPosition = index == 0 ? 0.0 : m_columnPositions.at(index - 1) + columnWidth;
 
-	// Insert column widths, column positions and a new column of cells.
 	for (int col = index; col < index + numColumns; ++col)
 	{
-		// Insert column widths and positions.
+		// Insert column width and position.
 		m_columnWidths.insert(col, columnWidth);
 		m_columnPositions.insert(col, columnPosition);
 		columnPosition += columnWidth;
 
-		// Insert a new column of cells.
+		// Insert a column of cells.
 		for (int row = 0; row < rows(); ++row)
 			m_cellRows[row].insert(col, TableCell(row, col, this));
 	}
@@ -288,6 +282,8 @@ qreal PageItem_Table::rowHeight(int row) const
 
 void PageItem_Table::resizeRow(int row, qreal height, ResizeStrategy strategy)
 {
+	ASSERT_VALID();
+
 	if (!validRow(row))
 		return;
 
@@ -299,6 +295,8 @@ void PageItem_Table::resizeRow(int row, qreal height, ResizeStrategy strategy)
 		qWarning("Unknown resize strategy!");
 
 	emit changed();
+
+	ASSERT_VALID();
 }
 
 qreal PageItem_Table::rowPosition(int row) const
@@ -319,6 +317,8 @@ qreal PageItem_Table::columnWidth(int column) const
 
 void PageItem_Table::resizeColumn(int column, qreal width, ResizeStrategy strategy)
 {
+	ASSERT_VALID();
+
 	if (!validColumn(column))
 		return;
 
@@ -330,6 +330,8 @@ void PageItem_Table::resizeColumn(int column, qreal width, ResizeStrategy strate
 		qWarning("Unknown resize strategy!");
 
 	emit changed();
+
+	ASSERT_VALID();
 }
 
 qreal PageItem_Table::columnPosition(int column) const
@@ -680,6 +682,35 @@ void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
 	// Paint the overflow marker.
 	if (isOverflowing())
 		drawOverflowMarker(p);
+}
+
+void PageItem_Table::initialize(int numRows, int numColumns)
+{
+	Q_ASSERT(m_Doc);
+	Q_ASSERT(numRows > 0);
+	Q_ASSERT(numColumns > 0);
+
+	// Internal style is in document-wide style context.
+	m_style.setContext(&m_Doc->tableStyles());
+
+	// Initialize rows of cells.
+	QList<TableCell> initialRow;
+	initialRow.append(TableCell(0, 0, this));
+	m_cellRows.append(initialRow);
+
+	// Initialize row/column geometries.
+	m_rowPositions.insert(0, 0.0);
+	m_rowHeights.insert(0, 10.0);
+	m_columnPositions.insert(0, 0.0);
+	m_columnWidths.insert(0, 10.0);
+
+	// Initialize row/column counts.
+	m_rows = 1;
+	m_columns = 1;
+
+	// Insert any remaining rows and/or columns.
+	insertRows(0, numRows - 1);
+	insertColumns(0, numColumns - 1);
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const
