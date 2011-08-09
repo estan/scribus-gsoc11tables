@@ -16,6 +16,18 @@
 #define CMDCELL_H
 
 /*! docstring */
+PyDoc_STRVAR(scribus_setcelltext__doc__,
+QT_TR_NOOP("setCellText(row, column, text, [\"name\"])\n\
+\n\
+Sets the text of the cell at \"row\", \"column\" in the table \"name\" to \"text\".\n\
+If \"name\" is not given the currently selected item is used.\n\
+\n\
+May throw ValueError if the cell does not exist.\n\
+"));
+/*! Set cell text */
+PyObject *scribus_setcelltext(PyObject * /*self*/, PyObject* args);
+
+/*! docstring */
 PyDoc_STRVAR(scribus_getcellstyle__doc__,
 QT_TR_NOOP("getCellStyle(row, column, [\"name\"]) -> string\n\
 \n\

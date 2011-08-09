@@ -363,6 +363,12 @@ public:
 	/// Returns the style of this table.
 	QString style() const;
 
+	/// Updates the position and size of all cell text frames for this table.
+	void updateCells() { updateCells(0, 0, rows() - 1, columns() - 1); }
+
+	/// Updates the position and size of cell text frames for cells in the specified area.
+	void updateCells(int startRow, int startColumn, int endRow, int endColumn);
+
 	/// Returns <code>true</code> if the table is overflowing its frame.
 	bool isOverflowing() const { return effectiveWidth() > width() || effectiveHeight() > height(); }
 
@@ -386,6 +392,10 @@ signals:
 	void changed();
 	/// This signal is emitted whenever the cell selection changes.
 	void selectionChanged();
+
+private slots:
+	/// Handles cell and table style changes in the document.
+	void handleStyleChanged();
 
 protected:
 	/// Paints this item.

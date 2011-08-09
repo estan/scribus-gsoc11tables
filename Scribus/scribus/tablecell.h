@@ -17,6 +17,7 @@ for which a new license (GPL+exception) is in place.
 #include <QString>
 
 #include "commonstrings.h"
+#include "pageitem_textframe.h"
 #include "styles/cellstyle.h"
 
 class PageItem_Table;
@@ -28,24 +29,30 @@ class ScPainter;
 class TableCellData : public QSharedData
 {
 public:
-	/// Construct data for an invalid cell.
+	/// Constructs data for an invalid cell.
 	TableCellData() :
 		isValid(false),
 		row(-1),
 		column(-1),
 		rowSpan(-1),
 		columnSpan(-1),
+		textFrame(0),
 		table(0) {}
-	/// Construct data from data in @a other.
+	/// Constructs data from data in @a other.
 	TableCellData(const TableCellData& other) : QSharedData(other),
 		isValid(other.isValid),
 		row(other.row),
 		column(other.column),
 		rowSpan(other.rowSpan),
 		columnSpan(other.columnSpan),
+		textFrame(other.textFrame),
 		style(other.style),
 		table(other.table) {}
-	~TableCellData() {}
+	/// Destroys the cell data.
+	~TableCellData()
+	{
+		delete textFrame;
+	}
 
 public:
 	/// Cell valid state.
@@ -59,6 +66,8 @@ public:
 	/// Number of columns the cell spans.
 	int columnSpan;
 
+	/// Text frame of the cell.
+	PageItem_TextFrame *textFrame;
 	/// Style of the cell.
 	CellStyle style;
 	/// Table containing the cell.
@@ -71,6 +80,10 @@ public:
  * It provides an interface for setting and getting cell properties. A cell may be
  * marked as invalid if the row or column containing the cell is removed. The valid
  * state of a cell may be queried using the <code>isValid()</code> function.
+ * <p>
+ * Text content may be set on the cell using <code>setText()</code>. If you want
+ * higher fidelity control over the cell content, retrieve its associated text frame
+ * with <code>textFrame()</code> and work with that.
  * <p>
  * A cell has a bounding rectangle. This is the rectangle on the table grid containing
  * the cell. It may be queried using the <code>boundingRect()</code> function.
@@ -127,58 +140,64 @@ public:
 	QString fillColor() const { return d->style.fillColor(); }
 
 	/// Sets the left border of this cell to @a border.
-	void setLeftBorder(const TableBorder& border) { d->style.setLeftBorder(border); }
+	void setLeftBorder(const TableBorder& border);
 
 	/// Returns the left border of this cell.
 	TableBorder leftBorder() const { return d->style.leftBorder(); }
 
 	/// Sets the right border of this cell to @a border.
-	void setRightBorder(const TableBorder& border) { d->style.setRightBorder(border); }
+	void setRightBorder(const TableBorder& border);
 
 	/// Returns the right border of this cell.
 	TableBorder rightBorder() const { return d->style.rightBorder(); }
 
 	/// Sets the top border of this cell to @a border.
-	void setTopBorder(const TableBorder& border) { d->style.setTopBorder(border); }
+	void setTopBorder(const TableBorder& border);
 
 	/// Returns the top border of this cell.
 	TableBorder topBorder() const { return d->style.topBorder(); }
 
 	/// Sets the bottom border of this cell to @a border.
-	void setBottomBorder(const TableBorder& border) { d->style.setBottomBorder(border); }
+	void setBottomBorder(const TableBorder& border);
 
 	/// Returns the bottom border of this cell.
 	TableBorder bottomBorder() const { return d->style.bottomBorder(); }
 
 	/// Sets the left padding of this cell to @a padding.
-	void setLeftPadding(qreal padding) { d->style.setLeftPadding(padding); }
+	void setLeftPadding(qreal padding);
 
 	/// Returns the left padding of this cell.
 	qreal leftPadding() const { return d->style.leftPadding(); }
 
 	/// Sets the right padding of this cell to @a padding.
-	void setRightPadding(qreal padding) { d->style.setRightPadding(padding); }
+	void setRightPadding(qreal padding);
 
 	/// Returns the right padding of this cell.
 	qreal rightPadding() const { return d->style.rightPadding(); }
 
 	/// Sets the top padding of this cell to @a padding.
-	void setTopPadding(qreal padding) { d->style.setTopPadding(padding); }
+	void setTopPadding(qreal padding);
 
 	/// Returns the top padding of this cell.
 	qreal topPadding() const { return d->style.topPadding(); }
 
 	/// Sets the bottom padding of this cell to @a padding.
-	void setBottomPadding(qreal padding) { d->style.setBottomPadding(padding); }
+	void setBottomPadding(qreal padding);
 
 	/// Returns the bottom padding of this cell.
 	qreal bottomPadding() const { return d->style.bottomPadding(); }
 
 	/// Sets the cell style for this cell to @a style.
-	void setStyle(const QString& style) { d->style.setParent(style); }
+	void setStyle(const QString& style);
 
 	/// Returns the named cell style for this cell.
 	QString style() const { return d->style.parent(); }
+
+	/// Sets the text for this cell to @a text.
+	void setText(const QString& text);
+
+	/// Returns the text frame for this cell.
+	PageItem_TextFrame* textFrame() const { return d->textFrame; }
 
 	/// Returns the cell as a string. Useful for debugging. The format is subject to change.
 	QString asString() const;
@@ -200,6 +219,8 @@ private:
 	void setColumnSpan(int columnSpan) { d->columnSpan = columnSpan; }
 	/// Sets the valid state of the cell to @a isValid.
 	void setValid(bool isValid) { d->isValid = isValid; }
+	/// Updates the size and position of the cell text frame.
+	void updateContent();
 
 	/// "Move" the cell down by @a numRows. E.g. increase its row by @a numRows.
 	void moveDown(int numRows) { d->row += numRows; }

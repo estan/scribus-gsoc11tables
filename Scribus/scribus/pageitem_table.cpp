@@ -19,6 +19,7 @@ for which a new license (GPL+exception) is in place.
 #include "cellarea.h"
 #include "collapsedtablepainter.h"
 #include "pageitem.h"
+#include "pageitem_textframe.h"
 #include "scpainter.h"
 #include "scribusdoc.h"
 #include "styles/tablestyle.h"
@@ -87,6 +88,9 @@ void PageItem_Table::resize(qreal width, qreal height)
 		m_rowPositions[row] *= actualHeightFactor;
 	}
 
+	// Update cells. TODO: Not for entire table.
+	updateCells();
+
 	emit changed();
 
 	ASSERT_VALID();
@@ -134,6 +138,9 @@ void PageItem_Table::insertRows(int index, int numRows)
 	// Increase number of rows.
 	m_rows += numRows;
 
+	// Update cells. TODO: Not for entire table.
+	updateCells();
+
 	emit changed();
 
 	ASSERT_VALID();
@@ -178,6 +185,9 @@ void PageItem_Table::removeRows(int index, int numRows)
 
 	// Decrease number of rows.
 	m_rows -= numRows;
+
+	// Update cells. TODO: Not for entire table.
+	updateCells();
 
 	emit changed();
 
@@ -224,6 +234,9 @@ void PageItem_Table::insertColumns(int index, int numColumns)
 	// Increase number of columns.
 	m_columns += numColumns;
 
+	// Update cells. TODO: Not for entire table.
+	updateCells();
+
 	emit changed();
 
 	ASSERT_VALID();
@@ -267,6 +280,9 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 	// Decrease number of columns.
 	m_columns -= numColumns;
 
+	// Update cells. TODO: Not for entire table.
+	updateCells();
+
 	emit changed();
 
 	ASSERT_VALID();
@@ -293,6 +309,9 @@ void PageItem_Table::resizeRow(int row, qreal height, ResizeStrategy strategy)
 		resizeRowResizeFollowing(row, height);
 	else
 		qWarning("Unknown resize strategy!");
+
+	// Update cells. TODO: Not for entire table.
+	updateCells();
 
 	emit changed();
 
@@ -328,6 +347,9 @@ void PageItem_Table::resizeColumn(int column, qreal width, ResizeStrategy strate
 		resizeColumnResizeFollowing(column, width);
 	else
 		qWarning("Unknown resize strategy!");
+
+	// Update cells. TODO: Not for entire table.
+	updateCells();
 
 	emit changed();
 
@@ -374,6 +396,9 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 	newSpanningCell.setRowSpan(newArea.height());
 	newSpanningCell.setColumnSpan(newArea.width());
 	m_cellAreas.append(newArea);
+
+	// Update cells. TODO: Not for entire table.
+	updateCells();
 
 	emit changed();
 
@@ -557,12 +582,14 @@ QString PageItem_Table::fillColor() const
 void PageItem_Table::setLeftBorder(const TableBorder& border)
 {
 	m_style.setLeftBorder(border);
+	updateCells(0, 0, rows() - 1, 0);
 	emit changed();
 }
 
 void PageItem_Table::unsetLeftBorder()
 {
 	m_style.resetLeftBorder();
+	updateCells(0, 0, rows() - 1, 0);
 	emit changed();
 }
 
@@ -574,12 +601,14 @@ TableBorder PageItem_Table::leftBorder() const
 void PageItem_Table::setRightBorder(const TableBorder& border)
 {
 	m_style.setRightBorder(border);
+	updateCells(0, columns() - 1, rows() - 1, columns() - 1);
 	emit changed();
 }
 
 void PageItem_Table::unsetRightBorder()
 {
 	m_style.resetRightBorder();
+	updateCells(0, columns() - 1, rows() - 1, columns() - 1);
 	emit changed();
 }
 
@@ -591,12 +620,14 @@ TableBorder PageItem_Table::rightBorder() const
 void PageItem_Table::setTopBorder(const TableBorder& border)
 {
 	m_style.setTopBorder(border);
+	updateCells(0, 0, 0, columns() - 1);
 	emit changed();
 }
 
 void PageItem_Table::unsetTopBorder()
 {
 	m_style.resetTopBorder();
+	updateCells(0, 0, 0, columns() - 1);
 	emit changed();
 }
 
@@ -608,12 +639,14 @@ TableBorder PageItem_Table::topBorder() const
 void PageItem_Table::setBottomBorder(const TableBorder& border)
 {
 	m_style.setBottomBorder(border);
+	updateCells(rows() - 1, 0, rows() - 1, columns() - 1);
 	emit changed();
 }
 
 void PageItem_Table::unsetBottomBorder()
 {
 	m_style.resetBottomBorder();
+	updateCells(rows() - 1, 0, rows() - 1, columns() - 1);
 	emit changed();
 }
 
@@ -625,18 +658,25 @@ TableBorder PageItem_Table::bottomBorder() const
 void PageItem_Table::setStyle(const QString& style)
 {
 	m_style.setParent(style);
+	updateCells();
 	emit changed();
 }
 
 void PageItem_Table::unsetStyle()
 {
 	m_style.setParent("");
+	updateCells();
 	emit changed();
 }
 
 QString PageItem_Table::style() const
 {
 	return m_style.parent();
+}
+
+void PageItem_Table::handleStyleChanged()
+{
+	updateCells();
 }
 
 void PageItem_Table::applicableActions(QStringList& actionList)
@@ -693,6 +733,10 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	// Insert any remaining rows and/or columns.
 	insertRows(0, numRows - 1);
 	insertColumns(0, numColumns - 1);
+
+	// Listen to changes in the document-wide cell/table style contexts.
+	m_Doc->tableStyles().connect(this, SLOT(handleStyleChanged()));
+	m_Doc->cellStyles().connect(this, SLOT(handleStyleChanged()));
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const
@@ -825,6 +869,19 @@ qreal PageItem_Table::resizeColumnResizeFollowing(int column, qreal width)
 	}
 
 	return newWidth;
+}
+
+void PageItem_Table::updateCells(int startRow, int startColumn, int endRow, int endColumn)
+{
+	if (startRow > endRow || startColumn > endColumn)
+		return; // Invalid area.
+
+	if (!validCell(startRow, startColumn) || !validCell(endRow, endColumn))
+		return; // Invalid area.
+
+	foreach (const QList<TableCell>& cellRow, m_cellRows)
+		foreach (TableCell cell, cellRow)
+			cell.updateContent();
 }
 
 void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)

@@ -6,12 +6,15 @@ to the COPYING file provided with the program. Following this notice may exist
 a copyright and/or license notice that predates the release of Scribus 1.3.2
 for which a new license (GPL+exception) is in place.
 */
-#include <QLineF>
 #include <QColor>
+#include <QLineF>
+#include <QRectF>
 
 #include "scpainter.h"
 #include "tablecell.h"
 #include "pageitem_table.h"
+#include "prefsmanager.h"
+#include "scribusdoc.h"
 #include "tableborder.h"
 #include "tableutils.h"
 
@@ -28,8 +31,13 @@ void CollapsedTablePainter::paintTable(ScPainter* p)
 	paintTableFill(p);
 
 	/*
-	 * We paint the table in four passes, first the cell fills, then the vertical
-	 * borders, then the horizontal borders and finally the decorative grid lines.
+	 * We paint the table in five passes:
+	 *
+	 * 1) Cell fills.
+	 * 2) Vertical borders.
+	 * 3) Horizontal borders
+	 * 4) Decorative grid lines.
+	 * 5) Cell content.
 	 */
 
 	// Pass 1: Paint cell fills.
@@ -80,31 +88,48 @@ void CollapsedTablePainter::paintTable(ScPainter* p)
 	}
 
 	// Pass 4: Paint grid lines.
-	// TODO: This should be configurable.
+	if (table()->m_Doc->guidesPrefs().framesShown)
+	{
+		for (int row = 0; row < table()->rows(); ++row)
+		{
+			int colSpan = 0;
+			for (int col = 0; col < table()->columns(); col += colSpan)
+			{
+				TableCell cell = table()->cellAt(row, col);
+				if (row == cell.row())
+				{
+					int endCol = col + cell.columnSpan() - 1;
+					int endRow = row + cell.rowSpan() - 1;
+					qreal left = table()->columnPosition(col);
+					qreal right = table()->columnPosition(endCol) + table()->columnWidth(endCol);
+					qreal top = table()->rowPosition(row);
+					qreal bottom = table()->rowPosition(endRow) + table()->rowHeight(endRow);
+					// Paint right and bottom grid line.
+					paintGridLine(QPointF(right, top), QPointF(right, bottom), p);
+					paintGridLine(QPointF(left, bottom), QPointF(right, bottom), p);
+					// Paint left and top grid line.
+					if (col == 0)
+						paintGridLine(QPointF(left, top), QPointF(left, bottom), p);
+					if (row == 0)
+						paintGridLine(QPointF(left, top), QPointF(right, top), p);
+				}
+				colSpan = cell.columnSpan();
+			}
+		}
+	}
+
+	// Pass 5: Paint cell content.
 	for (int row = 0; row < table()->rows(); ++row)
 	{
-		int colSpan = 0;
-		for (int col = 0; col < table()->columns(); col += colSpan)
+		for (int col = 0; col < table()->columns(); col ++)
 		{
 			TableCell cell = table()->cellAt(row, col);
-			if (row == cell.row())
+			if (cell.row() == row && cell.column() == col)
 			{
-				int endCol = col + cell.columnSpan() - 1;
-				int endRow = row + cell.rowSpan() - 1;
-				qreal left = table()->columnPosition(col);
-				qreal right = table()->columnPosition(endCol) + table()->columnWidth(endCol);
-				qreal top = table()->rowPosition(row);
-				qreal bottom = table()->rowPosition(endRow) + table()->rowHeight(endRow);
-				// Paint right and bottom grid line.
-				paintGridLine(QPointF(right, top), QPointF(right, bottom), p);
-				paintGridLine(QPointF(left, bottom), QPointF(right, bottom), p);
-				// Paint left and top grid line.
-				if (col == 0)
-					paintGridLine(QPointF(left, top), QPointF(left, bottom), p);
-				if (row == 0)
-					paintGridLine(QPointF(left, top), QPointF(right, top), p);
+				PageItem* textFrame = cell.textFrame();
+				textFrame->DrawObj(p, QRectF());
+				textFrame->DrawObj_Decoration(p);
 			}
-			colSpan = cell.columnSpan();
 		}
 	}
 
@@ -695,7 +720,8 @@ void CollapsedTablePainter::paintBorder(const TableBorder& border, const QPointF
 void CollapsedTablePainter::paintGridLine(const QPointF& start, const QPointF& end, ScPainter *p) const
 {
 	p->save();
-	p->setPen(QColor(100, 200, 255), 1.0 / qMax(p->zoomFactor(), 1.0), Qt::DotLine, Qt::FlatCap, Qt::MiterJoin);
+	p->setPen(PrefsManager::instance()->appPrefs.displayPrefs.frameNormColor,
+		0.2 / qMax(p->zoomFactor(), 1.0), Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin);
 	p->setStrokeMode(ScPainter::Solid);
 	p->drawLine(start, end);
 	p->restore();

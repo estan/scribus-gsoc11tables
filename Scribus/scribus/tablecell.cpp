@@ -13,6 +13,7 @@ for which a new license (GPL+exception) is in place.
 
 #include "commonstrings.h"
 #include "pageitem_table.h"
+#include "pageitem_textframe.h"
 #include "scribusdoc.h"
 #include "scpainter.h"
 #include "tableutils.h"
@@ -26,7 +27,12 @@ TableCell::TableCell(int row, int column, PageItem_Table *table) : d(new TableCe
 	Q_ASSERT(table);
 	d->table = table;
 
+	// The context for the internal style is the document-wide context.
 	d->style.setContext(&d->table->doc()->cellStyles());
+
+	// Create a text frame for the cell.
+	d->textFrame = new PageItem_TextFrame(d->table->m_Doc,
+		0, 0, 0, 0, 0, CommonStrings::None, CommonStrings::None);
 
 	setValid(true);
 	setRow(row);
@@ -51,27 +57,94 @@ QRectF TableCell::boundingRect() const
 	return QRectF(x, y, width, height);
 }
 
-// TODO: We should cache this rectangle.
 QRectF TableCell::contentRect() const
 {
 	if (!isValid())
 		return QRectF();
 
-	QRectF rect = boundingRect();
+	const qreal x = d->textFrame->xPos();
+	const qreal y = d->textFrame->yPos();
+	const qreal width = d->textFrame->width();
+	const qreal height = d->textFrame->height();
 
-	// Insets are paddings plus half border width.
-	const qreal leftInset = leftPadding() + maxLeftBorderWidth()/2;
-	const qreal rightInset = rightPadding() + maxRightBorderWidth()/2;
-	const qreal topInset = topPadding() + maxTopBorderWidth()/2;
-	const qreal bottomInset = bottomPadding() + maxBottomBorderWidth()/2;
+	return QRectF(x, y, width, height);
+}
 
-	// Adjust rectangle. (We don't allow width or height < 1.0)
-	rect.setLeft(rect.left() + leftInset);
-	rect.setTop(rect.top() + topInset);
-	rect.setWidth(qMax(1.0, rect.width() - rightInset));
-	rect.setHeight(qMax(1.0, rect.height() - bottomInset));
+void TableCell::setLeftBorder(const TableBorder& border)
+{
+	d->style.setLeftBorder(border);
+	d->table->updateCells();
+}
 
-	return rect;
+void TableCell::setRightBorder(const TableBorder& border)
+{
+	d->style.setRightBorder(border);
+	d->table->updateCells();
+}
+
+void TableCell::setTopBorder(const TableBorder& border)
+{
+	d->style.setTopBorder(border);
+	d->table->updateCells();
+}
+
+void TableCell::setBottomBorder(const TableBorder& border)
+{
+	d->style.setBottomBorder(border);
+	d->table->updateCells();
+}
+
+void TableCell::setLeftPadding(qreal padding)
+{
+	d->style.setLeftPadding(padding);
+	d->table->updateCells();
+}
+
+void TableCell::setRightPadding(qreal padding)
+{
+	d->style.setRightPadding(padding);
+	d->table->updateCells();
+}
+
+void TableCell::setTopPadding(qreal padding)
+{
+	d->style.setTopPadding(padding);
+	d->table->updateCells();
+}
+
+void TableCell::setBottomPadding(qreal padding)
+{
+	d->style.setBottomPadding(padding);
+	d->table->updateCells();
+}
+
+void TableCell::setStyle(const QString& style)
+{
+	d->style.setParent(style);
+	d->table->updateCells();
+}
+
+void TableCell::updateContent()
+{
+	QRectF contentRect = boundingRect();
+	contentRect.setLeft(contentRect.left() + leftPadding() + maxLeftBorderWidth()/2);
+	contentRect.setTop(contentRect.top() + topPadding() + maxTopBorderWidth()/2);
+	contentRect.setWidth(qMax(contentRect.width() - (rightPadding() + maxRightBorderWidth()/2), 1.0));
+	contentRect.setHeight(qMax(contentRect.height() - (bottomPadding() + maxBottomBorderWidth()/2), 1.0));
+
+	d->textFrame->setXYPos(contentRect.x(), contentRect.y());
+	d->textFrame->setWidthHeight(contentRect.width(), contentRect.height());
+	d->textFrame->updateClip();
+	d->textFrame->invalidateLayout();
+}
+
+void TableCell::setText(const QString& text)
+{
+	if (!isValid())
+		return;
+
+	d->textFrame->itemText.clear();
+	d->textFrame->itemText.insertChars(0, text);
 }
 
 QString TableCell::asString() const

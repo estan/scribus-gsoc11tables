@@ -466,6 +466,7 @@ PyMethodDef scribus_methods[] = {
 	{const_cast<char*>("isPDFBookmark"), scribus_ispdfbookmark, METH_VARARGS, tr(scribus_ispdfbookmark__doc__)},
 	{const_cast<char*>("setTextDistances"), scribus_settextdistances, METH_VARARGS, tr(scribus_settextdistances__doc__)},
 	{const_cast<char*>("setCellStyle"), scribus_setcellstyle, METH_VARARGS, tr(scribus_setcellstyle__doc__)},
+	{const_cast<char*>("setCellText"), scribus_setcelltext, METH_VARARGS, tr(scribus_setcelltext__doc__)},
 	{const_cast<char*>("setCellFillColor"), scribus_setcellfillcolor, METH_VARARGS, tr(scribus_setcellfillcolor__doc__)},
 	{const_cast<char*>("setCellLeftBorder"), scribus_setcellleftborder, METH_VARARGS, tr(scribus_setcellleftborder__doc__)},
 	{const_cast<char*>("setCellLeftPadding"), scribus_setcellleftpadding, METH_VARARGS, tr(scribus_setcellleftpadding__doc__)},
