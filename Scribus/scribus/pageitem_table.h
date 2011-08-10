@@ -388,7 +388,7 @@ public:
 	virtual QString infoDescription() { return QString(); }
 
 signals:
-	/// This signal is emitted whenever table changes.
+	/// This signal is emitted whenever the table changes.
 	void changed();
 	/// This signal is emitted whenever the cell selection changes.
 	void selectionChanged();
