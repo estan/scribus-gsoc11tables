@@ -6323,11 +6323,19 @@ void ScribusMainWindow::setAppMode(int mode)
 			delete doc->CurTimer;
 			doc->CurTimer = NULL;
 		} */
+
+		// Restore/save action shortcuts when entering/leaving edit mode.
 		if (mode!=modeEdit && oldMode==modeEdit)
 			actionManager->restoreActionShortcutsPostEditMode();
-		else
-		if (mode==modeEdit && oldMode!=modeEdit)
+		else if (mode==modeEdit && oldMode!=modeEdit)
 			actionManager->saveActionShortcutsPreEditMode();
+
+		// Restore/save action shortcuts when entering/leaving table edit mode.
+		if (mode != modeEditTable && oldMode == modeEditTable)
+			actionManager->restoreActionShortcutsPostEditMode();
+		else if (mode == modeEditTable && oldMode != modeEditTable)
+			actionManager->saveActionShortcutsPreEditMode();
+
 		if (oldMode == modeEdit)
 		{
 			view->zoomSpinBox->setFocusPolicy(Qt::ClickFocus);
