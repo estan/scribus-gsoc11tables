@@ -61,6 +61,18 @@ void CanvasMode_EditTable::deactivate(bool forGesture)
 {
 }
 
+void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
+{
+	event->accept();
+
+	if (event->key() == Qt::Key_Escape)
+	{
+		// Go back to normal mode.
+		m_view->requestMode(modeNormal);
+		return;
+	}
+}
+
 void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 {
 	event->accept();

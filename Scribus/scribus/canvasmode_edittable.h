@@ -38,6 +38,8 @@ public:
 
 	virtual void activate(bool fromGesture);
 	virtual void deactivate(bool forGesture);
+	virtual bool handleKeyEvents() { return true; }
+	virtual void keyPressEvent(QKeyEvent* event);
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	virtual void mousePressEvent(QMouseEvent* event);
 	virtual void drawControls(QPainter* p);
