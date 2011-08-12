@@ -134,6 +134,8 @@ void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
 			cursor = Qt::SizeFDiagCursor;
 			break;
 		case TableHandle::CellSelect:
+			cursor = Qt::IBeamCursor;
+			break;
 		case TableHandle::None:
 			break;
 		default:
