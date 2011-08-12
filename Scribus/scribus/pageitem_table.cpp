@@ -482,6 +482,15 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
+void PageItem_Table::setActiveCell(const TableCell& cell)
+{
+	if (!validCell(cell.row(), cell.column()))
+		return;
+
+	m_activeCell = cell;
+	m_Doc->currentStyle = cell.textFrame()->currentStyle();
+}
+
 TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
 {
 	const QPointF framePoint = getTransform().inverted().map(point);
@@ -737,6 +746,8 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	// Listen to changes in the document-wide cell/table style contexts.
 	m_Doc->tableStyles().connect(this, SLOT(handleStyleChanged()));
 	m_Doc->cellStyles().connect(this, SLOT(handleStyleChanged()));
+
+	setActiveCell(cellAt(0, 0));
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const

@@ -296,6 +296,21 @@ public:
 	TableCell cellAt(const QPointF& point) const;
 
 	/**
+	 * Returns the currently active cell.
+	 *
+	 * A table always has a valid active cell. This is the cell containing the cursor and that
+	 * will receive keyboard input during cell text editing.
+	 */
+	TableCell activeCell() const { return m_activeCell; }
+
+	/**
+	 * Sets the currently active cell to @a cell.
+	 *
+	 * @a cell must be a valid cell existing in this table.
+	 */
+	void setActiveCell(const TableCell& cell);
+
+	/**
 	 * Performs a hit test at @a point, which is in canvas coordinates.
 	 *
 	 * The returned handle describes what was hit. @a threshold is a distance in points.
@@ -488,6 +503,9 @@ private:
 
 	/// Set of selected cells.
 	QSet<TableCell> m_selection;
+
+	/// Currently active cell.
+	TableCell m_activeCell;
 
 	/// Style of the table.
 	TableStyle m_style;
