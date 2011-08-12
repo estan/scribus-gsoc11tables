@@ -43,6 +43,7 @@ class  ScribusView;
 class  ScribusMainWindow;
 class  PageItem;
 class  PageItemPreview;
+class  PageItem_TextFrame;
 
 /** These aren't real appmodes but open a new window or override behaviour for a short time */
 enum SubMode
@@ -144,6 +145,8 @@ protected:
 	void setResizeCursor(int how, double rot = 0.0);
 	bool commonMouseMove(QMouseEvent *m);
 	void commonDrawControls(QPainter* p, bool drawHandles);
+	/// Draws the text cursor for @a textframe.
+	void commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe);
 
 	void commonkeyPressEvent_NormalNodeEdit(QKeyEvent *e);
 	void commonkeyReleaseEvent(QKeyEvent *e);

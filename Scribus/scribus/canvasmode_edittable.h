@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QCursor>
 #include <QObject>
+#include <QTime>
 
 #include "canvasmode.h"
 #include "cellarea.h"
@@ -21,6 +22,7 @@ class ColumnResize;
 class PageItem_Table;
 class QMouseEvent;
 class QPainter;
+class QTimer;
 class RowResize;
 class ScribusView;
 class TableResize;
@@ -44,13 +46,31 @@ public:
 	virtual void mousePressEvent(QMouseEvent* event);
 	virtual void drawControls(QPainter* p);
 
+private slots:
+	/// Updates the part of the canvas containing the table.
+	void updateCanvas();
+
+private:
+	/// Draws the text cursor for the currently active cell.
+	void drawTextCursor(QPainter* p);
+
 private:
 	/// Table being edited.
 	PageItem_Table *m_table;
 
-	/// The "select row" cursor.
+	/// Timer for canvas updates.
+	QTimer* m_canvasUpdateTimer;
+
+	/// Time since last text cursor blink.
+	QTime m_blinkTime;
+	/// <code>true</code> if the text cursor should make a long blink.
+	bool m_longBlink;
+	/// <code>true</code> if the text cursor is visible.
+	bool m_cursorVisible;
+
+	/// The "select row" mouse cursor.
 	QCursor m_selectRowCursor;
-	/// The "select column" cursor.
+	/// The "select column" mouse cursor.
 	QCursor m_selectColumnCursor;
 
 	/// Gesture for resizing a table.

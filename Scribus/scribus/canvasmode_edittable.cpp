@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 #include <QDebug>
 #include <QPainter>
 #include <QPointF>
+#include <QTimer>
 
 #include "canvas.h"
 #include "canvasgesture_cellselect.h"
@@ -30,6 +31,9 @@ for which a new license (GPL+exception) is in place.
 
 CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view),
 	m_table(0),
+	m_canvasUpdateTimer(new QTimer(view)),
+	m_longBlink(false),
+	m_cursorVisible(false),
 	m_selectRowCursor(loadIcon("select_row.png")),
 	m_selectColumnCursor(loadIcon("select_column.png")),
 	m_tableResizeGesture(new TableResize(this)),
@@ -37,6 +41,7 @@ CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view)
 	m_columnResizeGesture(new ColumnResize(this)),
 	m_cellSelectGesture(new CellSelect(this))
 {
+	connect(m_canvasUpdateTimer, SIGNAL(timeout()), this, SLOT(updateCanvas()));
 }
 
 CanvasMode_EditTable::~CanvasMode_EditTable()
@@ -53,12 +58,17 @@ void CanvasMode_EditTable::activate(bool fromGesture)
 	Q_ASSERT(item && item->isTable());
 	m_table = item->asTable();
 
+	m_blinkTime.start();
+	m_canvasUpdateTimer->start(200);
+
 	if (fromGesture)
 		qApp->changeOverrideCursor(Qt::ArrowCursor);
 }
 
 void CanvasMode_EditTable::deactivate(bool forGesture)
 {
+	if (!forGesture)
+		m_canvasUpdateTimer->stop();
 }
 
 void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
@@ -69,14 +79,31 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 	{
 		// Go back to normal mode.
 		m_view->requestMode(modeNormal);
+		return;
 	}
-	else {
-		// Pass event to text frame of active cell.
-		bool repeat;
-		m_table->activeCell().textFrame()->handleModeEditKey(event, repeat);
-		m_canvas->m_viewMode.forceRedraw = true; // Hack?
-		m_canvas->update(m_canvas->canvasToLocal(m_table->getBoundingRect()));
+
+	// Determine if we want a long blink.
+	switch (event->key())
+	{
+		case Qt::Key_PageUp:
+		case Qt::Key_PageDown:
+		case Qt::Key_Up:
+		case Qt::Key_Down:
+		case Qt::Key_Home:
+		case Qt::Key_End:
+			m_longBlink = true;
+			break;
+		default:
+			m_longBlink = false;
+			break;
 	}
+
+	// Pass event to text frame of active cell.
+	bool repeat;
+	m_table->activeCell().textFrame()->handleModeEditKey(event, repeat);
+	m_canvas->m_viewMode.forceRedraw = true; // Hack?
+
+	updateCanvas();
 }
 
 void CanvasMode_EditTable::mouseMoveEvent(QMouseEvent* event)
@@ -168,5 +195,32 @@ void CanvasMode_EditTable::drawControls(QPainter* p)
 {
 	p->save();
 	commonDrawControls(p, false);
+	drawTextCursor(p);
 	p->restore();
+}
+
+void CanvasMode_EditTable::updateCanvas()
+{
+	m_canvas->update(m_canvas->canvasToLocal(m_table->getBoundingRect()));
+}
+
+void CanvasMode_EditTable::drawTextCursor(QPainter* p)
+{
+	if ((!m_longBlink && m_blinkTime.elapsed() > qApp->cursorFlashTime() / 2)
+		|| (m_longBlink && m_blinkTime.elapsed() > qApp->cursorFlashTime()))
+	{
+		// Reset blink timer
+		m_blinkTime.restart();
+		m_longBlink = false;
+		m_cursorVisible = !m_cursorVisible;
+	}
+
+	if (m_cursorVisible)
+	{
+		// Paint text cursor.
+		p->save();
+		p->setTransform(m_table->getTransform(), true);
+		commonDrawTextCursor(p, m_table->activeCell().textFrame());
+		p->restore();
+	}
 }
