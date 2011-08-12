@@ -66,6 +66,7 @@
 #include <QMdiArea>
 #include <QMdiSubWindow>
 #include <QPainter>
+#include <QPointF>
 
 
 CanvasMode::CanvasMode (ScribusView* view) :
@@ -733,7 +734,7 @@ void CanvasMode::commonDrawControls(QPainter* p, bool drawHandles)
 		drawSelection(p, drawHandles);
 }
 
-void CanvasMode::commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe)
+void CanvasMode::commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe, const QPointF& offset)
 {
 	double dx, dy, dy1;
 	QPen cPen ( Qt::black, 0.9 , Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin );
@@ -869,7 +870,7 @@ void CanvasMode::commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe
 	dy =  qMin ( qMax ( dy,0.0 ) , textframe->height() );
 	dy1 = qMin ( qMax ( dy1,0.0 ), textframe->height() );
 
-	p->drawLine ( QLineF ( dx,dy,dx,dy1 ) );
+	p->drawLine ( QLineF ( dx,dy,dx,dy1 ).translated(offset) );
 
 	p->restore();
 }

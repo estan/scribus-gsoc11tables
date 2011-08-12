@@ -25,6 +25,7 @@
 #include <QMouseEvent>
 #include <QPainterPath>
 #include <QPoint>
+#include <QPointF>
 #include <QRect>
 #include <QTimer>
 #include <QWidgetAction>
@@ -236,7 +237,7 @@ void CanvasMode_Edit::drawTextCursor ( QPainter *p, PageItem_TextFrame* textfram
 // 		qDebug()<<dbgString;
 // 		qDebug()<<"==============================================================";
 		// end debug
-		commonDrawTextCursor(p, textframe);
+		commonDrawTextCursor(p, textframe, QPointF());
 	}
 }
 

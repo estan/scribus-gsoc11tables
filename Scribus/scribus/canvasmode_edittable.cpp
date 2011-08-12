@@ -220,7 +220,7 @@ void CanvasMode_EditTable::drawTextCursor(QPainter* p)
 		// Paint text cursor.
 		p->save();
 		p->setTransform(m_table->getTransform(), true);
-		commonDrawTextCursor(p, m_table->activeCell().textFrame());
+		commonDrawTextCursor(p, m_table->activeCell().textFrame(), m_table->gridOffset());
 		p->restore();
 	}
 }

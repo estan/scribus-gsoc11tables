@@ -22,6 +22,7 @@
 
 #include <QMap>
 #include <QPen>
+#include <QPointF>
 #include <QBrush>
 
 class QDragEnterEvent;
@@ -145,8 +146,8 @@ protected:
 	void setResizeCursor(int how, double rot = 0.0);
 	bool commonMouseMove(QMouseEvent *m);
 	void commonDrawControls(QPainter* p, bool drawHandles);
-	/// Draws the text cursor for @a textframe.
-	void commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe);
+	/// Draws the text cursor for @a textframe, offset by @a offset.
+	void commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe, const QPointF& offset);
 
 	void commonkeyPressEvent_NormalNodeEdit(QKeyEvent *e);
 	void commonkeyReleaseEvent(QKeyEvent *e);
