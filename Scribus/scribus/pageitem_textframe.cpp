@@ -2410,7 +2410,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 					if (!m_Doc->RePos)
 					{
 						if (((selecteds && Select) || ((NextBox != 0 || BackBox != 0) && selecteds))
-							&& (m_Doc->appMode == modeEdit))
+							&& (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable))
 						{
 							double xcoZli = selX + hls->glyph.xoffset;
 							desc = - charStyleS.font().descent(charStyleS.fontSize() / 10.0);
@@ -2503,7 +2503,7 @@ void PageItem_TextFrame::DrawObj_Item(ScPainter *p, QRectF cullingArea)
 				{
 					desc = - charStyle.font().descent(charStyle.fontSize() / 10.0);
 					asce = charStyle.font().ascent(charStyle.fontSize() / 10.0);
-					if (((selected && Select) || ((NextBox != 0 || BackBox != 0) && selected)) && (m_Doc->appMode == modeEdit))
+					if (((selected && Select) || ((NextBox != 0 || BackBox != 0) && selected)) && (m_Doc->appMode == modeEdit || m_Doc->appMode == modeEditTable))
 					{
 						// set text color to highlight if its selected
 						p->setBrush(qApp->palette().color(QPalette::Active, QPalette::HighlightedText));

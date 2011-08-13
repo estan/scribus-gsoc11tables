@@ -488,6 +488,7 @@ void PageItem_Table::setActiveCell(const TableCell& cell)
 		return;
 
 	m_activeCell = cell;
+	m_activeCell.textFrame()->setSelected(true);
 	m_Doc->currentStyle = cell.textFrame()->currentStyle();
 }
 
