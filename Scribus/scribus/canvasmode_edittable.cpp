@@ -193,7 +193,7 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				m_cursorVisible = true;
 				m_blinkTime.restart();
 
-				// Set the active cell, deselect all text and position cursor.
+				// Set the active cell and position text cursor.
 				m_table->setActiveCell(m_table->cellAt(canvasPoint));
 				m_view->slotSetCurs(event->globalPos().x(), event->globalPos().y());
 				m_lastCursorPos = m_table->activeCell().textFrame()->itemText.cursorPosition();
