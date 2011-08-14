@@ -170,6 +170,7 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				// Not implemented.
 				break;
 			case TableHandle::RowResize:
+				// Start row resize gesture.
 				m_rowResizeGesture->setup(m_table, handle.index());
 				m_view->startGesture(m_rowResizeGesture);
 				break;
@@ -177,10 +178,12 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				// Not implemented.
 				break;
 			case TableHandle::ColumnResize:
+				// Start column resize gesture.
 				m_columnResizeGesture->setup(m_table, handle.index());
 				m_view->startGesture(m_columnResizeGesture);
 				break;
 			case TableHandle::TableResize:
+				// Start table resize gesture.
 				m_tableResizeGesture->setup(m_table);
 				m_view->startGesture(m_tableResizeGesture);
 				break;
