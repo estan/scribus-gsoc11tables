@@ -178,6 +178,7 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				//m_cellSelectGesture->setup(m_table, m_table->cellAt(canvasPoint));
 				//m_view->startGesture(m_cellSelectGesture);
 				m_table->setActiveCell(m_table->cellAt(canvasPoint));
+				m_view->slotSetCurs(event->globalPos().x(), event->globalPos().y());
 				break;
 			case TableHandle::None:
 				// Not implemented.
