@@ -200,7 +200,9 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				updateCanvas(true);
 				break;
 			case TableHandle::None:
-				// Not implemented.
+				// Deselect the table and go back to normal mode.
+				m_view->Deselect(true);
+				m_view->requestMode(modeNormal);
 				break;
 			default:
 				qWarning("Unknown hit target");
