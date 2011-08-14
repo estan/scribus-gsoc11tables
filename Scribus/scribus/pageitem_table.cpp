@@ -487,9 +487,17 @@ void PageItem_Table::setActiveCell(const TableCell& cell)
 	if (!validCell(cell.row(), cell.column()))
 		return;
 
+	if (m_activeCell.isValid())
+	{
+		// Deselect previous active cell and its text.
+		m_activeCell.textFrame()->setSelected(false);
+		m_activeCell.textFrame()->itemText.deselectAll();
+	}
+
+	// Set the new active cell and select it.
 	m_activeCell = cell;
 	m_activeCell.textFrame()->setSelected(true);
-	m_Doc->currentStyle = cell.textFrame()->currentStyle();
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
 }
 
 TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const

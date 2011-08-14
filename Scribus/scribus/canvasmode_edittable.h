@@ -44,13 +44,20 @@ public:
 	virtual void keyPressEvent(QKeyEvent* event);
 	virtual void mouseMoveEvent(QMouseEvent* event);
 	virtual void mousePressEvent(QMouseEvent* event);
+	virtual void mouseReleaseEvent(QMouseEvent* event);
 	virtual void drawControls(QPainter* p);
 
 private slots:
-	/// Updates the part of the canvas containing the table.
-	void updateCanvas();
+	/**
+	 * Updates the part of the canvas containing the table.
+	 *
+	 * If @a forceRedraw is <code>true</code>, an redraw of the canvas will be forced.
+	 */
+	void updateCanvas(bool force = false);
 
 private:
+	/// Handles a mouse move event with the left button held down.
+	void handleMouseDrag(QMouseEvent* event);
 	/// Draws the text cursor for the currently active cell.
 	void drawTextCursor(QPainter* p);
 
@@ -67,6 +74,9 @@ private:
 	bool m_longBlink;
 	/// <code>true</code> if the text cursor is visible.
 	bool m_cursorVisible;
+
+	// Last cursor position pressed with the mouse, or <code>-1</code>.
+	int m_lastCursorPos;
 
 	/// The "select row" mouse cursor.
 	QCursor m_selectRowCursor;
