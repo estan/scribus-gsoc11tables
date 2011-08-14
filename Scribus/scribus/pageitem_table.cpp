@@ -487,9 +487,7 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 void PageItem_Table::setActiveCell(const TableCell& cell)
 {
-	TableCell activeCell;
-	if (!validCell(cell.row(), cell.column()))
-		activeCell = cellAt(0, 0);
+	TableCell activeCell = validCell(cell.row(), cell.column()) ? cell : cellAt(0, 0);
 
 	if (m_activeCell.isValid())
 	{
