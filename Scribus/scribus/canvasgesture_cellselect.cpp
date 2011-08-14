@@ -33,7 +33,7 @@ void CellSelect::keyPressEvent(QKeyEvent* event)
 {
 	if (event->key() == Qt::Key_Escape)
 	{
-		// Cancel the resize.
+		// Cancel the cell selection.
 		event->accept();
 		m_view->stopGesture();
 	}
@@ -42,19 +42,15 @@ void CellSelect::keyPressEvent(QKeyEvent* event)
 void CellSelect::mousePressEvent(QMouseEvent* event)
 {
 	event->accept();
+
+	// Clear selection.
 	table()->clearSelection();
 
-	// Set a new start cell.
-	m_startCell = table()->cellAt(m_canvas->globalToCanvas(event->globalPos()).toQPointF());
+	// Stop the gesture.
+	m_view->stopGesture();
 
-	// If it is valid, select it, otherwise stop the gesture.
-	if (m_startCell.isValid())
-	{
-		table()->selectCell(m_startCell.row(), m_startCell.column());
-		m_canvas->update();
-	}
-	else
-		m_view->stopGesture();
+	// Pass the mouse press to the delegate (table editing canvas mode).
+	delegate()->mousePressEvent(event);
 }
 
 void CellSelect::mouseReleaseEvent(QMouseEvent* event)
