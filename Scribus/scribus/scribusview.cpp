@@ -1575,8 +1575,9 @@ bool ScribusView::slotSetCurs(int x, int y)
 	}
 	else if (item->isTable())
 	{
-		// Use text frame of active table cell and map point to table grid coordinates.
+		// Activate cell under cursor and position cursor in its text frame.
 		PageItem_Table *table = item->asTable();
+		table->setActiveCell(table->cellAt(m_canvas->globalToCanvas(QPoint(x,y)).toQPointF()));
 		textFrame = table->activeCell().textFrame();
 		canvasPoint = table->getTransform().inverted().map(
 			m_canvas->globalToCanvas(QPoint(x, y)).toQPointF()) - table->gridOffset();
