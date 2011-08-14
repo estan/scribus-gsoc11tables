@@ -53,6 +53,9 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 
 PageItem_Table::~PageItem_Table()
 {
+	m_Doc->tableStyles().disconnect(this, SLOT(handleStyleChanged()));
+	m_Doc->cellStyles().disconnect(this, SLOT(handleStyleChanged()));
+
 	delete m_tablePainter;
 }
 
