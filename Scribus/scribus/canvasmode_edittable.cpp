@@ -220,6 +220,51 @@ void CanvasMode_EditTable::mouseReleaseEvent(QMouseEvent* event)
 	m_lastCursorPos = -1;
 }
 
+void CanvasMode_EditTable::mouseDoubleClickEvent(QMouseEvent* event)
+{
+	TableCell hitCell = m_table->cellAt(m_canvas->globalToCanvas(event->globalPos()).toQPointF());
+	if (!hitCell.isValid())
+		return;
+
+	event->accept();
+
+	PageItem_TextFrame* textFrame = hitCell.textFrame();
+	if (event->modifiers() & Qt::ControlModifier)
+	{
+		int start = 0, end = 0;
+
+		if (event->modifiers() & Qt::ShiftModifier)
+		{
+			// Double click with Ctrl+Shift to select multiple paragraphs.
+			uint oldParNr = textFrame->itemText.nrOfParagraph(m_lastCursorPos);
+			uint newParNr = textFrame->itemText.nrOfParagraph();
+
+			start = textFrame->itemText.startOfParagraph(qMin(oldParNr, newParNr));
+			end = textFrame->itemText.endOfParagraph(qMax(oldParNr, newParNr));
+		}
+		else
+		{
+			// Double click with Ctrl to select a single paragraph.
+			m_lastCursorPos = textFrame->itemText.cursorPosition();
+			uint parNr = textFrame->itemText.nrOfParagraph(m_lastCursorPos);
+			start = textFrame->itemText.startOfParagraph(parNr);
+			end = textFrame->itemText.endOfParagraph(parNr);
+		}
+		textFrame->itemText.deselectAll();
+		textFrame->itemText.extendSelection(start, end);
+		textFrame->itemText.setCursorPosition(end);
+	}
+	else
+	{
+		// Regular double click selects a word.
+		m_lastCursorPos = textFrame->itemText.cursorPosition();
+		uint pos = textFrame->itemText.selectWord(textFrame->itemText.cursorPosition());
+		textFrame->itemText.setCursorPosition(pos);
+	}
+
+	updateCanvas(true);
+}
+
 void CanvasMode_EditTable::drawControls(QPainter* p)
 {
 	p->save();
