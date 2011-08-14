@@ -306,7 +306,7 @@ public:
 	/**
 	 * Sets the currently active cell to @a cell.
 	 *
-	 * @a cell must be a valid cell existing in this table.
+	 * If @a cell is invalid or not in this table, the cell at row 0, column 0 will be activated.
 	 */
 	void setActiveCell(const TableCell& cell);
 

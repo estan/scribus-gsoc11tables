@@ -487,8 +487,9 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 void PageItem_Table::setActiveCell(const TableCell& cell)
 {
+	TableCell activeCell;
 	if (!validCell(cell.row(), cell.column()))
-		return;
+		activeCell = cellAt(0, 0);
 
 	if (m_activeCell.isValid())
 	{
@@ -498,7 +499,7 @@ void PageItem_Table::setActiveCell(const TableCell& cell)
 	}
 
 	// Set the new active cell and select it.
-	m_activeCell = cell;
+	m_activeCell = activeCell;
 	m_activeCell.textFrame()->setSelected(true);
 	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
 }
