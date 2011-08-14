@@ -58,6 +58,8 @@ void CanvasMode_EditTable::activate(bool fromGesture)
 	Q_ASSERT(item && item->isTable());
 	m_table = item->asTable();
 
+	m_longBlink = true;
+	m_cursorVisible = true;
 	m_blinkTime.start();
 	m_canvasUpdateTimer->start(200);
 
@@ -177,6 +179,9 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 			case TableHandle::CellSelect:
 				//m_cellSelectGesture->setup(m_table, m_table->cellAt(canvasPoint));
 				//m_view->startGesture(m_cellSelectGesture);
+				m_longBlink = true;
+				m_cursorVisible = true;
+				m_blinkTime.restart();
 				m_table->setActiveCell(m_table->cellAt(canvasPoint));
 				m_view->slotSetCurs(event->globalPos().x(), event->globalPos().y());
 				break;
