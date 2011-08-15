@@ -29,9 +29,9 @@ for which a new license (GPL+exception) is in place.
 #include "pageitem_table.h"
 
 #ifdef WANT_DEBUG
-	#define ASSERT_VALID() qt_noop()
-#else
 	#define ASSERT_VALID() assertValid(); qt_noop()
+#else
+	#define ASSERT_VALID() qt_noop()
 #endif
 
 // The minimum row height.
