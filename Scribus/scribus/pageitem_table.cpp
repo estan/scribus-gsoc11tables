@@ -487,19 +487,20 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 
 void PageItem_Table::setActiveCell(const TableCell& cell)
 {
-	TableCell activeCell = validCell(cell.row(), cell.column()) ? cell : cellAt(0, 0);
+	ASSERT_VALID();
 
-	if (m_activeCell.isValid())
-	{
-		// Deselect previous active cell and its text.
-		m_activeCell.textFrame()->setSelected(false);
-		m_activeCell.textFrame()->itemText.deselectAll();
-	}
+	TableCell newActiveCell = validCell(cell.row(), cell.column()) ? cell : cellAt(0, 0);
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
 
 	// Set the new active cell and select it.
-	m_activeCell = activeCell;
+	m_activeCell = newActiveCell;
 	m_activeCell.textFrame()->setSelected(true);
 	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+
+	ASSERT_VALID();
 }
 
 TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
@@ -758,7 +759,7 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	m_Doc->tableStyles().connect(this, SLOT(handleStyleChanged()));
 	m_Doc->cellStyles().connect(this, SLOT(handleStyleChanged()));
 
-	setActiveCell(cellAt(0, 0));
+	m_activeCell = cellAt(0, 0);
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const
@@ -1012,4 +1013,8 @@ void PageItem_Table::assertValid() const
 			}
 		}
 	}
+
+	// Check that we have a valid active cell.
+	Q_ASSERT(m_activeCell.isValid());
+	Q_ASSERT(validCell(m_activeCell.row(), m_activeCell.column()));
 }
