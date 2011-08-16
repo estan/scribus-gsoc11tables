@@ -244,6 +244,7 @@ private:
 	friend class PageItem_Table;
 	QExplicitlySharedDataPointer<TableCellData> d;
 };
+Q_DECLARE_TYPEINFO(TableCell, Q_MOVABLE_TYPE);
 
 inline uint qHash(const TableCell& cell)
 {

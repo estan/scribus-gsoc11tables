@@ -66,6 +66,7 @@ private:
 	/// The color of the table border line.
 	QString m_color;
 };
+Q_DECLARE_TYPEINFO(TableBorderLine, Q_MOVABLE_TYPE);
 
 /**
  * The TableBorder class represents a border on a table or table cell.
