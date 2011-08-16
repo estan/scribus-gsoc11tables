@@ -733,6 +733,13 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	// Internal style is in document-wide style context.
 	m_style.setContext(&m_Doc->tableStyles());
 
+	// Reserve space in lists.
+	m_cellRows.reserve(numRows);
+	m_rowHeights.reserve(numRows);
+	m_rowPositions.reserve(numRows);
+	m_columnWidths.reserve(numColumns);
+	m_columnPositions.reserve(numColumns);
+
 	// Initialize rows of cells.
 	QList<TableCell> initialRow;
 	initialRow.append(TableCell(0, 0, this));
