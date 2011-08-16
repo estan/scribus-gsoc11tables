@@ -124,6 +124,7 @@ private:
 	int m_width;
 	int m_height;
 };
+Q_DECLARE_TYPEINFO(CellArea, Q_MOVABLE_TYPE);
 
 bool operator==(const CellArea& lhs, const CellArea& rhs);
 bool operator!=(const CellArea& lhs, const CellArea& rhs);
