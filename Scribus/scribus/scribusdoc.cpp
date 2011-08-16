@@ -12862,7 +12862,7 @@ void ScribusDoc::itemSelection_AdjustImagetoFrameSize( Selection *customSelectio
 	}
 }
 
-void ScribusDoc::itemSelection_AdjustFrametoTableSize()
+void ScribusDoc::itemSelection_AdjustFrameToTable()
 {
 	// TODO: Do this in an undo transaction?
 	int selectedItemCount = m_Selection->count();
@@ -12881,7 +12881,7 @@ void ScribusDoc::itemSelection_AdjustFrametoTableSize()
 	changed();
 }
 
-void ScribusDoc::itemSelection_AdjustTabletoFrameSize()
+void ScribusDoc::itemSelection_AdjustTableToFrame()
 {
 	// TODO: Do this in an undo transaction?
 	int selectedItemCount = m_Selection->count();

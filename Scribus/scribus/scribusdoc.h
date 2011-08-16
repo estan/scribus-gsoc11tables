@@ -1370,10 +1370,6 @@ public slots:
 	 * Adjust an image size to fit the size of the frame
 	 */
 	void itemSelection_AdjustImagetoFrameSize(Selection* customSelection=0);
-	/// Adjusts the size of the frames of any selected tables to fit the size of the tables they contain.
-	void itemSelection_AdjustFrametoTableSize();
-	/// Adjusts the size of any selected tables to fit the size of their frames.
-	void itemSelection_AdjustTabletoFrameSize();
 	//! @brief startArrowID or endArrowID of -1 mean not applying a selection at this point.
 	void itemSelection_ApplyArrowHead(int startArrowID=-1, int endArrowID=-1, Selection* customSelection=0);
 	void itemSelection_ApplyArrowScale(int startArrowSc, int endArrowSc, Selection* customSelection);
@@ -1392,6 +1388,84 @@ public slots:
 	void itemSelection_SetItemStrokePatternType(bool type);
 	void itemSelection_SetItemPatternMask(QString pattern);
 	void itemSelection_SetItemPatternMaskProps(double scaleX, double scaleY, double offsetX, double offsetY, double rotation, double skewX, double skewY, bool mirrorX, bool mirrorY);
+
+	// Table related slots.
+
+	// TODO: Extend the docs for all of these once they are implemented.
+
+	/**
+	 * Inserts one or more rows above or below the row of the active cell in a table.
+	 *
+	 * The user will be prompted by a dialog for the number of rows and where they
+	 * should be inserted.
+	 *
+	 * If no table is selected, or if the application is not in table edit mode, then
+	 * this slot does nothing.
+	 */
+	void itemSelection_InsertTableRows() {}
+
+	/**
+	 * Inserts one or more columns above or below the column of the active cell in a table.
+	 *
+	 * The user will be prompted by a dialog for the number of columns and where they
+	 * should be inserted. If no table is selected, or if the application is not in table
+	 * edit mode, then this slot does nothing.
+	 */
+	void itemSelection_InsertTableColumns() {}
+
+	/**
+	 * Deletes the selected row(s) in a table.
+	 *
+	 * If no rows are selected, the row containing the cursor will be deleted. If no table
+	 * is selected, or if the application is not in table edit mode, then
+	 * this slot does nothing.
+	 */
+	void itemSelection_DeleteTableRows() {}
+
+	/**
+	 * Deletes the selected column(s) in a table, or the row containing the active cell.
+	 */
+	void itemSelection_DeleteTableColumns() {}
+
+	/**
+	 * Merges the selected cells in a table.
+	 */
+	void itemSelection_MergeTableCells() {}
+
+	/**
+	 * Splits one or more cells in a table into multiple cells.
+	 */
+	void itemSelection_SplitTableCells() {}
+
+	/**
+	 * Sets the height of the selected row(s) in a table, or of the row containing the active cell.
+	 */
+	void itemSelection_SetTableRowHeights() {}
+
+	/**
+	 * Sets the width of the selected column(s) in a table, or of the column containing the active cell.
+	 */
+	void itemSelection_SetTableColumnWidths() {}
+
+	/**
+	 * Distributes the selected rows in a table evenly, or all rows if no rows are selected.
+	 */
+	void itemSelection_DistributeTableRowsEvenly() {}
+
+	/**
+	 * Distributes columns evenly in a selected table.
+	 */
+	void itemSelection_DistributeTableColumnsEvenly() {}
+
+	/**
+	 * Adjusts the size of the frames of any selected tables to fit the size of the tables they contain.
+	 */
+	void itemSelection_AdjustFrameToTable();
+
+	/**
+	 * Adjusts the size of any selected tables to fit the size of their frames.
+	 */
+	void itemSelection_AdjustTableToFrame();
 
 	void undoRedoBegin();
 	void undoRedoDone();
