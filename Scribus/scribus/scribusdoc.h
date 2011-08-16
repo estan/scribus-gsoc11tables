@@ -1402,7 +1402,7 @@ public slots:
 	 * If no table is selected, or if the application is not in table edit mode, then
 	 * this slot does nothing.
 	 */
-	void itemSelection_InsertTableRows() {}
+	void itemSelection_InsertTableRows();
 
 	/**
 	 * Inserts one or more columns above or below the column of the active cell in a table.

@@ -82,6 +82,7 @@ SET(SCRIBUS_UI_SRC
   ui/gtfiledialog.ui
   ui/guidemanager.ui
   ui/insertaframe.ui
+  ui/inserttablerowsdialog.ui
   ui/latexeditor.ui
   ui/newmarginwidgetbase.ui
   ui/measurementsbase.ui
@@ -296,6 +297,7 @@ SET(SCRIBUS_MOC_CLASSES
   ui/imageinfodialog.h
   ui/insertTable.h
   ui/insertaframe.h
+  ui/inserttablerowsdialog.h
   ui/inspage.h
   ui/javadocs.h
   ui/latexeditor.h
@@ -708,6 +710,7 @@ SET(SCRIBUS_SOURCES
   ui/imageinfodialog.cpp
   ui/insertTable.cpp
   ui/insertaframe.cpp
+  ui/inserttablerowsdialog.cpp
   ui/inspage.cpp
   ui/javadocs.cpp
   ui/latexeditor.cpp

@@ -26,13 +26,15 @@ for which a new license (GPL+exception) is in place.
 #include <sstream>
 
 #include <QByteArray>
- #include <QDebug>
+#include <QDebug>
+#include <QDialog>
 #include <QEventLoop>
 #include <QFile>
 #include <QList>
 #include <QTime>
 #include <QPainter>
 #include <QPixmap>
+#include <QPointer>
 #include <QProgressBar>
 
 #include "canvas.h"
@@ -45,6 +47,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "ui/guidemanager.h"
 #include "hyphenator.h"
+#include "ui/inserttablerowsdialog.h"
 #include "page.h"
 #include "pageitem.h"
 #include "pageitem_imageframe.h"
@@ -6917,6 +6920,42 @@ void ScribusDoc::itemSelection_SetItemPatternMaskProps(double imageScaleX, doubl
 		m_updateManager.setUpdatesEnabled();
 		changed();
 	}
+}
+
+void ScribusDoc::itemSelection_InsertTableRows()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	QPointer<InsertTableRowsDialog> dialog = new InsertTableRowsDialog(m_ScMW);
+	if (dialog->exec() == QDialog::Accepted)
+	{
+		const int numRows = dialog->numberOfRows();
+
+		// Determine index to insert at.
+		const TableCell activeCell = table->activeCell();
+		int before = 0, after = table->rows(); // Beginning/end of table.
+		if (appMode == modeEditTable)
+		{
+			// Before/after row of active cell.
+			before = qMax(table->activeCell().row() - 1, 0);
+			after = table->activeCell().row() + table->activeCell().rowSpan();
+		}
+		const int index = dialog->position() == InsertTableRowsDialog::Before ? before : after;
+
+		// Insert the table.
+		table->insertRows(index, numRows);
+		table->update();
+
+		changed();
+	}
+
+	delete dialog;
 }
 
 void ScribusDoc::itemSelection_SetEffects(int s, Selection* customSelection)
