@@ -132,8 +132,8 @@ void TableCell::updateContent()
 	contentRect.setWidth(qMax(contentRect.width() - (rightPadding() + maxRightBorderWidth()/2), 1.0));
 	contentRect.setHeight(qMax(contentRect.height() - (bottomPadding() + maxBottomBorderWidth()/2), 1.0));
 
-	d->textFrame->setXYPos(contentRect.x(), contentRect.y());
-	d->textFrame->setWidthHeight(contentRect.width(), contentRect.height());
+	d->textFrame->setXYPos(contentRect.x(), contentRect.y(), true);
+	d->textFrame->setWidthHeight(contentRect.width(), contentRect.height(), true);
 	d->textFrame->updateClip();
 	d->textFrame->invalidateLayout();
 }
