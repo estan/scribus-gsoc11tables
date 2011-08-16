@@ -22,6 +22,7 @@ from scribus import *
 from traceback import print_exc
 from sys import stdout
 from inspect import getmembers, ismethod
+from time import time
 
 class TableTests:
     def __init__(self):
@@ -367,14 +368,19 @@ if __name__ == '__main__':
     methods = getmembers(tests, is_test_method)
     ntests = len(methods)
     nfailed = 0
+    total_time = 0
     for testnr, (name, method) in enumerate(methods):
         print '\t%i/%i: %s()%s' % (testnr + 1, ntests, name, '.' * (30 - len(name))),
         try:
+            start_time = time()
             method()
+            test_time = time() - start_time
+            total_time += test_time
         except:
             print 'Failed'
             print_exc(file=stdout)
             nfailed += 1
         else:
-            print 'Passed'
+            print 'Passed  %.3f s' % round(test_time, 3)
     print '%i%% passed, %i tests failed out of %i' % (int(round((float(ntests - nfailed)/ntests)*100)), nfailed, ntests)
+    print 'total test time = %.3f s' % round(total_time, 3)
