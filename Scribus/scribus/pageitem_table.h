@@ -249,9 +249,9 @@ public:
 	void splitCell(int row, int column, int numRows, int numCols);
 
 	/**
-	 * Returns the cell selection.
+	 * Returns the set of selected cells.
 	 */
-	QSet<TableCell> selection() const { return m_selection; }
+	QSet<TableCell> selectedCells() const { return m_selection; }
 
 	/**
 	 * Adds the cell at @a row, @column to the selection.
