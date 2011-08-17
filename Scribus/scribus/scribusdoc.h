@@ -1394,7 +1394,7 @@ public slots:
 	// TODO: Extend the docs for all of these once they are implemented.
 
 	/**
-	 * Inserts one or more rows in a table.
+	 * Inserts rows in a table.
 	 *
 	 * The user will be prompted by a dialog for the number of rows and where they should
 	 * be inserted. If in table edit mode, rows may be inserted before or after the active
@@ -1406,7 +1406,7 @@ public slots:
 	void itemSelection_InsertTableRows();
 
 	/**
-	 * Inserts one or more columns in a table.
+	 * Inserts columns in a table.
 	 *
 	 * The user will be prompted by a dialog for the number of columns and where they should
 	 * be inserted. If in table edit mode, columns may be inserted before or after the active
@@ -1418,13 +1418,15 @@ public slots:
 	void itemSelection_InsertTableColumns();
 
 	/**
-	 * Deletes the selected row(s) in a table.
+	 * Deletes rows in a table.
 	 *
-	 * If no rows are selected, the row containing the cursor will be deleted. If no table
-	 * is selected, or if the application is not in table edit mode, then
-	 * this slot does nothing.
+	 * If the there is a cell selection, all rows spanned by the selection will be deleted.
+	 * If there is no cell selection, the rows spanned by the active cell will be deleted.
+	 *
+	 * If no table is selected, or if the application is not in table edit mode, then this slot
+	 * does nothing.
 	 */
-	void itemSelection_DeleteTableRows() {}
+	void itemSelection_DeleteTableRows();
 
 	/**
 	 * Deletes the selected column(s) in a table, or the row containing the active cell.

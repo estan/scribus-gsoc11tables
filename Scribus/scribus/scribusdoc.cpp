@@ -31,6 +31,7 @@ for which a new license (GPL+exception) is in place.
 #include <QEventLoop>
 #include <QFile>
 #include <QList>
+#include <QtAlgorithms>
 #include <QTime>
 #include <QPainter>
 #include <QPixmap>
@@ -6991,13 +6992,66 @@ void ScribusDoc::itemSelection_InsertTableColumns()
 	delete dialog;
 }
 
+void ScribusDoc::itemSelection_DeleteTableRows()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	if (appMode != modeEditTable)
+		return;
+
+	if (table->selectedRows().size() >= table->rows())
+		return;
+
+	if (table->selectedRows().isEmpty())
+	{
+		// Remove rows spanned by active cell.
+		TableCell activeCell = table->activeCell();
+		table->removeRows(activeCell.row(), activeCell.rowSpan());
+	}
+	else
+	{
+		// Remove selected row(s).
+		QList<int> selectedRows = table->selectedRows().toList();
+		qSort(selectedRows.begin(), selectedRows.end(), qGreater<int>());
+
+		int index = 0;
+		int numRows = 1;
+		for (int i = 0; i < selectedRows.size() - 1; ++i)
+		{
+			index = selectedRows[i];
+			if (selectedRows[i] - 1 == selectedRows[i + 1])
+			{
+				index = selectedRows[i + 1];
+				numRows++;
+			}
+			else
+			{
+				table->removeRows(index, numRows);
+				numRows = 1;
+			}
+		}
+		table->removeRows(index, numRows);
+	}
+
+	table->clearSelection();
+	table->update();
+
+	changed();
+}
+
 void ScribusDoc::itemSelection_SetEffects(int s, Selection* customSelection)
 {
 	CharStyle newStyle;
 	newStyle.setFeatures(static_cast<StyleFlag>(s).featureList());
 	itemSelection_ApplyCharStyle(newStyle, customSelection);
 	return;
-	
+
 	uint selectedItemCount=m_Selection->count();
 	if (selectedItemCount != 0 && s != ScStyle_None)
 	{
