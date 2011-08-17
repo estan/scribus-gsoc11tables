@@ -1394,22 +1394,26 @@ public slots:
 	// TODO: Extend the docs for all of these once they are implemented.
 
 	/**
-	 * Inserts one or more rows above or below the row of the active cell in a table.
+	 * Inserts one or more rows in a table.
 	 *
-	 * The user will be prompted by a dialog for the number of rows and where they
-	 * should be inserted.
+	 * The user will be prompted by a dialog for the number of rows and where they should
+	 * be inserted. If in table edit mode, rows may be inserted before or after the active
+	 * cell. If in normal mode, rows may be inserted at the beginning or end of the selected
+	 * table.
 	 *
-	 * If no table is selected, or if the application is not in table edit mode, then
-	 * this slot does nothing.
+	 * If no table is selected, then this slot does nothing.
 	 */
 	void itemSelection_InsertTableRows();
 
 	/**
-	 * Inserts one or more columns above or below the column of the active cell in a table.
+	 * Inserts one or more columns in a table.
 	 *
-	 * The user will be prompted by a dialog for the number of columns and where they
-	 * should be inserted. If no table is selected, or if the application is not in table
-	 * edit mode, then this slot does nothing.
+	 * The user will be prompted by a dialog for the number of columns and where they should
+	 * be inserted. If in table edit mode, columns may be inserted before or after the active
+	 * cell. If in normal mode, columns may be inserted at the beginning or end of the selected
+	 * table.
+	 *
+	 * If no table is selected, then this slot does nothing.
 	 */
 	void itemSelection_InsertTableColumns();
 
