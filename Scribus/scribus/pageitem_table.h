@@ -10,6 +10,7 @@ for which a new license (GPL+exception) is in place.
 #define PAGEITEM_TABLE_H
 
 #include <QList>
+#include <QPair>
 #include <QPointF>
 #include <QRectF>
 #include <QSet>
@@ -252,6 +253,22 @@ public:
 	 * Returns the set of selected cells.
 	 */
 	QSet<TableCell> selectedCells() const { return m_selection; }
+
+	/**
+	 * Returns the list of selected rows.
+	 *
+	 * The function will return all rows spanned by the selected cells as a sorted list of
+	 * non-overlapping <code>[startRow, endRow]</code> ranges.
+	 */
+	QList<QPair<int, int> > selectedRows() const;
+
+	/**
+	 * Returns the list of selected columns.
+	 *
+	 * The function will return all columns spanned by the selected cells as a sorted list of
+	 * non-overlapping <code>[startColumn, endColumn]</code> ranges.
+	 */
+	QList<QPair<int, int> > selectedColumns() const;
 
 	/**
 	 * Adds the cell at @a row, @column to the selection.

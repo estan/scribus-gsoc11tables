@@ -10,6 +10,7 @@ for which a new license (GPL+exception) is in place.
 
 #include <QDebug>
 #include <QMutableListIterator>
+#include <QPair>
 #include <QPointF>
 #include <QRectF>
 #include <QString>
@@ -409,6 +410,68 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 {
 	// Not implemented.
 	emit changed();
+}
+
+QList<QPair<int, int> > PageItem_Table::selectedRows() const
+{
+	if (selectedCells().isEmpty())
+		return QList<QPair<int, int> >();
+
+	// Create sorted list of row ranges.
+	QList<QPair<int, int> > ranges;
+	foreach (const TableCell& cell, selectedCells())
+		ranges.append(QPair<int, int>(cell.row(), cell.row() + cell.rowSpan() - 1));
+	qSort(ranges.begin(), ranges.end());
+
+	// Merge the collected ranges (no overlaps).
+	QList<QPair<int, int> > mergedRanges;
+	QList<QPair<int, int> >::iterator it = ranges.begin();
+	QPair<int, int> current = *(it)++;
+	while (it != ranges.end())
+	{
+		if (current.second >= it->first - 1)
+			current.second = qMax(current.second, it->second);
+		else
+		{
+			mergedRanges.append(current);
+			current = *(it);
+		}
+		it++;
+	}
+	mergedRanges.append(current);
+
+	return mergedRanges;
+}
+
+QList<QPair<int, int> > PageItem_Table::selectedColumns() const
+{
+	if (selectedCells().isEmpty())
+		return QList<QPair<int, int> >();
+
+	// Create sorted list of column ranges.
+	QList<QPair<int, int> > ranges;
+	foreach (const TableCell& cell, selectedCells())
+		ranges.append(QPair<int, int>(cell.column(), cell.column() + cell.columnSpan() - 1));
+	qSort(ranges.begin(), ranges.end());
+
+	// Merge the collected ranges (no overlaps).
+	QList<QPair<int, int> > mergedRanges;
+	QList<QPair<int, int> >::iterator it = ranges.begin();
+	QPair<int, int> current = *(it)++;
+	while (it != ranges.end())
+	{
+		if (current.second >= it->first - 1)
+			current.second = qMax(current.second, it->second);
+		else
+		{
+			mergedRanges.append(current);
+			current = *(it);
+		}
+		it++;
+	}
+	mergedRanges.append(current);
+
+	return mergedRanges;
 }
 
 void PageItem_Table::selectCell(int row, int column)
