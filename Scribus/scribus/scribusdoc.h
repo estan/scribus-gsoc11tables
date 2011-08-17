@@ -1429,7 +1429,13 @@ public slots:
 	void itemSelection_DeleteTableRows();
 
 	/**
-	 * Deletes the selected column(s) in a table, or the row containing the active cell.
+	 * Deletes columns in a table.
+	 *
+	 * If the there is a cell selection, all columns spanned by the selection will be deleted.
+	 * If there is no cell selection, the columns spanned by the active cell will be deleted.
+	 *
+	 * If no table is selected, or if the application is not in table edit mode, then this slot
+	 * does nothing.
 	 */
 	void itemSelection_DeleteTableColumns();
 
@@ -1444,12 +1450,12 @@ public slots:
 	void itemSelection_MergeTableCells();
 
 	/**
-	 * Splits one or more cells in a table into multiple cells.
+	 * Splits cells in a table.
 	 */
 	void itemSelection_SplitTableCells() {}
 
 	/**
-	 * Sets the height of the selected row(s) in a table, or of the row containing the active cell.
+	 * Sets the height of rows in a table.
 	 */
 	void itemSelection_SetTableRowHeights() {}
 
