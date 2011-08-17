@@ -90,6 +90,7 @@ for which a new license (GPL+exception) is in place.
 #include "selection.h"
 #include "serializer.h"
 #include "tableborder.h"
+#include "ui/tablerowheightsdialog.h"
 #include "ui/hruler.h"
 #include "ui/layers.h"
 #include "ui/storyeditor.h"
@@ -7130,6 +7131,53 @@ void ScribusDoc::itemSelection_MergeTableCells()
 	table->setActiveCell(table->cellAt(row, column));
 	table->update();
 
+	changed();
+}
+
+void ScribusDoc::itemSelection_SetTableRowHeights()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	QPointer<TableRowHeightsDialog> dialog = new TableRowHeightsDialog(unitIndex(), m_ScMW);
+	if (dialog->exec() == QDialog::Rejected)
+		return;
+
+	const qreal rowHeight = dialog->rowHeight();
+	if (appMode == modeEditTable)
+	{
+		if (table->selectedCells().isEmpty())
+		{
+			// Set height of rows spanned by active cell.
+			TableCell activeCell = table->activeCell();
+			int startRow = activeCell.row();
+			int endRow = startRow + activeCell.rowSpan() - 1;
+			for (int row = startRow; row <= endRow; ++row)
+				table->resizeRow(row, rowHeight);
+		}
+		else
+		{
+			// Set height of selected rows.
+			foreach (const int row, table->selectedRows())
+				table->resizeRow(row, rowHeight);
+		}
+	}
+	else
+	{
+		// Set height of all rows in table.
+		for (int row = 0; row < table->rows(); ++row)
+			table->resizeRow(row, rowHeight);
+	}
+
+	delete dialog;
+
+	table->clearSelection();
+	table->update();
 	changed();
 }
 

@@ -1456,8 +1456,15 @@ public slots:
 
 	/**
 	 * Sets the height of rows in a table.
+	 *
+	 * The user will be prompted by a dialog for entering a row height. If in table editing
+	 * mode, all rows of the table will get their height set. If the there is a cell selection,
+	 * all rows spanned by the selection will get their height set. If there is no cell
+	 * selection, the rows spanned by the active cell will get their height set.
+	 *
+	 * If no table is selected, then this slot does nothing.
 	 */
-	void itemSelection_SetTableRowHeights() {}
+	void itemSelection_SetTableRowHeights();
 
 	/**
 	 * Sets the width of the selected column(s) in a table, or of the column containing the active cell.

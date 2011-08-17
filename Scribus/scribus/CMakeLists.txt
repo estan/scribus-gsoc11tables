@@ -152,6 +152,7 @@ SET(SCRIBUS_UI_SRC
   ui/spiralvectorbase.ui
   ui/spiralwidgetbase.ui
   ui/stylemanager.ui
+  ui/tablerowheightsdialog.ui
   ui/transformdialogbase.ui
   ui/transparencypalette.ui
   ui/copypagetomasterpage.ui
@@ -434,6 +435,7 @@ SET(SCRIBUS_MOC_CLASSES
   ui/swatchcombo.h
   ui/symbolpalette.h
   ui/tablesideselector.h
+  ui/tablerowheightsdialog.h
   ui/tabmanager.h
   ui/tabpdfoptions.h
   ui/tabruler.h
@@ -853,6 +855,7 @@ SET(SCRIBUS_SOURCES
   ui/styleview.cpp
   ui/swatchcombo.cpp
   ui/symbolpalette.cpp
+  ui/tablerowheightsdialog.cpp
   ui/tablesideselector.cpp
   ui/tabmanager.cpp
   ui/tabpdfoptions.cpp
