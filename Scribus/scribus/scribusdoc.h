@@ -1435,8 +1435,13 @@ public slots:
 
 	/**
 	 * Merges the selected cells in a table.
+	 *
+	 * The merged area will span from the top left to the bottom right of the selected cells.
+	 *
+	 * If no table is selected, or if the application is not in table edit mode, or if less
+	 * than two cells is selected, then this slot does nothing.
 	 */
-	void itemSelection_MergeTableCells() {}
+	void itemSelection_MergeTableCells();
 
 	/**
 	 * Splits one or more cells in a table into multiple cells.

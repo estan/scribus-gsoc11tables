@@ -7098,6 +7098,41 @@ void ScribusDoc::itemSelection_DeleteTableColumns()
 	changed();
 }
 
+void ScribusDoc::itemSelection_MergeTableCells()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	if (appMode != modeEditTable)
+		return;
+
+	if (table->selectedCells().size() < 2)
+		return;
+
+	QList<int> selectedRows = table->selectedRows().toList();
+	QList<int> selectedColumns = table->selectedColumns().toList();
+	qSort(selectedRows);
+	qSort(selectedColumns);
+
+	const int row = selectedRows.first();
+	const int column = selectedColumns.first();
+	const int numRows = selectedRows.last() - row + 1;
+	const int numColumns = selectedColumns.last() - column + 1;
+
+	table->mergeCells(row, column, numRows, numColumns);
+
+	table->clearSelection();
+	table->setActiveCell(table->cellAt(row, column));
+	table->update();
+
+	changed();
+}
+
 void ScribusDoc::itemSelection_SetEffects(int s, Selection* customSelection)
 {
 	CharStyle newStyle;
