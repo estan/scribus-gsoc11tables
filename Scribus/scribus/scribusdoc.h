@@ -1411,7 +1411,7 @@ public slots:
 	 * should be inserted. If no table is selected, or if the application is not in table
 	 * edit mode, then this slot does nothing.
 	 */
-	void itemSelection_InsertTableColumns() {}
+	void itemSelection_InsertTableColumns();
 
 	/**
 	 * Deletes the selected row(s) in a table.

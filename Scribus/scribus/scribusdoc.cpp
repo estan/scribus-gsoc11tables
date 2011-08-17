@@ -47,6 +47,7 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "ui/guidemanager.h"
 #include "hyphenator.h"
+#include "ui/inserttablecolumnsdialog.h"
 #include "ui/inserttablerowsdialog.h"
 #include "page.h"
 #include "pageitem.h"
@@ -6948,6 +6949,40 @@ void ScribusDoc::itemSelection_InsertTableRows()
 
 		// Insert the rows.
 		table->insertRows(index, dialog->numberOfRows());
+		table->update();
+
+		changed();
+	}
+
+	delete dialog;
+}
+
+void ScribusDoc::itemSelection_InsertTableColumns()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	QPointer<InsertTableColumnsDialog> dialog = new InsertTableColumnsDialog(appMode, m_ScMW);
+	if (dialog->exec() == QDialog::Accepted)
+	{
+		/*
+		 * In table edit mode we insert either before or after the active
+		 * cell, otherwise we insert at beginning or end of table.
+		 */
+		int index = 0;
+		const TableCell cell = table->activeCell();
+		if (dialog->position() == InsertTableColumnsDialog::Before)
+			index = appMode == modeEditTable ? cell.column() : 0;
+		else
+			index = appMode == modeEditTable ? cell.column() + cell.columnSpan() : table->columns();
+
+		// Insert the columns.
+		table->insertColumns(index, dialog->numberOfColumns());
 		table->update();
 
 		changed();
