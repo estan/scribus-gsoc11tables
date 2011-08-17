@@ -7045,6 +7045,59 @@ void ScribusDoc::itemSelection_DeleteTableRows()
 	changed();
 }
 
+void ScribusDoc::itemSelection_DeleteTableColumns()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	if (appMode != modeEditTable)
+		return;
+
+	if (table->selectedColumns().size() >= table->columns())
+		return;
+
+	if (table->selectedColumns().isEmpty())
+	{
+		// Remove columns spanned by active cell.
+		TableCell activeCell = table->activeCell();
+		table->removeColumns(activeCell.column(), activeCell.columnSpan());
+	}
+	else
+	{
+		// Remove selected column(s).
+		QList<int> selectedColumns = table->selectedColumns().toList();
+		qSort(selectedColumns.begin(), selectedColumns.end(), qGreater<int>());
+
+		int index = 0;
+		int numColumns = 1;
+		for (int i = 0; i < selectedColumns.size() - 1; ++i)
+		{
+			index = selectedColumns[i];
+			if (selectedColumns[i] - 1 == selectedColumns[i + 1])
+			{
+				index = selectedColumns[i + 1];
+				numColumns++;
+			}
+			else
+			{
+				table->removeColumns(index, numColumns);
+				numColumns = 1;
+			}
+		}
+		table->removeColumns(index, numColumns);
+	}
+
+	table->clearSelection();
+	table->update();
+
+	changed();
+}
+
 void ScribusDoc::itemSelection_SetEffects(int s, Selection* customSelection)
 {
 	CharStyle newStyle;

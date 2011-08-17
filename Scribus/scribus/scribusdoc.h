@@ -1431,7 +1431,7 @@ public slots:
 	/**
 	 * Deletes the selected column(s) in a table, or the row containing the active cell.
 	 */
-	void itemSelection_DeleteTableColumns() {}
+	void itemSelection_DeleteTableColumns();
 
 	/**
 	 * Merges the selected cells in a table.
