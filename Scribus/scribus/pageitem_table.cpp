@@ -9,10 +9,11 @@ for which a new license (GPL+exception) is in place.
 #include <algorithm>
 
 #include <QDebug>
+#include <QList>
 #include <QMutableListIterator>
-#include <QPair>
 #include <QPointF>
 #include <QRectF>
+#include <QSet>
 #include <QString>
 #include <QTransform>
 #include <QtAlgorithms>
@@ -412,66 +413,30 @@ void PageItem_Table::splitCell(int row, int column, int numRows, int numCols)
 	emit changed();
 }
 
-QList<QPair<int, int> > PageItem_Table::selectedRows() const
+QSet<int> PageItem_Table::selectedRows() const
 {
-	if (selectedCells().isEmpty())
-		return QList<QPair<int, int> >();
-
-	// Create sorted list of row ranges.
-	QList<QPair<int, int> > ranges;
+	QSet<int> rows;
 	foreach (const TableCell& cell, selectedCells())
-		ranges.append(QPair<int, int>(cell.row(), cell.row() + cell.rowSpan() - 1));
-	qSort(ranges.begin(), ranges.end());
-
-	// Merge the collected ranges (no overlaps).
-	QList<QPair<int, int> > mergedRanges;
-	QList<QPair<int, int> >::iterator it = ranges.begin();
-	QPair<int, int> current = *(it)++;
-	while (it != ranges.end())
 	{
-		if (current.second >= it->first - 1)
-			current.second = qMax(current.second, it->second);
-		else
-		{
-			mergedRanges.append(current);
-			current = *(it);
-		}
-		it++;
+		const int startRow = cell.row();
+		const int endRow = startRow + cell.rowSpan() - 1;
+		for (int row = startRow; row <= endRow; ++row)
+			rows.insert(row);
 	}
-	mergedRanges.append(current);
-
-	return mergedRanges;
+	return rows;
 }
 
-QList<QPair<int, int> > PageItem_Table::selectedColumns() const
+QSet<int> PageItem_Table::selectedColumns() const
 {
-	if (selectedCells().isEmpty())
-		return QList<QPair<int, int> >();
-
-	// Create sorted list of column ranges.
-	QList<QPair<int, int> > ranges;
+	QSet<int> columns;
 	foreach (const TableCell& cell, selectedCells())
-		ranges.append(QPair<int, int>(cell.column(), cell.column() + cell.columnSpan() - 1));
-	qSort(ranges.begin(), ranges.end());
-
-	// Merge the collected ranges (no overlaps).
-	QList<QPair<int, int> > mergedRanges;
-	QList<QPair<int, int> >::iterator it = ranges.begin();
-	QPair<int, int> current = *(it)++;
-	while (it != ranges.end())
 	{
-		if (current.second >= it->first - 1)
-			current.second = qMax(current.second, it->second);
-		else
-		{
-			mergedRanges.append(current);
-			current = *(it);
-		}
-		it++;
+		const int startColumn = cell.column();
+		const int endColumn = startColumn + cell.columnSpan() - 1;
+		for (int col = startColumn; col <= endColumn; ++col)
+			columns.insert(col);
 	}
-	mergedRanges.append(current);
-
-	return mergedRanges;
+	return columns;
 }
 
 void PageItem_Table::selectCell(int row, int column)
