@@ -28,12 +28,13 @@ public:
 	};
 
 public:
-	explicit InsertTableRowsDialog(QWidget *parent = 0);
+	/// Constructs a new dialog for inserting rows. @a appMode is the current application mode.
+	explicit InsertTableRowsDialog(int appMode, QWidget *parent = 0);
 
 	/// Returns the number of rows the user entered.
 	int numberOfRows() const { return numRows->value(); }
 
-	/// Returns the position to insert at picked by the user.
+	/// Returns the position the user picked.
 	Position position() const { return static_cast<Position>(positions->checkedId()); }
 };
 

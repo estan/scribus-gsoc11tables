@@ -6932,24 +6932,22 @@ void ScribusDoc::itemSelection_InsertTableRows()
 	if (!table)
 		return;
 
-	QPointer<InsertTableRowsDialog> dialog = new InsertTableRowsDialog(m_ScMW);
+	QPointer<InsertTableRowsDialog> dialog = new InsertTableRowsDialog(appMode, m_ScMW);
 	if (dialog->exec() == QDialog::Accepted)
 	{
-		const int numRows = dialog->numberOfRows();
+		/*
+		 * In table edit mode we insert either before or after the active
+		 * cell, otherwise we insert at beginning or end of table.
+		 */
+		int index = 0;
+		const TableCell cell = table->activeCell();
+		if (dialog->position() == InsertTableRowsDialog::Before)
+			index = appMode == modeEditTable ? cell.row() : 0;
+		else
+			index = appMode == modeEditTable ? cell.row() + cell.rowSpan() : table->rows();
 
-		// Determine index to insert at.
-		const TableCell activeCell = table->activeCell();
-		int before = 0, after = table->rows(); // Beginning/end of table.
-		if (appMode == modeEditTable)
-		{
-			// Before/after row of active cell.
-			before = qMax(table->activeCell().row() - 1, 0);
-			after = table->activeCell().row() + table->activeCell().rowSpan();
-		}
-		const int index = dialog->position() == InsertTableRowsDialog::Before ? before : after;
-
-		// Insert the table.
-		table->insertRows(index, numRows);
+		// Insert the rows.
+		table->insertRows(index, dialog->numberOfRows());
 		table->update();
 
 		changed();
