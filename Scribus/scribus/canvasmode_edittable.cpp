@@ -79,14 +79,14 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 {
 	event->accept();
 
+	// Handle some keys specific to this mode.
 	if (event->key() == Qt::Key_Escape)
 	{
 		// Go back to normal mode.
 		m_view->requestMode(modeNormal);
-		return;
 	}
 
-	// Determine if we want a long blink.
+	// Determine if we want a long text cursor blink.
 	switch (event->key())
 	{
 		case Qt::Key_PageUp:
@@ -102,7 +102,31 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 			break;
 	}
 
-	// Pass event to text frame of active cell.
+	// Handle keyboard navigation between cells.
+	if (event->modifiers() == Qt::AltModifier)
+	{
+		switch (event->key())
+		{
+			case Qt::Key_Left:
+				// Move left
+				m_table->moveLeft();
+				return;
+			case Qt::Key_Right:
+				// Move right.
+				m_table->moveRight();
+				return;
+			case Qt::Key_Up:
+				// Move up.
+				m_table->moveUp();
+				return;
+			case Qt::Key_Down:
+				// Move down.
+				m_table->moveDown();
+				return;
+		}
+	}
+
+	// Pass all other keys to text frame of active cell.
 	bool repeat;
 	m_table->activeCell().textFrame()->handleModeEditKey(event, repeat);
 	updateCanvas(true);

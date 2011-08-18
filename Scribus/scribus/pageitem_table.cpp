@@ -549,7 +549,83 @@ void PageItem_Table::setActiveCell(const TableCell& cell)
 	m_activeCell.textFrame()->setSelected(true);
 	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
 
+	// Set the active logical position.
+	m_activeRow = m_activeCell.row();
+	m_activeColumn = m_activeCell.column();
+
 	ASSERT_VALID();
+}
+
+void PageItem_Table::moveLeft()
+{
+	if (m_activeCell.column() < 1)
+		return;
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
+
+	// Move active logical position left.
+	m_activeColumn = m_activeCell.column() - 1;
+
+	// Set the new active cell and select it.
+	m_activeCell = cellAt(m_activeRow, m_activeColumn);
+	m_activeCell.textFrame()->setSelected(true);
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+}
+
+void PageItem_Table::moveRight()
+{
+	if (m_activeCell.column() + m_activeCell.columnSpan() >= columns())
+		return;
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
+
+	// Move active logical position right.
+	m_activeColumn = m_activeCell.column() + m_activeCell.columnSpan();
+
+	// Set the new active cell and select it.
+	m_activeCell = cellAt(m_activeRow, m_activeColumn);
+	m_activeCell.textFrame()->setSelected(true);
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+}
+
+void PageItem_Table::moveUp()
+{
+	if (m_activeCell.row() < 1)
+		return;
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
+
+	// Move active logical position up.
+	m_activeRow = m_activeCell.row() - 1;
+
+	// Set the new active cell and select it.
+	m_activeCell = cellAt(m_activeRow, m_activeColumn);
+	m_activeCell.textFrame()->setSelected(true);
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+}
+
+void PageItem_Table::moveDown()
+{
+	if (m_activeCell.row() + m_activeCell.rowSpan() >= rows())
+		return;
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
+
+	// Move active logical position down.
+	m_activeRow = m_activeCell.row() + m_activeCell.rowSpan();
+
+	// Set the new active cell and select it.
+	m_activeCell = cellAt(m_activeRow, m_activeColumn);
+	m_activeCell.textFrame()->setSelected(true);
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
 }
 
 TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const

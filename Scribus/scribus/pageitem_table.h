@@ -345,6 +345,26 @@ public:
 	void setActiveCell(const TableCell& cell);
 
 	/**
+	 * Moves left in the table, or do nothing if at the table end.
+	 */
+	void moveLeft();
+
+	/**
+	 * Moves right in the table, or do nothing if at the table end.
+	 */
+	void moveRight();
+
+	/**
+	 * Moves up in the table, or do nothing if at the table end.
+	 */
+	void moveUp();
+
+	/**
+	 * Moves down in the table, or do nothing if at the table end.
+	 */
+	void moveDown();
+
+	/**
 	 * Performs a hit test at @a point, which is in canvas coordinates.
 	 *
 	 * The returned handle describes what was hit. @a threshold is a distance in points.
@@ -538,14 +558,43 @@ private:
 	/// Set of selected cells.
 	QSet<TableCell> m_selection;
 
-	/// Currently active cell.
-	TableCell m_activeCell;
 
 	/// Style of the table.
 	TableStyle m_style;
 
 	/// The table painter to paint the table with.
 	TablePainter* m_tablePainter;
+
+	/// Currently active cell.
+	TableCell m_activeCell;
+
+	/*
+	 * The two members below describe the active "logical position" on the table grid.
+	 * This position may or may not correspond with the position of the active cell.
+	 *
+	 * As an example, imagine the following scenario:
+	 *
+	 * +--------+--------+                            +--------+--------+
+	 * |        |        |                            |        | |      |
+	 * +--------+        |  --> User presses Tab -->  +--------+        |
+	 * | |      |        |                            |        |        |
+	 * +--------+--------+                            +--------+--------+
+	 *  Cursor in (1, 0)                               Cursor in (0, 1)
+	 *
+	 * The active cell is now the spanning cell at (0, 1). If we would use the row and
+	 * column of the active cell as the basis for keyboard navigation between cells,
+	 * then pressing Shift+Tab after the scenario above would bring the cursor into
+	 * cell (0, 0), not back to to (1, 0). Hence, in addition to the active cell, we
+	 * keep track of a "logical position". This is the logical position on the table
+	 * grid that is active. In the above scenario, the logical position would change
+	 * from (1, 0) to (1, 1).
+	 */
+
+	/// The logical active row.
+	int m_activeRow;
+
+	/// The logical active column.
+	int m_activeColumn;
 };
 
 #endif // PAGEITEM_TABLE_H
