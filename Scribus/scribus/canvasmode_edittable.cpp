@@ -337,16 +337,6 @@ void CanvasMode_EditTable::handleMouseDrag(QMouseEvent* event)
 
 void CanvasMode_EditTable::drawTextCursor(QPainter* p)
 {
-	if (m_table->activeCell().textFrame()->lastInFrame() < 0)
-	{
-		/*
-		 * Happens when a single-line text frame overflows and going
-		 * further will the call to commonDrawTextCursor(...) below
-		 * would result in a crash, so we just return instead.
-		 */
-		return;
-	}
-
 	if ((!m_longBlink && m_blinkTime.elapsed() > qApp->cursorFlashTime() / 2)
 		|| (m_longBlink && m_blinkTime.elapsed() > qApp->cursorFlashTime()))
 	{

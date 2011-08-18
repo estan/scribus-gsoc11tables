@@ -756,7 +756,7 @@ void CanvasMode::commonDrawTextCursor(QPainter* p, PageItem_TextFrame* textframe
 	{
 		// Happens often when typing directly into frame.
 		// And the cursor curses nothing, vertigo.
-		textCursorPos = textframe->lastInFrame();
+		textCursorPos = qMax(0, textframe->lastInFrame());
 		QChar textCursorChar = textframe->itemText.text(textCursorPos);
 		if (textCursorChar == SpecialChars::PARSEP || textCursorChar == SpecialChars::LINEBREAK)
 		{
