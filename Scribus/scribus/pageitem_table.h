@@ -175,6 +175,16 @@ public:
 	void resizeRow(int row, qreal height, ResizeStrategy strategy = MoveFollowing);
 
 	/**
+	 * Distributes the rows from @a startRow to @a endRow evenly.
+	 *
+	 * All rows in the range will have the same size while the height of the entire range will
+	 * remain unaffected.
+	 *
+	 * If the range is not in the table, this method does nothing.
+	 */
+	void distributeRows(int startRow, int endRow);
+
+	/**
 	 * Returns the position of @a row, or 0 if @a row does not exist.
 	 */
 	qreal rowPosition(int row) const;
@@ -218,6 +228,16 @@ public:
 	 * If @a column does not exists, this method does nothing.
 	 */
 	void resizeColumn(int column, qreal width, ResizeStrategy strategy = MoveFollowing);
+
+	/**
+	 * Distributes the columns from @a startColumn to @a endColumn evenly.
+	 *
+	 * All columns in the range will have the same size while the width of the entire range will
+	 * remain unaffected.
+	 *
+	 * If the range is not in the table, this method does nothing.
+	 */
+	void distributeColumns(int startColumn, int endColumn);
 
 	/**
 	 * Returns the position of @a column, or 0 if @a column does not exist.

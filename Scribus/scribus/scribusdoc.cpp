@@ -7229,6 +7229,88 @@ void ScribusDoc::itemSelection_SetTableColumnWidths()
 	changed();
 }
 
+void ScribusDoc::itemSelection_DistributeTableRowsEvenly()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	if (appMode == modeEditTable && !table->selectedRows().isEmpty())
+	{
+		// Distribute each contigous range of selected rows.
+		QList<int> selectedRows = table->selectedRows().toList();
+		qSort(selectedRows);
+		int startRow = selectedRows.first();
+		int endRow = startRow;
+		for (int i = 0; i < selectedRows.size() - 1; ++i)
+		{
+			if (selectedRows[i + 1] == endRow + 1)
+				endRow++; // Extend range.
+			else
+			{
+				table->distributeRows(startRow, endRow);
+				// Move range.
+				startRow = selectedRows[i + 1];
+				endRow = startRow;
+			}
+		}
+		table->distributeRows(startRow, endRow);
+	}
+	else
+	{
+		// Distribute all rows in the table.
+		table->distributeRows(0, table->rows() - 1);
+	}
+
+	table->update();
+	changed();
+}
+
+void ScribusDoc::itemSelection_DistributeTableColumnsEvenly()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	if (appMode == modeEditTable && !table->selectedColumns().isEmpty())
+	{
+		// Distribute each contigous range of selected columns.
+		QList<int> selectedColumns = table->selectedColumns().toList();
+		qSort(selectedColumns);
+		int startColumn = selectedColumns.first();
+		int endColumn = startColumn;
+		for (int i = 0; i < selectedColumns.size() - 1; ++i)
+		{
+			if (selectedColumns[i + 1] == endColumn + 1)
+				endColumn++; // Extend range.
+			else
+			{
+				table->distributeColumns(startColumn, endColumn);
+				// Move range.
+				startColumn = selectedColumns[i + 1];
+				endColumn = startColumn;
+			}
+		}
+		table->distributeColumns(startColumn, endColumn);
+	}
+	else
+	{
+		// Distribute all columns in the table.
+		table->distributeColumns(0, table->columns() - 1);
+	}
+
+	table->update();
+	changed();
+}
+
 void ScribusDoc::itemSelection_SetEffects(int s, Selection* customSelection)
 {
 	CharStyle newStyle;

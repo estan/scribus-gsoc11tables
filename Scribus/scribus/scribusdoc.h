@@ -1479,14 +1479,24 @@ public slots:
 	void itemSelection_SetTableColumnWidths();
 
 	/**
-	 * Distributes the selected rows in a table evenly, or all rows if no rows are selected.
+	 * Distributes rows in a table evenly.
+	 *
+	 * If in table edit mode and there is a cell selection, each contigous range of selected rows
+	 * is distributed. If there is no cell selection, all rows in the table are distributed.
+	 *
+	 * If there is no table selected, then this slot does nothing.
 	 */
-	void itemSelection_DistributeTableRowsEvenly() {}
+	void itemSelection_DistributeTableRowsEvenly();
 
 	/**
-	 * Distributes columns evenly in a selected table.
+	 * Distributes columns in a table evenly.
+	 *
+	 * If in table edit mode and there is a cell selection, each contigous range of selected columns
+	 * is distributed. If there is no cell selection, all columns in the table are distributed.
+	 *
+	 * If there is no table selected, then this slot does nothing.
 	 */
-	void itemSelection_DistributeTableColumnsEvenly() {}
+	void itemSelection_DistributeTableColumnsEvenly();
 
 	/**
 	 * Adjusts the size of the frames of any selected tables to fit the size of the tables they contain.

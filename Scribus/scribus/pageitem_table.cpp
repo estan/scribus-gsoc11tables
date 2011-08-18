@@ -320,6 +320,30 @@ void PageItem_Table::resizeRow(int row, qreal height, ResizeStrategy strategy)
 	ASSERT_VALID();
 }
 
+void PageItem_Table::distributeRows(int startRow, int endRow)
+{
+	if (startRow < 0 || endRow > rows() - 1 || startRow > endRow)
+		return;
+
+	const int numRows = endRow - startRow + 1;
+	const qreal newHeight = (rowPosition(endRow) + rowHeight(endRow) - rowPosition(startRow)) / numRows;
+
+	for (int row = startRow; row <= endRow; ++row)
+		resizeRow(row, newHeight);
+}
+
+void PageItem_Table::distributeColumns(int startColumn, int endColumn)
+{
+	if (startColumn < 0 || endColumn > columns() - 1 || startColumn > endColumn)
+		return;
+
+	const int numColumns = endColumn - startColumn + 1;
+	const qreal newWidth = (columnPosition(endColumn) + columnWidth(endColumn) - columnPosition(startColumn)) / numColumns;
+
+	for (int column = startColumn; column <= endColumn; ++column)
+		resizeColumn(column, newWidth);
+}
+
 qreal PageItem_Table::rowPosition(int row) const
 {
 	if (!validRow(row))
