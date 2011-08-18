@@ -90,6 +90,7 @@ for which a new license (GPL+exception) is in place.
 #include "selection.h"
 #include "serializer.h"
 #include "tableborder.h"
+#include "ui/tablecolumnwidthsdialog.h"
 #include "ui/tablerowheightsdialog.h"
 #include "ui/hruler.h"
 #include "ui/layers.h"
@@ -7172,6 +7173,53 @@ void ScribusDoc::itemSelection_SetTableRowHeights()
 		// Set height of all rows in table.
 		for (int row = 0; row < table->rows(); ++row)
 			table->resizeRow(row, rowHeight / unitRatio());
+	}
+
+	delete dialog;
+
+	table->clearSelection();
+	table->update();
+	changed();
+}
+
+void ScribusDoc::itemSelection_SetTableColumnWidths()
+{
+	PageItem* item = m_Selection->itemAt(0);
+	if (!item || !item->isTable())
+		return;
+
+	PageItem_Table* table = item->asTable();
+	if (!table)
+		return;
+
+	QPointer<TableColumnWidthsDialog> dialog = new TableColumnWidthsDialog(this, m_ScMW);
+	if (dialog->exec() == QDialog::Rejected)
+		return;
+
+	const qreal columnWidth = dialog->columnWidth();
+	if (appMode == modeEditTable)
+	{
+		if (table->selectedCells().isEmpty())
+		{
+			// Set width of columns spanned by active cell.
+			TableCell activeCell = table->activeCell();
+			int startColumn = activeCell.column();
+			int endColumn = startColumn + activeCell.columnSpan() - 1;
+			for (int column = startColumn; column <= endColumn; ++column)
+				table->resizeColumn(column, columnWidth / unitRatio());
+		}
+		else
+		{
+			// Set width of selected columns.
+			foreach (const int column, table->selectedColumns())
+				table->resizeColumn(column, columnWidth / unitRatio());
+		}
+	}
+	else
+	{
+		// Set width of all columns in table.
+		for (int column = 0; column < table->columns(); ++column)
+			table->resizeColumn(column, columnWidth / unitRatio());
 	}
 
 	delete dialog;

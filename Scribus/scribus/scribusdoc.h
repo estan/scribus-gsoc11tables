@@ -1467,9 +1467,16 @@ public slots:
 	void itemSelection_SetTableRowHeights();
 
 	/**
-	 * Sets the width of the selected column(s) in a table, or of the column containing the active cell.
+	 * Sets the width of columns in a table.
+	 *
+	 * The user will be prompted by a dialog for entering a column width. If in table editing
+	 * mode, all columns of the table will get their width set. If the there is a cell selection,
+	 * all columns spanned by the selection will get their width set. If there is no cell
+	 * selection, the columns spanned by the active cell will get their width set.
+	 *
+	 * If no table is selected, then this slot does nothing.
 	 */
-	void itemSelection_SetTableColumnWidths() {}
+	void itemSelection_SetTableColumnWidths();
 
 	/**
 	 * Distributes the selected rows in a table evenly, or all rows if no rows are selected.
