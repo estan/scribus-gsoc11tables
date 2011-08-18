@@ -1391,8 +1391,6 @@ public slots:
 
 	// Table related slots.
 
-	// TODO: Extend the docs for all of these once they are implemented.
-
 	/**
 	 * Inserts rows in a table.
 	 *
@@ -1451,6 +1449,8 @@ public slots:
 
 	/**
 	 * Splits cells in a table.
+	 *
+	 * TODO: Implement this.
 	 */
 	void itemSelection_SplitTableCells() {}
 
@@ -1500,11 +1500,15 @@ public slots:
 
 	/**
 	 * Adjusts the size of the frames of any selected tables to fit the size of the tables they contain.
+	 *
+	 * If there are no tables in the current selection, then this slot does nothing.
 	 */
 	void itemSelection_AdjustFrameToTable();
 
 	/**
 	 * Adjusts the size of any selected tables to fit the size of their frames.
+	 *
+	 * If there are no tables in the current selection, then this slot does nothing.
 	 */
 	void itemSelection_AdjustTableToFrame();
 
