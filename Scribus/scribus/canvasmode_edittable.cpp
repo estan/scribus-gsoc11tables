@@ -117,18 +117,30 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_Left:
 				// Move left
 				m_table->moveLeft();
+				m_longBlink = true;
+				m_cursorVisible = true;
+				m_blinkTime.restart();
 				return;
 			case Qt::Key_Right:
 				// Move right.
 				m_table->moveRight();
+				m_longBlink = true;
+				m_cursorVisible = true;
+				m_blinkTime.restart();
 				return;
 			case Qt::Key_Up:
 				// Move up.
 				m_table->moveUp();
+				m_longBlink = true;
+				m_cursorVisible = true;
+				m_blinkTime.restart();
 				return;
 			case Qt::Key_Down:
 				// Move down.
 				m_table->moveDown();
+				m_longBlink = true;
+				m_cursorVisible = true;
+				m_blinkTime.restart();
 				return;
 		}
 	}
