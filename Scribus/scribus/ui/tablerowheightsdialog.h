@@ -11,6 +11,8 @@ for which a new license (GPL+exception) is in place.
 
 #include "ui_tablerowheightsdialog.h"
 
+class ScribusDoc;
+
 /**
  * This is the dialog used when setting row heights on a table.
  */
@@ -18,14 +20,14 @@ class TableRowHeightsDialog : public QDialog, private Ui::TableRowHeightsDialog
 {
 	Q_OBJECT
 public:
-	/// Constructs a new dialog. The dialog will use the unit with index @a unitIndex.
-	explicit TableRowHeightsDialog(int unitIndex, QWidget *parent = 0);
+	/// Constructs a new dialog. The dialog will use the unit of @a doc.
+	explicit TableRowHeightsDialog(ScribusDoc* doc, QWidget *parent = 0);
 
-	/// Returns the number of rows the user entered.
-	qreal rowHeight() const { return tableRowHeight->getValue(); }
+	/// Returns the row height the user entered.
+	qreal rowHeight() const;
 
 private:
-	int m_unitIndex;
+	ScribusDoc* m_doc;
 };
 
 #endif // INSERTTABLEROWSDIALOG_H

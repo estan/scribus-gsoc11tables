@@ -7144,7 +7144,7 @@ void ScribusDoc::itemSelection_SetTableRowHeights()
 	if (!table)
 		return;
 
-	QPointer<TableRowHeightsDialog> dialog = new TableRowHeightsDialog(unitIndex(), m_ScMW);
+	QPointer<TableRowHeightsDialog> dialog = new TableRowHeightsDialog(this, m_ScMW);
 	if (dialog->exec() == QDialog::Rejected)
 		return;
 
@@ -7158,20 +7158,20 @@ void ScribusDoc::itemSelection_SetTableRowHeights()
 			int startRow = activeCell.row();
 			int endRow = startRow + activeCell.rowSpan() - 1;
 			for (int row = startRow; row <= endRow; ++row)
-				table->resizeRow(row, rowHeight);
+				table->resizeRow(row, rowHeight / unitRatio());
 		}
 		else
 		{
 			// Set height of selected rows.
 			foreach (const int row, table->selectedRows())
-				table->resizeRow(row, rowHeight);
+				table->resizeRow(row, rowHeight / unitRatio());
 		}
 	}
 	else
 	{
 		// Set height of all rows in table.
 		for (int row = 0; row < table->rows(); ++row)
-			table->resizeRow(row, rowHeight);
+			table->resizeRow(row, rowHeight / unitRatio());
 	}
 
 	delete dialog;
