@@ -30,4 +30,4 @@ private:
 	ScribusDoc* m_doc;
 };
 
-#endif // INSERTTABLEROWSDIALOG_H
+#endif // TABLEROWHEIGHTSDIALOG_H
