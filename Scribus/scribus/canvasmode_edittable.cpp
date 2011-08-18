@@ -29,6 +29,13 @@ for which a new license (GPL+exception) is in place.
 
 #include "canvasmode_edittable.h"
 
+// TODO: We should have a preference for this instead.
+#ifdef Q_OS_MAC
+	static const Qt::KeyboardModifiers CellNavigationModifiers = Qt::AltModifier | Qt::KeypadModifier;
+#else
+	static const Qt::KeyboardModifiers CellNavigationModifiers = Qt::AltModifier;
+#endif
+
 CanvasMode_EditTable::CanvasMode_EditTable(ScribusView* view) : CanvasMode(view),
 	m_table(0),
 	m_canvasUpdateTimer(new QTimer(view)),
@@ -103,7 +110,7 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 	}
 
 	// Handle keyboard navigation between cells.
-	if (event->modifiers() == Qt::AltModifier)
+	if (event->modifiers() == CellNavigationModifiers)
 	{
 		switch (event->key())
 		{
