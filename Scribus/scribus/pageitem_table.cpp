@@ -11,6 +11,7 @@ for which a new license (GPL+exception) is in place.
 #include <QDebug>
 #include <QList>
 #include <QMutableListIterator>
+#include <QMutableSetIterator>
 #include <QPointF>
 #include <QRectF>
 #include <QSet>
@@ -51,6 +52,8 @@ PageItem_Table::PageItem_Table(ScribusDoc *pa, double x, double y, double w, dou
 
 	adjustTableToFrame();
 	adjustFrameToTable();
+
+	ASSERT_VALID();
 }
 
 PageItem_Table::~PageItem_Table()
@@ -191,6 +194,15 @@ void PageItem_Table::removeRows(int index, int numRows)
 	// Update cells. TODO: Not for entire table.
 	updateCells();
 
+	// Remove any invalid cells from selection.
+	QMutableSetIterator<TableCell> cellIt(m_selection);
+	while (cellIt.hasNext())
+		if (!cellIt.next().isValid())
+			cellIt.remove();
+
+	// Move to cell above.
+	moveTo(cellAt(qMax(index - 1, 0), m_activeColumn));
+
 	emit changed();
 
 	ASSERT_VALID();
@@ -284,6 +296,15 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 
 	// Update cells. TODO: Not for entire table.
 	updateCells();
+
+	// Remove any invalid cells from selection.
+	QMutableSetIterator<TableCell> cellIt(m_selection);
+	while (cellIt.hasNext())
+		if (!cellIt.next().isValid())
+			cellIt.remove();
+
+	// Move to cell to the left.
+	moveTo(cellAt(m_activeRow, qMax(0, m_activeColumn - 1)));
 
 	emit changed();
 
@@ -417,7 +438,7 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 		}
 	}
 
-	// Set row/column span of new spanning cell, and finally add new area.
+	// Set row/column span of new spanning cell, and add new area.
 	TableCell newSpanningCell = cellAt(newArea.row(), newArea.column());
 	newSpanningCell.setRowSpan(newArea.height());
 	newSpanningCell.setColumnSpan(newArea.width());
@@ -425,6 +446,20 @@ void PageItem_Table::mergeCells(int row, int column, int numRows, int numCols)
 
 	// Update cells. TODO: Not for entire table.
 	updateCells();
+
+	// If merged area covers active position, move to the spanning cell.
+	if (newArea.contains(m_activeRow, m_activeColumn))
+		moveTo(newSpanningCell);
+
+	// Remove all cells covered by the merged area from the selection.
+	QMutableSetIterator<TableCell> cellIt(m_selection);
+	while (cellIt.hasNext())
+	{
+		TableCell cell = cellIt.next();
+		if (newArea.contains(cell.row(), cell.column()) &&
+			!(cell.row() == newArea.row() && cell.column() == newArea.column()))
+			cellIt.remove();
+	}
 
 	emit changed();
 
@@ -854,6 +889,8 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	m_Doc->cellStyles().connect(this, SLOT(handleStyleChanged()));
 
 	m_activeCell = cellAt(0, 0);
+	m_activeRow = 0;
+	m_activeColumn = 0;
 }
 
 void PageItem_Table::activateCell(const TableCell& cell)
@@ -1131,7 +1168,29 @@ void PageItem_Table::assertValid() const
 		}
 	}
 
-	// Check that we have a valid active cell.
+	// Check that the active position is in this table.
+	Q_ASSERT(validCell(m_activeRow, m_activeColumn));
+
+	// Check that the active cell is valid.
 	Q_ASSERT(m_activeCell.isValid());
 	Q_ASSERT(validCell(m_activeCell.row(), m_activeCell.column()));
+
+	// Check that selected cells are valid.
+	foreach (const TableCell& cell, m_selection)
+	{
+		Q_ASSERT(cell.isValid());
+		Q_ASSERT(validCell(cell.row(), cell.column()));
+	}
+
+	foreach (const CellArea& cellArea, m_cellAreas)
+	{
+		// Check that the active cell is not covered.
+		if (cellArea.contains(m_activeCell.row(), m_activeCell.column()))
+			Q_ASSERT(m_activeCell.row() == cellArea.row() && m_activeCell.column() == cellArea.column());
+
+		// Check that the selected cells are not covered.
+		foreach (const TableCell& cell, m_selection)
+			if (cellArea.contains(cell.row(), cell.column()))
+				Q_ASSERT(cell.row() == cellArea.row() && cell.column() == cellArea.column());
+	}
 }

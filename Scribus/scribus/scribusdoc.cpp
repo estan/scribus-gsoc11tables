@@ -6952,6 +6952,7 @@ void ScribusDoc::itemSelection_InsertTableRows()
 
 		// Insert the rows.
 		table->insertRows(index, dialog->numberOfRows());
+		table->clearSelection();
 		table->update();
 
 		changed();
@@ -6986,6 +6987,7 @@ void ScribusDoc::itemSelection_InsertTableColumns()
 
 		// Insert the columns.
 		table->insertColumns(index, dialog->numberOfColumns());
+		table->clearSelection();
 		table->update();
 
 		changed();
@@ -7041,7 +7043,7 @@ void ScribusDoc::itemSelection_DeleteTableRows()
 		table->removeRows(index, numRows);
 	}
 
-	table->clearSelection();
+	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
 	changed();
@@ -7094,7 +7096,7 @@ void ScribusDoc::itemSelection_DeleteTableColumns()
 		table->removeColumns(index, numColumns);
 	}
 
-	table->clearSelection();
+	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
 	changed();
@@ -7128,8 +7130,7 @@ void ScribusDoc::itemSelection_MergeTableCells()
 
 	table->mergeCells(row, column, numRows, numColumns);
 
-	table->clearSelection();
-	table->moveTo(table->cellAt(row, column));
+	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
 	changed();
@@ -7177,7 +7178,6 @@ void ScribusDoc::itemSelection_SetTableRowHeights()
 
 	delete dialog;
 
-	table->clearSelection();
 	table->update();
 	changed();
 }
@@ -7224,7 +7224,6 @@ void ScribusDoc::itemSelection_SetTableColumnWidths()
 
 	delete dialog;
 
-	table->clearSelection();
 	table->update();
 	changed();
 }
