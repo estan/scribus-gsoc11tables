@@ -338,13 +338,6 @@ public:
 	TableCell activeCell() const { return m_activeCell; }
 
 	/**
-	 * Sets the currently active cell to @a cell.
-	 *
-	 * If @a cell is invalid or not in this table, the cell at row 0, column 0 will be activated.
-	 */
-	void setActiveCell(const TableCell& cell);
-
-	/**
 	 * Moves left in the table, or do nothing if at the table end.
 	 */
 	void moveLeft();
@@ -363,6 +356,11 @@ public:
 	 * Moves down in the table, or do nothing if at the table end.
 	 */
 	void moveDown();
+
+	/**
+	 * Moves to @a cell, or the cell at row 0, column 0 if @a cell is invalid.
+	 */
+	void moveTo(const TableCell& cell);
 
 	/**
 	 * Performs a hit test at @a point, which is in canvas coordinates.
@@ -486,6 +484,9 @@ private:
 	 * Should be called once, and once only, during table construction.
 	 */
 	void initialize(int numRows, int numColumns);
+
+	/// Activates the cell @a cell, or the cell at row 0, column 0 if @a cell is invalid.
+	void activateCell(const TableCell& cell);
 
 	/// Returns true if @a row is a row in this table.
 	bool validRow(int row) const { return row >= 0 && row < m_rows; }

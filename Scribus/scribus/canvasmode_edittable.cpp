@@ -220,8 +220,8 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				m_view->startGesture(m_tableResizeGesture);
 				break;
 			case TableHandle::CellSelect:
-				// Set the active cell and position text cursor.
-				m_table->setActiveCell(m_table->cellAt(canvasPoint));
+				// Move to the pressed cell and position the text cursor.
+				m_table->moveTo(m_table->cellAt(canvasPoint));
 				m_view->slotSetCurs(event->globalPos().x(), event->globalPos().y());
 				m_lastCursorPos = m_table->activeCell().textFrame()->itemText.cursorPosition();
 				makeLongTextCursorBlink();

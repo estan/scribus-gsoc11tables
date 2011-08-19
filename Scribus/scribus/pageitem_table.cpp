@@ -534,44 +534,14 @@ TableCell PageItem_Table::cellAt(const QPointF& point) const
 		qUpperBound(m_columnPositions, gridPoint.x()) - m_columnPositions.begin() - 1);
 }
 
-void PageItem_Table::setActiveCell(const TableCell& cell)
-{
-	ASSERT_VALID();
-
-	TableCell newActiveCell = validCell(cell.row(), cell.column()) ? cell : cellAt(0, 0);
-
-	// Deselect previous active cell and its text.
-	m_activeCell.textFrame()->setSelected(false);
-	m_activeCell.textFrame()->itemText.deselectAll();
-
-	// Set the new active cell and select it.
-	m_activeCell = newActiveCell;
-	m_activeCell.textFrame()->setSelected(true);
-	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
-
-	// Set the active logical position.
-	m_activeRow = m_activeCell.row();
-	m_activeColumn = m_activeCell.column();
-
-	ASSERT_VALID();
-}
-
 void PageItem_Table::moveLeft()
 {
 	if (m_activeCell.column() < 1)
 		return;
 
-	// Deselect previous active cell and its text.
-	m_activeCell.textFrame()->setSelected(false);
-	m_activeCell.textFrame()->itemText.deselectAll();
-
-	// Move active logical position left.
+	// Move active position left and activate cell at new position.
 	m_activeColumn = m_activeCell.column() - 1;
-
-	// Set the new active cell and select it.
-	m_activeCell = cellAt(m_activeRow, m_activeColumn);
-	m_activeCell.textFrame()->setSelected(true);
-	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+	activateCell(cellAt(m_activeRow, m_activeColumn));
 }
 
 void PageItem_Table::moveRight()
@@ -579,17 +549,9 @@ void PageItem_Table::moveRight()
 	if (m_activeCell.column() + m_activeCell.columnSpan() >= columns())
 		return;
 
-	// Deselect previous active cell and its text.
-	m_activeCell.textFrame()->setSelected(false);
-	m_activeCell.textFrame()->itemText.deselectAll();
-
-	// Move active logical position right.
+	// Move active position right and activate cell at new position.
 	m_activeColumn = m_activeCell.column() + m_activeCell.columnSpan();
-
-	// Set the new active cell and select it.
-	m_activeCell = cellAt(m_activeRow, m_activeColumn);
-	m_activeCell.textFrame()->setSelected(true);
-	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+	activateCell(cellAt(m_activeRow, m_activeColumn));
 }
 
 void PageItem_Table::moveUp()
@@ -597,17 +559,9 @@ void PageItem_Table::moveUp()
 	if (m_activeCell.row() < 1)
 		return;
 
-	// Deselect previous active cell and its text.
-	m_activeCell.textFrame()->setSelected(false);
-	m_activeCell.textFrame()->itemText.deselectAll();
-
-	// Move active logical position up.
+	// Move active position up and activate cell at new position.
 	m_activeRow = m_activeCell.row() - 1;
-
-	// Set the new active cell and select it.
-	m_activeCell = cellAt(m_activeRow, m_activeColumn);
-	m_activeCell.textFrame()->setSelected(true);
-	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+	activateCell(cellAt(m_activeRow, m_activeColumn));
 }
 
 void PageItem_Table::moveDown()
@@ -626,6 +580,14 @@ void PageItem_Table::moveDown()
 	m_activeCell = cellAt(m_activeRow, m_activeColumn);
 	m_activeCell.textFrame()->setSelected(true);
 	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+}
+
+void PageItem_Table::moveTo(const TableCell& cell)
+{
+	// Activate the cell and move active position to its top left.
+	activateCell(cell);
+	m_activeRow = activeCell().row();
+	m_activeColumn = activeCell().column();
 }
 
 TableHandle PageItem_Table::hitTest(const QPointF& point, qreal threshold) const
@@ -892,6 +854,24 @@ void PageItem_Table::initialize(int numRows, int numColumns)
 	m_Doc->cellStyles().connect(this, SLOT(handleStyleChanged()));
 
 	m_activeCell = cellAt(0, 0);
+}
+
+void PageItem_Table::activateCell(const TableCell& cell)
+{
+	ASSERT_VALID();
+
+	TableCell newActiveCell = validCell(cell.row(), cell.column()) ? cell : cellAt(0, 0);
+
+	// Deselect previous active cell and its text.
+	m_activeCell.textFrame()->setSelected(false);
+	m_activeCell.textFrame()->itemText.deselectAll();
+
+	// Set the new active cell and select it.
+	m_activeCell = newActiveCell;
+	m_activeCell.textFrame()->setSelected(true);
+	m_Doc->currentStyle = m_activeCell.textFrame()->currentStyle();
+
+	ASSERT_VALID();
 }
 
 qreal PageItem_Table::maxLeftBorderWidth() const

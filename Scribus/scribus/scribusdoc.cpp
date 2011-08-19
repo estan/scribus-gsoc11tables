@@ -7129,7 +7129,7 @@ void ScribusDoc::itemSelection_MergeTableCells()
 	table->mergeCells(row, column, numRows, numColumns);
 
 	table->clearSelection();
-	table->setActiveCell(table->cellAt(row, column));
+	table->moveTo(table->cellAt(row, column));
 	table->update();
 
 	changed();
