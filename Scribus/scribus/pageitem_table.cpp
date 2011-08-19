@@ -824,8 +824,18 @@ void PageItem_Table::handleStyleChanged()
 
 void PageItem_Table::applicableActions(QStringList& actionList)
 {
-	actionList << "itemAdjustFrameToTable";
-	actionList << "itemAdjustTableToFrame";
+	actionList << "tableInsertRows";
+	actionList << "tableInsertColumns";
+	actionList << "tableDeleteRows";
+	actionList << "tableDeleteColumns";
+	actionList << "tableMergeCells";
+	actionList << "tableSplitCells";
+	actionList << "tableSetRowHeights";
+	actionList << "tableSetColumnWidths";
+	actionList << "tableDistributeRowsEvenly";
+	actionList << "tableDistributeColumnsEvenly";
+	actionList << "tableAdjustFrameToTable";
+	actionList << "tableAdjustTableToFrame";
 }
 
 void PageItem_Table::DrawObj_Item(ScPainter *p, QRectF /*e*/)
