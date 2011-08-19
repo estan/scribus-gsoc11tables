@@ -1050,9 +1050,14 @@ void PageItem_Table::updateSpans(int index, int number, ChangeType changeType)
 		// Check if the area was affected by the change.
 		if (newArea != oldArea)
 		{
-			if (newArea.height() < 2 && newArea.width() < 2)
+			if (newArea.height() < 1 || newArea.height() < 1)
 			{
-				// Adjusted area is 1x1 or less, so remove it.
+				// Adjusted area was annihilated, so remove it.
+				areaIt.remove();
+			}
+			else if (newArea.height() == 1 && newArea.width() == 1)
+			{
+				// Adjusted area is 1x1, so remove it.
 				areaIt.remove();
 
 				// And reset row/column span of spanning cell to 1.
