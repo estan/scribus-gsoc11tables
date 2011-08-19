@@ -21,11 +21,13 @@ for which a new license (GPL+exception) is in place.
 #include "cellarea.h"
 #include "fpoint.h"
 #include "pageitem_table.h"
+#include "scribus.h"
 #include "scribusdoc.h"
 #include "scribusview.h"
 #include "selection.h"
 #include "tablehandle.h"
 #include "util_icon.h"
+#include "ui/scmwmenumanager.h"
 
 #include "canvasmode_edittable.h"
 
@@ -239,7 +241,9 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 	}
 	else if (event->button() == Qt::RightButton)
 	{
-		qDebug() << "Show table context menu";
+		// Show the table popup menu.
+		qApp->changeOverrideCursor(Qt::ArrowCursor);
+		m_view->m_ScMW->scrMenuMgr->runMenuAtPos("ItemTable", event->globalPos());
 	}
 }
 

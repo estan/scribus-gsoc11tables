@@ -18,9 +18,11 @@ for which a new license (GPL+exception) is in place.
 #include "fpoint.h"
 #include "pageitem.h"
 #include "pageitem_table.h"
+#include "scribus.h"
 #include "scribusview.h"
 #include "tablecell.h"
 #include "tableutils.h"
+#include "ui/scmwmenumanager.h"
 
 #include "canvasgesture_cellselect.h"
 
@@ -43,14 +45,23 @@ void CellSelect::mousePressEvent(QMouseEvent* event)
 {
 	event->accept();
 
-	// Clear selection.
-	table()->clearSelection();
+	if (event->button() == Qt::RightButton)
+	{
+		// Show the table popup menu.
+		qApp->changeOverrideCursor(Qt::ArrowCursor);
+		m_view->m_ScMW->scrMenuMgr->runMenuAtPos("ItemTable", event->globalPos());
+	}
+	else
+	{
+		// Clear selection.
+		table()->clearSelection();
 
-	// Stop the gesture.
-	m_view->stopGesture();
+		// Stop the gesture.
+		m_view->stopGesture();
 
-	// Pass the mouse press to the delegate (table editing canvas mode).
-	delegate()->mousePressEvent(event);
+		// Pass the mouse press to the delegate (table editing canvas mode).
+		delegate()->mousePressEvent(event);
+	}
 }
 
 void CellSelect::mouseReleaseEvent(QMouseEvent* event)
