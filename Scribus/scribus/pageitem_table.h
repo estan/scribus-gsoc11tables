@@ -558,7 +558,6 @@ private:
 	/// Set of selected cells.
 	QSet<TableCell> m_selection;
 
-
 	/// Style of the table.
 	TableStyle m_style;
 
