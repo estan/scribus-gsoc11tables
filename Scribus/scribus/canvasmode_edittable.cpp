@@ -67,10 +67,10 @@ void CanvasMode_EditTable::activate(bool fromGesture)
 	m_table = item->asTable();
 
 	m_lastCursorPos = -1;
-	m_longBlink = true;
-	m_cursorVisible = true;
 	m_blinkTime.start();
 	m_canvasUpdateTimer->start(200);
+
+	makeLongTextCursorBlink();
 
 	if (fromGesture)
 		qApp->changeOverrideCursor(Qt::ArrowCursor);
@@ -93,7 +93,7 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 		m_view->requestMode(modeNormal);
 	}
 
-	// Determine if we want a long text cursor blink.
+	// Long text cursor blink on PgUp/PgDown/Up/Down/Home/End.
 	switch (event->key())
 	{
 		case Qt::Key_PageUp:
@@ -102,10 +102,7 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 		case Qt::Key_Down:
 		case Qt::Key_Home:
 		case Qt::Key_End:
-			m_longBlink = true;
-			break;
-		default:
-			m_longBlink = false;
+			makeLongTextCursorBlink();
 			break;
 	}
 
@@ -117,30 +114,22 @@ void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)
 			case Qt::Key_Left:
 				// Move left
 				m_table->moveLeft();
-				m_longBlink = true;
-				m_cursorVisible = true;
-				m_blinkTime.restart();
+				makeLongTextCursorBlink();
 				return;
 			case Qt::Key_Right:
 				// Move right.
 				m_table->moveRight();
-				m_longBlink = true;
-				m_cursorVisible = true;
-				m_blinkTime.restart();
+				makeLongTextCursorBlink();
 				return;
 			case Qt::Key_Up:
 				// Move up.
 				m_table->moveUp();
-				m_longBlink = true;
-				m_cursorVisible = true;
-				m_blinkTime.restart();
+				makeLongTextCursorBlink();
 				return;
 			case Qt::Key_Down:
 				// Move down.
 				m_table->moveDown();
-				m_longBlink = true;
-				m_cursorVisible = true;
-				m_blinkTime.restart();
+				makeLongTextCursorBlink();
 				return;
 		}
 	}
@@ -231,15 +220,11 @@ void CanvasMode_EditTable::mousePressEvent(QMouseEvent* event)
 				m_view->startGesture(m_tableResizeGesture);
 				break;
 			case TableHandle::CellSelect:
-				// Make a long cursor blink.
-				m_longBlink = true;
-				m_cursorVisible = true;
-				m_blinkTime.restart();
-
 				// Set the active cell and position text cursor.
 				m_table->setActiveCell(m_table->cellAt(canvasPoint));
 				m_view->slotSetCurs(event->globalPos().x(), event->globalPos().y());
 				m_lastCursorPos = m_table->activeCell().textFrame()->itemText.cursorPosition();
+				makeLongTextCursorBlink();
 				updateCanvas(true);
 				break;
 			case TableHandle::None:
@@ -373,4 +358,11 @@ void CanvasMode_EditTable::drawTextCursor(QPainter* p)
 		commonDrawTextCursor(p, m_table->activeCell().textFrame(), m_table->gridOffset());
 		p->restore();
 	}
+}
+
+void CanvasMode_EditTable::makeLongTextCursorBlink()
+{
+	m_cursorVisible = true;
+	m_longBlink = true;
+	m_blinkTime.restart();
 }

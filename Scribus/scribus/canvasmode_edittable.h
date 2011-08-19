@@ -61,6 +61,8 @@ private:
 	void handleMouseDrag(QMouseEvent* event);
 	/// Draws the text cursor for the currently active cell.
 	void drawTextCursor(QPainter* p);
+	/// Makes the next text cursor blink a long blink.
+	void makeLongTextCursorBlink();
 
 private:
 	/// Table being edited.
