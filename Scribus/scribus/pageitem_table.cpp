@@ -200,8 +200,8 @@ void PageItem_Table::removeRows(int index, int numRows)
 		if (!cellIt.next().isValid())
 			cellIt.remove();
 
-	// Move to cell above.
-	moveTo(cellAt(qMax(index - 1, 0), m_activeColumn));
+	// Move to cell below.
+	moveTo(cellAt(qMin(index + 1, rows() - 1), m_activeColumn));
 
 	emit changed();
 
@@ -303,8 +303,8 @@ void PageItem_Table::removeColumns(int index, int numColumns)
 		if (!cellIt.next().isValid())
 			cellIt.remove();
 
-	// Move to cell to the left.
-	moveTo(cellAt(m_activeRow, qMax(0, m_activeColumn - 1)));
+	// Move to cell to the right.
+	moveTo(cellAt(m_activeRow, qMin(m_activeColumn + 1, columns() - 1)));
 
 	emit changed();
 
