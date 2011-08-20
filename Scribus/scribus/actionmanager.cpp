@@ -438,9 +438,9 @@ void ActionManager::initItemMenuActions()
 	name="tableDeleteColumns";
 	scrActions->insert(name, new ScrAction(loadIcon("16/delete-table-columns.png"), loadIcon("22/delete-table-columns.png"), "", defaultKey(name), mainWindow));
 	name="tableMergeCells";
-	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
+	scrActions->insert(name, new ScrAction(loadIcon("16/merge-table-cells.png"), loadIcon("22/merge-table-cells.png"), "", defaultKey(name), mainWindow));
 	name="tableSplitCells";
-	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
+	scrActions->insert(name, new ScrAction(loadIcon("16/split-table-cells.png"), loadIcon("22/split-table-cells.png"), "", defaultKey(name), mainWindow));
 	name="tableSetRowHeights";
 	scrActions->insert(name, new ScrAction("", defaultKey(name), mainWindow));
 	name="tableSetColumnWidths";
