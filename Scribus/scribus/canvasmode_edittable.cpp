@@ -68,20 +68,23 @@ void CanvasMode_EditTable::activate(bool fromGesture)
 	Q_ASSERT(item && item->isTable());
 	m_table = item->asTable();
 
+	if (fromGesture)
+		qApp->changeOverrideCursor(Qt::ArrowCursor);
+
 	m_lastCursorPos = -1;
 	m_blinkTime.start();
 	m_canvasUpdateTimer->start(200);
-
 	makeLongTextCursorBlink();
 
-	if (fromGesture)
-		qApp->changeOverrideCursor(Qt::ArrowCursor);
+	m_view->m_ScMW->updateTableMenuActions();
 }
 
 void CanvasMode_EditTable::deactivate(bool forGesture)
 {
 	if (!forGesture)
 		m_canvasUpdateTimer->stop();
+
+	m_view->m_ScMW->updateTableMenuActions();
 }
 
 void CanvasMode_EditTable::keyPressEvent(QKeyEvent* event)

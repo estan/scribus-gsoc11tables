@@ -102,6 +102,7 @@ for which a new license (GPL+exception) is in place.
 #include "page.h"
 #include "pageitem_imageframe.h"
 #include "pageitem_latexframe.h"
+#include "pageitem_table.h"
 #include "pageitem_textframe.h"
 #include "pagesize.h"
 #include "pdflib.h"
@@ -2641,19 +2642,6 @@ void ScribusMainWindow::HaveNewSel(int SelectedType)
 	scrActions["itemUpdateImage"]->setEnabled(SelectedType==PageItem::ImageFrame && (currItem->PictureIsAvailable || currItem->asLatexFrame()));
 	scrActions["itemAdjustFrameToImage"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable && !currItem->isTableItem);
 	scrActions["itemAdjustImageToFrame"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable);
-	// TODO: Enabled state of some of these table actions should be dependant on app mode and cell selection.
-	scrActions["tableInsertRows"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableInsertColumns"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableDeleteRows"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableDeleteColumns"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableMergeCells"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableSplitCells"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableSetRowHeights"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableSetColumnWidths"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableDistributeRowsEvenly"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableDistributeColumnsEvenly"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableAdjustFrameToTable"]->setEnabled(SelectedType==PageItem::Table);
-	scrActions["tableAdjustTableToFrame"]->setEnabled(SelectedType==PageItem::Table);
 	scrActions["itemExtendedImageProperties"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable && currItem->pixm.imgInfo.valid);
 	scrActions["itemToggleInlineImage"]->setEnabled(SelectedType==PageItem::ImageFrame && currItem->PictureIsAvailable);
 	scrMenuMgr->setMenuEnabled("ItemPreviewSettings", SelectedType==PageItem::ImageFrame);
@@ -3194,6 +3182,8 @@ void ScribusMainWindow::HaveNewSel(int SelectedType)
 				pluginAction->setEnabled(ixplug->handleSelection(doc, SelectedType));
 		}
 	}
+
+	updateTableMenuActions();
 }
 
 void ScribusMainWindow::slotDocCh(bool /*reb*/)
@@ -4616,18 +4606,6 @@ bool ScribusMainWindow::DoFileClose()
 //		scrActions["itemSendToScrapbook"]->setEnabled(false);
 		scrMenuMgr->setMenuEnabled("itemSendToScrapbook", false);
 		scrActions["itemSendToPattern"]->setEnabled(false);
-		scrActions["tableInsertRows"]->setEnabled(false);
-		scrActions["tableInsertColumns"]->setEnabled(false);
-		scrActions["tableDeleteRows"]->setEnabled(false);
-		scrActions["tableDeleteColumns"]->setEnabled(false);
-		scrActions["tableMergeCells"]->setEnabled(false);
-		scrActions["tableSplitCells"]->setEnabled(false);
-		scrActions["tableSetRowHeights"]->setEnabled(false);
-		scrActions["tableSetColumnWidths"]->setEnabled(false);
-		scrActions["tableDistributeRowsEvenly"]->setEnabled(false);
-		scrActions["tableDistributeColumnsEvenly"]->setEnabled(false);
-		scrActions["tableAdjustFrameToTable"]->setEnabled(false);
-		scrActions["tableAdjustTableToFrame"]->setEnabled(false);
 		scrActions["itemAdjustFrameToImage"]->setEnabled(false);
 		scrActions["itemAdjustImageToFrame"]->setEnabled(false);
 		scrActions["itemExtendedImageProperties"]->setEnabled(false);
@@ -4711,6 +4689,9 @@ bool ScribusMainWindow::DoFileClose()
 		else
 			QDir::setCurrent( QDir::homePath() );
 	}
+
+	updateTableMenuActions();
+
 	return true;
 }
 
@@ -10148,4 +10129,34 @@ void ScribusMainWindow::enableTextActions(QMap<QString, QPointer<ScrAction> > *a
 	scrMenuMgr->setMenuEnabled("InsertQuote", enabled);
 	scrMenuMgr->setMenuEnabled("InsertSpace", enabled);
 	scrMenuMgr->setMenuEnabled("InsertLigature", enabled);
+}
+
+void ScribusMainWindow::updateTableMenuActions()
+{
+	// Determine state.
+	PageItem* item = doc ? doc->m_Selection->itemAt(0) : 0;
+	PageItem_Table* table = (item && item->isTable()) ? item->asTable() : 0;
+	const bool tableEdited = table && doc->appMode == modeEditTable;
+	const int tableRows = table ? table->rows() : 0;
+	const int tableColumns = table ? table->columns() : 0;
+	const int selectedRows = tableEdited ? table->selectedRows().size() : 0;
+	const int selectedColumns = tableEdited ? table->selectedColumns().size() : 0;
+	const int selectedCells = tableEdited ? table->selectedCells().size() : 0;
+
+	// Enable/disable menu actions.
+	scrMenuMgr->setMenuEnabled("ItemTable", table);
+	scrActions["tableInsertRows"]->setEnabled(table || (tableEdited && selectedCells < 1));
+	scrActions["tableInsertColumns"]->setEnabled(table || (tableEdited && selectedCells < 1));
+	scrActions["tableDeleteRows"]->setEnabled(tableEdited &&
+		((selectedRows < 1 && tableRows > 1) || (selectedRows > 0 && selectedRows < tableRows)));
+	scrActions["tableDeleteColumns"]->setEnabled(tableEdited &&
+		((selectedColumns < 1 && tableColumns > 1) || (selectedColumns > 0 && selectedColumns < tableColumns)));
+	scrActions["tableMergeCells"]->setEnabled(selectedCells > 1);
+	scrActions["tableSplitCells"]->setEnabled(false); // Not implemented.
+	scrActions["tableSetRowHeights"]->setEnabled(tableEdited);
+	scrActions["tableSetColumnWidths"]->setEnabled(tableEdited);
+	scrActions["tableDistributeRowsEvenly"]->setEnabled(selectedRows > 1);
+	scrActions["tableDistributeColumnsEvenly"]->setEnabled(selectedColumns > 1);
+	scrActions["tableAdjustFrameToTable"]->setEnabled(table);
+	scrActions["tableAdjustTableToFrame"]->setEnabled(table);
 }

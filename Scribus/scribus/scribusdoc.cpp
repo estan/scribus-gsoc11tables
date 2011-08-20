@@ -6955,6 +6955,7 @@ void ScribusDoc::itemSelection_InsertTableRows()
 		table->clearSelection();
 		table->update();
 
+		m_ScMW->updateTableMenuActions();
 		changed();
 	}
 
@@ -6990,6 +6991,7 @@ void ScribusDoc::itemSelection_InsertTableColumns()
 		table->clearSelection();
 		table->update();
 
+		m_ScMW->updateTableMenuActions();
 		changed();
 	}
 
@@ -7046,6 +7048,7 @@ void ScribusDoc::itemSelection_DeleteTableRows()
 	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
+	m_ScMW->updateTableMenuActions();
 	changed();
 }
 
@@ -7099,6 +7102,7 @@ void ScribusDoc::itemSelection_DeleteTableColumns()
 	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
+	m_ScMW->updateTableMenuActions();
 	changed();
 }
 
@@ -7133,6 +7137,7 @@ void ScribusDoc::itemSelection_MergeTableCells()
 	m_View->stopGesture(); // FIXME: Don't use m_View.
 	table->update();
 
+	m_ScMW->updateTableMenuActions();
 	changed();
 }
 
