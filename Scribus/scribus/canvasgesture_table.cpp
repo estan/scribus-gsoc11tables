@@ -83,6 +83,7 @@ void TableGesture::paintTableOutline(
 			{
 				p->drawLine(startPoint + offset, endPoint + offset);
 				startPoint.setY(bottom);
+				endPoint.setY(bottom);
 			}
 		}
 		if (endPoint.y() > startPoint.y())
@@ -106,6 +107,7 @@ void TableGesture::paintTableOutline(
 			{
 				p->drawLine(startPoint + offset, endPoint + offset);
 				startPoint.setX(right);
+				endPoint.setX(right);
 			}
 		}
 		if (endPoint.x() > startPoint.x())
